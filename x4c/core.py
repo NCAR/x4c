@@ -98,7 +98,7 @@ class XDataset:
 
         if weight_file is not None:
             # using a user-provided weight file for any unsupported regridding
-            ds_rgd = utils.regrid_cam_se(ds, weight_file=weight_file)
+            ds_rgd = utils.regrid_cam_se(self.ds, weight_file=weight_file)
         else:
             if grid[:2] == 'ne':
                 # SE grid
