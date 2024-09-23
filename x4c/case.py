@@ -1,4 +1,7 @@
 import os
+import glob
+import xarray as xr
+import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import multiprocessing as mp
@@ -207,3 +210,59 @@ class Timeseries:
         
     def copy(self):
         return deepcopy(self)
+
+class Climo:
+    def __init__(self, root_dir, casename):
+        self.root_dir = root_dir
+        self.casename = casename
+        utils.p_header(f'>>> case.root_dir: {self.root_dir}')
+        utils.p_header(f'>>> case.casename: {self.casename}')
+
+    def gen_MONS_climo(self, output_dirpath, climo_period=None):
+        output_dirpath = pathlib.Path(output_dirpath)
+        if not output_dirpath.exists():
+            output_dirpath.mkdir(parents=True, exist_ok=True)
+            utils.p_header(f'>>> output directory created at: {output_dirpath}')
+
+        paths = sorted(glob.glob(os.path.join(self.root_dir, '*_climo.nc')))
+        ds = core.open_mfdataset(paths)
+        if climo_period is None:
+            try:
+                climo_period = ds.attrs['climo_period']
+            except:
+                pass
+
+        if climo_period is not None:
+            fname = f'{self.casename}_{climo_period[0]}_{climo_period[1]}_MONS_climo.nc'
+        else:
+            fname = f'{self.casename}_MONS_climo.nc'
+
+        output_fpath = os.path.join(output_dirpath, fname)
+        ds.to_netcdf(output_fpath)
+        utils.p_header(f'>>> MONS_climo generated at: {output_fpath}')
+        self.MONS_climo_path = output_fpath
+        utils.p_success(f'>>> case.MONS_climo_path created')
+
+    def gen_seasons_climo(self, MONS_climo_path=None):
+        if MONS_climo_path is None:
+            MONS_climo_path = self.MONS_climo_path
+
+        ds = xr.open_dataset(MONS_climo_path)
+
+        sn_dict = {
+            'ANN': list(range(1, 13)),
+            'DJF': [12, 1, 2],
+            'MAM': [1, 2, 3],
+            'JJA': [6, 7, 8],
+            'SON': [9, 10, 11],
+        }
+
+        for sn, months in sn_dict.items():
+            output_fpath = MONS_climo_path.replace('MONS', sn)
+            if os.path.exists(output_fpath):
+                os.remove(output_fpath)
+
+            ds_mean = ds.sel(time=months).mean('time').expand_dims('time')
+            ds_mean = ds_mean.assign_coords(time=[ds.coords['time'][0]])
+            ds_mean.to_netcdf(output_fpath, unlimited_dims={'time':True})
+            utils.p_header(f'>>> {sn}_climo generated at: {output_fpath}')

@@ -12,7 +12,7 @@ x4c (xarray4cesm) is an Xarray extension that aims to support efficient and intu
 conda install -c conda-forge jupyter notebook xesmf
 
 # x4c
-pip install git+https://https://github.com/NCAR/x4c.git
+pip install git+https://github.com/NCAR/x4c.git
 ```
 
 
