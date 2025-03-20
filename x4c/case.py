@@ -345,7 +345,6 @@ class Means:
     def merge_means(self, sn, output_dirpath, overwrite=False, casetag=None):
         utils.p_header(f'>>> Processing season {sn}')
         paths = glob.glob(os.path.join(self.root_dir, sn, f'*_{sn}_means.nc'))
-        print(paths)
         if casetag is None:
             fname = f'{sn}_means.nc'
         else:
