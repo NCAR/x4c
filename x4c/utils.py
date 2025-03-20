@@ -102,15 +102,27 @@ def regrid_cam_se(ds, weight_file):
 
     return ds_out
 
-def annualize(ds, months=None):
+def annualize(ds, months=None, days_weighted=False):
     months = list(range(1, 13)) if months is None else np.abs(months)
     sds = ds.sel(time=ds['time.month'].isin(months))
     anchor = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
     idx = months[-1]-1
+
+    if days_weighted:
+        # weighted version
+        days_in_month = sds.time.dt.days_in_month
+        weights = days_in_month.groupby('time.year') / days_in_month.groupby('time.year').sum()
+        ds_weighted = sds * weights
+        ds_ann = ds_weighted.resample(time=f'YE-{anchor[idx]}').sum()
+        ds_ann = ds_ann.where(sds.notnull())
+    else:
+        ds_ann = sds.resample(time=f'YE-{anchor[idx]}').mean()  # unweighted version
+
     try:
-        ds_ann = sds.resample(time=f'YE-{anchor[idx]}').mean()  # new version
+        ds_ann.name = sds.name
     except:
-        ds_ann = sds.resample(time=f'A-{anchor[idx]}').mean()   # old version
+        pass
+
     return ds_ann
 
 def monthly2annual(ds):

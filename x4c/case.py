@@ -80,7 +80,7 @@ class Timeseries:
         if len(comps) == 1:
             return comps[0]
         elif len(comps) == 0:
-            if f'get_{vn}' in diags.DiagCalc.__dict__:
+            if f'get_{vn}' in self.diags.DiagCalc.__dict__:
                 utils.p_warning(f'>>> {vn} is a supported derived variable.')
             else:
                 raise ValueError('The input variable name is unknown.')
@@ -197,6 +197,76 @@ class Timeseries:
 
         utils.p_success(f'>>> {len(vns)} climo files created in: {output_dirpath}')
 
+    def get_ts(self, vn, comp, timespan=None, adjust_month=True, slicing=False, regrid=False, dlat=1, dlon=1):
+        grid = self.grid_dict[comp]
+        paths = self.get_paths(vn, comp=comp, timespan=timespan)
+        ds = core.open_mfdataset(paths, adjust_month=adjust_month)
+
+        if slicing: ds = ds.sel(time=slice(timespan[0], timespan[1]))
+
+        ds_out = ds
+        ds_out.attrs['comp'] = comp
+        ds_out.attrs['grid'] = grid
+        if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
+        return ds_out
+
+    def save_means(self, vn, comp, output_dirpath, timespan, adjust_month=True, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+        output_dirpath = pathlib.Path(output_dirpath)
+        if not output_dirpath.exists():
+            output_dirpath.mkdir(parents=True, exist_ok=True)
+            utils.p_success(f'>>> output directory created at: {output_dirpath}')
+
+        ds = self.get_ts(vn, comp, timespan=timespan, adjust_month=adjust_month, slicing=slicing, regrid=False)
+
+        sn_dict = {
+            'ANN': list(range(1, 13)),
+            'DJF': [12, 1, 2],
+            'MAM': [1, 2, 3],
+            'JJA': [6, 7, 8],
+            'SON': [9, 10, 11],
+        }
+
+        for sn, months in sn_dict.items():
+            output_subdirpath = pathlib.Path(os.path.join(output_dirpath, sn))
+            if not output_subdirpath.exists():
+                output_subdirpath.mkdir(parents=True, exist_ok=True)
+
+            fname = f'{timespan[0]}_{timespan[1]}_{vn}_{sn}_means.nc'
+            if self.casename is not None: fname = f'{self.casename}_{fname}'
+
+            out_path = os.path.join(output_subdirpath, fname)
+            if overwrite or not os.path.exists(out_path):
+                ds_ann = ds.x.annualize(months=months)
+                if regrid: ds_ann = ds_ann.x.regrid(dlat=dlat, dlon=dlon)
+                ds_ann.to_netcdf(out_path)
+                ds_ann.close()
+
+    def gen_means(self, output_dirpath, comp=None, vns=None, timespan=None, adjust_month=True, slicing=False,
+                  regrid=False, dlat=1, dlon=1, overwrite=False, nproc=1):
+
+        if comp is None:
+            raise ValueError('Please specify component via the argument `comp`.')
+
+        if vns is None:
+            vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
+
+        utils.p_header(f'>>> Generating seaonal means for {len(vns)} variables:')
+        for i in range(len(vns)//10+1):
+            print(vns[10*i:10*i+10])
+
+        if nproc == 1:
+            for vn in vns:
+                self.save_means(
+                    vn, comp, output_dirpath, timespan, adjust_month=adjust_month, slicing=slicing,
+                    regrid=regrid, dlat=dlat, dlon=dlon, overwrite=overwrite, 
+                )
+        else:
+            utils.p_hint(f'>>> nproc: {nproc}')
+            with mp.Pool(processes=nproc) as p:
+                arg_list = [(vn, comp, output_dirpath, timespan, adjust_month, slicing, regrid, dlat, dlon, overwrite) for vn in vns]
+                p.starmap(self.save_means, tqdm(arg_list, total=len(vns), desc=f'Generating seasonal mean files'))
+
+
     def clear_ds(self, vn=None):
         ''' Clear the existing `.ds` property
         '''
@@ -266,3 +336,46 @@ class Climo:
             ds_mean = ds_mean.assign_coords(time=[ds.coords['time'][0]])
             ds_mean.to_netcdf(output_fpath, unlimited_dims={'time':True})
             utils.p_header(f'>>> {sn}_climo generated at: {output_fpath}')
+
+class Means:
+    def __init__(self, root_dir):
+        self.root_dir = root_dir
+        utils.p_header(f'>>> case.root_dir: {self.root_dir}')
+
+    def merge_means(self, sn, output_dirpath, overwrite=False, casetag=None):
+        utils.p_header(f'>>> Processing season {sn}')
+        paths = glob.glob(os.path.join(self.root_dir, sn, f'*_{sn}_means.nc'))
+        print(paths)
+        if casetag is None:
+            fname = f'{sn}_means.nc'
+        else:
+            fname = f'{casetag}_{sn}_means.nc'
+        out_path = os.path.join(output_dirpath, fname)
+        if overwrite or not os.path.exists(out_path):
+            ds_list = []
+            for path in paths:
+                ds_tmp = core.open_dataset(path)
+                for k, v in ds_tmp.coords.items():
+                    try:
+                        if any(np.isnan(v.values)):
+                            ds_tmp = ds_tmp.drop_vars(k)
+                    except:
+                        pass
+                ds_list.append(ds_tmp)
+
+            utils.p_header(f'>>> Merging files')
+            ds = xr.merge(ds_list)
+            ds.to_netcdf(out_path)
+            utils.p_header(f'>>> Merged mean file saved at: {out_path}')
+        else:
+            utils.p_warning(f'>>> The result already exists. Skipping ...')
+
+    def merge_means_nproc(self, output_dirpath, sns=['ANN', 'DJF', 'MAM', 'JJA', 'SON'], overwrite=False, casetag=None, nproc=1):
+        if nproc == 1:
+            for sn in sns:
+                self.merge_means(sn, output_dirpath, overwrite=overwrite, casetag=casetag)
+        else:
+            utils.p_hint(f'>>> nproc: {nproc}')
+            with mp.Pool(processes=nproc) as p:
+                arg_list = [(sn, output_dirpath, overwrite, casetag) for sn in sns]
+                p.starmap(self.merge_means, tqdm(arg_list, total=len(sns), desc=f'Merging mean files'))

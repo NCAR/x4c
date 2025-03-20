@@ -213,7 +213,18 @@ class XDataset:
         if 'month' in ds.coords:
             ds = ds.rename({'month': 'time'})
         return ds
-        
+
+    def annualize(self, months=None, days_weighted=False):
+        ''' Annualize/seasonalize a `xarray.Dataset`
+
+        Args:
+            months (list of int): a list of integers to represent month combinations,
+                e.g., `None` means calendar year annualization, [7,8,9] means JJA annualization, and [-12,1,2] means DJF annualization
+
+        '''
+        ds_ann = utils.annualize(self.ds, months=months, days_weighted=days_weighted)
+        ds_ann.attrs = dict(self.ds.attrs)
+        return ds_ann
 
 @xr.register_dataarray_accessor('x')
 class XDataArray:
@@ -242,4 +253,16 @@ class XDataArray:
         if 'grid' in self.da.attrs: da.attrs['grid'] = self.da.attrs['grid']
         if 'month' in da.coords:
             da = da.rename({'month': 'time'})
+        return da
+
+    def annualize(self, months=None, days_weighted=False):
+        ''' Annualize/seasonalize a `xarray.DataArray`
+
+        Args:
+            months (list of int): a list of integers to represent month combinations,
+                e.g., [7,8,9] means JJA annualization, and [-12,1,2] means DJF annualization
+
+        '''
+        da = utils.annualize(self.da, months=months, days_weighted=days_weighted)
+        da = utils.update_attrs(da, self.da)
         return da
