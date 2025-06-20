@@ -63,7 +63,7 @@ Taking a clean installation as example, first let's create a new environment nam
 
 .. code-block:: bash
 
-    conda create -n x4c-env python=3.12
+    conda create -n x4c-env python=3.13   # supports Python 3.12 and 3.13
     conda activate x4c-env
 
 Then install some dependencies via :code:`conda`:

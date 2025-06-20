@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=db61ab07" />
@@ -375,8 +375,44 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-features">Core Features</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cesm-diagnostics">CESM Diagnostics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-x4c.core">Core Features</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.load_dataset"><code class="docutils literal notranslate"><span class="pre">load_dataset()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.open_mfdataset"><code class="docutils literal notranslate"><span class="pre">open_mfdataset()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataset"><code class="docutils literal notranslate"><span class="pre">XDataset</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataset.annualize"><code class="docutils literal notranslate"><span class="pre">XDataset.annualize()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataset.da"><code class="docutils literal notranslate"><span class="pre">XDataset.da</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataset.regrid"><code class="docutils literal notranslate"><span class="pre">XDataset.regrid()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray"><code class="docutils literal notranslate"><span class="pre">XDataArray</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.annualize"><code class="docutils literal notranslate"><span class="pre">XDataArray.annualize()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.ds"><code class="docutils literal notranslate"><span class="pre">XDataArray.ds</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.geo_mean"><code class="docutils literal notranslate"><span class="pre">XDataArray.geo_mean()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.get_plev"><code class="docutils literal notranslate"><span class="pre">XDataArray.get_plev()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.gm"><code class="docutils literal notranslate"><span class="pre">XDataArray.gm</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.gs"><code class="docutils literal notranslate"><span class="pre">XDataArray.gs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.nearest2d"><code class="docutils literal notranslate"><span class="pre">XDataArray.nearest2d()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.nhm"><code class="docutils literal notranslate"><span class="pre">XDataArray.nhm</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.nhs"><code class="docutils literal notranslate"><span class="pre">XDataArray.nhs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.plot"><code class="docutils literal notranslate"><span class="pre">XDataArray.plot()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.shm"><code class="docutils literal notranslate"><span class="pre">XDataArray.shm</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.shs"><code class="docutils literal notranslate"><span class="pre">XDataArray.shs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.somin"><code class="docutils literal notranslate"><span class="pre">XDataArray.somin</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.zm"><code class="docutils literal notranslate"><span class="pre">XDataArray.zm</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cesm-diagnostics">CESM Diagnostics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.calc"><code class="docutils literal notranslate"><span class="pre">Timeseries.calc()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.clear_ds"><code class="docutils literal notranslate"><span class="pre">Timeseries.clear_ds()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.gen_ts_spell"><code class="docutils literal notranslate"><span class="pre">Timeseries.gen_ts_spell()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.get_climo"><code class="docutils literal notranslate"><span class="pre">Timeseries.get_climo()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -390,11 +426,287 @@ document.write(`
                   
   <section id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
-<section id="core-features">
-<h2>Core Features<a class="headerlink" href="#core-features" title="Link to this heading">#</a></h2>
+<section id="module-x4c.core">
+<span id="core-features"></span><h2>Core Features<a class="headerlink" href="#module-x4c.core" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="x4c.core.load_dataset">
+<span class="sig-prename descclassname"><span class="pre">x4c.core.</span></span><span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.load_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Load a netCDF file and form a <cite>xarray.Dataset</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – path to the netCDF file</p></li>
+<li><p><strong>adjust_month</strong> (<em>bool</em>) – adjust the month of the <cite>xarray.Dataset</cite> (the default CESM output has a month shift)</p></li>
+<li><p><strong>comp</strong> (<em>str</em>) – the tag for CESM component, including “atm”, “ocn”, “lnd”, “ice”, and “rof”</p></li>
+<li><p><strong>grid</strong> (<em>str</em>) – the grid tag for the CESM output (e.g., ne16, g16)</p></li>
+<li><p><strong>vn</strong> (<em>str</em>) – variable name</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="x4c.core.open_mfdataset">
+<span class="sig-prename descclassname"><span class="pre">x4c.core.</span></span><span class="sig-name descname"><span class="pre">open_mfdataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.open_mfdataset" title="Link to this definition">#</a></dt>
+<dd><p>Open multiple netCDF files and form a <cite>xarray.Dataset</cite> in a lazy load mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – path to the netCDF file</p></li>
+<li><p><strong>adjust_month</strong> (<em>bool</em>) – adjust the month of the <cite>xarray.Dataset</cite> (the default CESM output has a month shift)</p></li>
+<li><p><strong>comp</strong> (<em>str</em>) – the tag for CESM component, including “atm”, “ocn”, “lnd”, “ice”, and “rof”</p></li>
+<li><p><strong>grid</strong> (<em>str</em>) – the grid tag for the CESM output (e.g., ne16, g16)</p></li>
+<li><p><strong>vn</strong> (<em>str</em>) – variable name</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="x4c.core.XDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">x4c.core.</span></span><span class="sig-name descname"><span class="pre">XDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataset" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="x4c.core.XDataset.annualize">
+<span class="sig-name descname"><span class="pre">annualize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time2year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataset.annualize" title="Link to this definition">#</a></dt>
+<dd><p>Annualize/seasonalize a <cite>xarray.Dataset</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>months</strong> (<em>list</em><em> of </em><em>int</em>) – a list of integers to represent month combinations,
+e.g., <cite>None</cite> means calendar year annualization, [7,8,9] means JJA annualization, and [-12,1,2] means DJF annualization</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataset.da">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">da</span></span><a class="headerlink" href="#x4c.core.XDataset.da" title="Link to this definition">#</a></dt>
+<dd><p>get its <cite>xarray.DataArray</cite> version</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.core.XDataset.regrid">
+<span class="sig-name descname"><span class="pre">regrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dlon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataset.regrid" title="Link to this definition">#</a></dt>
+<dd><p>Regrid the CESM output to a normal lat/lon grid</p>
+<p>Supported atmosphere regridding: ne16np4, ne16pg3, ne30np4, ne30pg3, ne120np4, ne120pg4 TO 1x1d / 2x2d.
+Supported ocean regridding: any grid similar to g16 TO 1x1d / 2x2d.
+For any other regridding, <cite>weight_file</cite> must be provided by the user.</p>
+<p>For the atmosphere grid regridding, the default method is area-weighted;
+while for the ocean grid, the default is bilinear.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dlon</strong> (<em>float</em>) – longitude spacing</p></li>
+<li><p><strong>dlat</strong> (<em>float</em>) – latitude spacing</p></li>
+<li><p><strong>weight_file</strong> (<em>str</em>) – the path to an ESMF-generated weighting file for regridding</p></li>
+<li><p><strong>gs</strong> (<em>str</em>) – grid style in ‘T’ or ‘U’ for the ocean grid</p></li>
+<li><p><strong>method</strong> (<em>str</em>) – regridding method for the ocean grid</p></li>
+<li><p><strong>periodic</strong> (<em>bool</em>) – the assumption of the periodicity of the data when perform the regrid method</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="x4c.core.XDataArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">x4c.core.</span></span><span class="sig-name descname"><span class="pre">XDataArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataArray" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.annualize">
+<span class="sig-name descname"><span class="pre">annualize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataArray.annualize" title="Link to this definition">#</a></dt>
+<dd><p>Annualize/seasonalize a <cite>xarray.DataArray</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>months</strong> (<em>list</em><em> of </em><em>int</em>) – a list of integers to represent month combinations,
+e.g., [7,8,9] means JJA annualization, and [-12,1,2] means DJF annualization</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.ds">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ds</span></span><a class="headerlink" href="#x4c.core.XDataArray.ds" title="Link to this definition">#</a></dt>
+<dd><p>get its <cite>xarray.Dataset</cite> version</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.geo_mean">
+<span class="sig-name descname"><span class="pre">geo_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latlon_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-90,</span> <span class="pre">90,</span> <span class="pre">0,</span> <span class="pre">360)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataArray.geo_mean" title="Link to this definition">#</a></dt>
+<dd><p>The lat-weighted mean given a lat/lon range or a climate index name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latlon_range</strong> (<em>tuple</em><em> or </em><em>list</em>) – the lat/lon range for lat-weighted average
+in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
+<li><p><strong>ind</strong> (<em>str</em>) – <p>a climate index name; supported names include:</p>
+<ul>
+<li><p>’nino3.4’</p></li>
+<li><p>’nino1+2’</p></li>
+<li><p>’nino3’</p></li>
+<li><p>’nino4’</p></li>
+<li><p>’tpi’</p></li>
+<li><p>’wp’</p></li>
+<li><p>’dmi’</p></li>
+<li><p>’iobw’</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.get_plev">
+<span class="sig-name descname"><span class="pre">get_plev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataArray.get_plev" title="Link to this definition">#</a></dt>
+<dd><p>See: <a class="reference external" href="https://geocat-comp.readthedocs.io/en/v2024.04.0/user_api/generated/geocat.comp.interpolation.interp_hybrid_to_pressure.html">https://geocat-comp.readthedocs.io/en/v2024.04.0/user_api/generated/geocat.comp.interpolation.interp_hybrid_to_pressure.html</a></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.gm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gm</span></span><a class="headerlink" href="#x4c.core.XDataArray.gm" title="Link to this definition">#</a></dt>
+<dd><p>the global area-weighted mean</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.gs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gs</span></span><a class="headerlink" href="#x4c.core.XDataArray.gs" title="Link to this definition">#</a></dt>
+<dd><p>the global area-weighted sum</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.nearest2d">
+<span class="sig-name descname"><span class="pre">nearest2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lon'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lon'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataArray.nearest2d" title="Link to this definition">#</a></dt>
+<dd><p>Select the nearest non-NaN grid point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>da</strong> – xarray.DataArray or Dataset</p></li>
+<li><p><strong>lat_name</strong> – names of coordinate variables in da</p></li>
+<li><p><strong>lon_name</strong> – names of coordinate variables in da</p></li>
+<li><p><strong>target_lat</strong> – float or 1D arrays of lat/lon values to match</p></li>
+<li><p><strong>target_lon</strong> – float or 1D arrays of lat/lon values to match</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>xarray.DataArray or Dataset sliced at nearest grid points</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.nhm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nhm</span></span><a class="headerlink" href="#x4c.core.XDataArray.nhm" title="Link to this definition">#</a></dt>
+<dd><p>the NH area-weighted mean</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.nhs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nhs</span></span><a class="headerlink" href="#x4c.core.XDataArray.nhs" title="Link to this definition">#</a></dt>
+<dd><p>the NH area-weighted sum</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latlon_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_clabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clevels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clabel_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Robinson'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PlateCarree'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central_longitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">180</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bad_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dimgray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_gridlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridline_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridline_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'--'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coastline_zorder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coastline_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_markersizes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colname_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_marker_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_site_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lgd_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_im</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.XDataArray.plot" title="Link to this definition">#</a></dt>
+<dd><p>The plotting functionality</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) – figure title</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em> or </em><em>list</em>) – figure size in format of (w, h)</p></li>
+<li><p><strong>ax</strong> (<cite>matplotlib.axes</cite>) – a <cite>matplotlib.axes</cite></p></li>
+<li><p><strong>latlon_range</strong> (<em>tuple</em><em> or </em><em>list</em>) – lat/lon range in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
+<li><p><strong>projection</strong> (<em>str</em>) – a projection name supported by <cite>Cartopy</cite></p></li>
+<li><p><strong>transform</strong> (<em>str</em>) – a projection name supported by <cite>Cartopy</cite></p></li>
+<li><p><strong>central_longitude</strong> (<em>float</em>) – the central longitude of the map to plot</p></li>
+<li><p><strong>proj_args</strong> (<em>dict</em>) – other keyword arguments for projection</p></li>
+<li><p><strong>add_gridlines</strong> (<em>bool</em>) – if True, the map will be added with gridlines</p></li>
+<li><p><strong>gridline_labels</strong> (<em>bool</em>) – if True, the lat/lon ticklabels will appear</p></li>
+<li><p><strong>gridline_style</strong> (<em>str</em>) – the gridline style, e.g., ‘-’, ‘–’</p></li>
+<li><p><strong>ssv</strong> (<cite>xarray.DataArray</cite>) – a sea surface variable used for plotting the coastlines</p></li>
+<li><p><strong>gs</strong> (<em>str</em>) – grid style in ‘T’ or ‘U’ for the ocean grid</p></li>
+<li><p><strong>coastline_zorder</strong> (<em>int</em>) – the layer order for the coastlines</p></li>
+<li><p><strong>coastline_width</strong> (<em>float</em>) – the width of the coastlines</p></li>
+<li><p><strong>df_sites</strong> (<cite>pandas.DataFrame</cite>) – a <cite>pandas.DataFrame</cite> that stores the information of a collection of sites</p></li>
+<li><p><strong>colname_dict</strong> (<em>dict</em>) – a dictionary of column names for <cite>df_sites</cite> in the “key:value” format “assumed name:real name”</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.shm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shm</span></span><a class="headerlink" href="#x4c.core.XDataArray.shm" title="Link to this definition">#</a></dt>
+<dd><p>the SH area-weighted mean</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.shs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shs</span></span><a class="headerlink" href="#x4c.core.XDataArray.shs" title="Link to this definition">#</a></dt>
+<dd><p>the SH area-weighted sum</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.somin">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">somin</span></span><a class="headerlink" href="#x4c.core.XDataArray.somin" title="Link to this definition">#</a></dt>
+<dd><p>the Southern Ocean min</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="x4c.core.XDataArray.zm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zm</span></span><a class="headerlink" href="#x4c.core.XDataArray.zm" title="Link to this definition">#</a></dt>
+<dd><p>the zonal mean</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="cesm-diagnostics">
 <h2>CESM Diagnostics<a class="headerlink" href="#cesm-diagnostics" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="x4c.case.Timeseries">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">x4c.case.</span></span><span class="sig-name descname"><span class="pre">Timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">casename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries" title="Link to this definition">#</a></dt>
+<dd><p>Initialize a CESM Timeseries case generated by CESM Postprocessing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root_dir</strong> (<em>str</em>) – the root directory of the CESM Timeseries output</p></li>
+<li><p><strong>grid_dict</strong> (<em>dict</em>) – the grid dictionary for different components</p></li>
+<li><p><strong>timestep</strong> (<em>int</em>) – the number of years stored in a single timeseries file</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.case.Timeseries.calc">
+<span class="sig-name descname"><span class="pre">calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recalculate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries.calc" title="Link to this definition">#</a></dt>
+<dd><p>Calculate a diagnostic spell</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.case.Timeseries.clear_ds">
+<span class="sig-name descname"><span class="pre">clear_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries.clear_ds" title="Link to this definition">#</a></dt>
+<dd><p>Clear the existing <cite>.ds</cite> property</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.case.Timeseries.gen_ts_spell">
+<span class="sig-name descname"><span class="pre">gen_ts_spell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dirpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries.gen_ts_spell" title="Link to this definition">#</a></dt>
+<dd><p>Generate timeseries based on a spell</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="x4c.case.Timeseries.get_climo">
+<span class="sig-name descname"><span class="pre">get_climo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slicing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries.get_climo" title="Link to this definition">#</a></dt>
+<dd><p>Generate the climatology file for the given variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slicing</strong> (<em>bool</em>) – could be problematic</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -434,8 +746,44 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-features">Core Features</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cesm-diagnostics">CESM Diagnostics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-x4c.core">Core Features</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.load_dataset"><code class="docutils literal notranslate"><span class="pre">load_dataset()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.open_mfdataset"><code class="docutils literal notranslate"><span class="pre">open_mfdataset()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataset"><code class="docutils literal notranslate"><span class="pre">XDataset</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataset.annualize"><code class="docutils literal notranslate"><span class="pre">XDataset.annualize()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataset.da"><code class="docutils literal notranslate"><span class="pre">XDataset.da</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataset.regrid"><code class="docutils literal notranslate"><span class="pre">XDataset.regrid()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray"><code class="docutils literal notranslate"><span class="pre">XDataArray</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.annualize"><code class="docutils literal notranslate"><span class="pre">XDataArray.annualize()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.ds"><code class="docutils literal notranslate"><span class="pre">XDataArray.ds</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.geo_mean"><code class="docutils literal notranslate"><span class="pre">XDataArray.geo_mean()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.get_plev"><code class="docutils literal notranslate"><span class="pre">XDataArray.get_plev()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.gm"><code class="docutils literal notranslate"><span class="pre">XDataArray.gm</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.gs"><code class="docutils literal notranslate"><span class="pre">XDataArray.gs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.nearest2d"><code class="docutils literal notranslate"><span class="pre">XDataArray.nearest2d()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.nhm"><code class="docutils literal notranslate"><span class="pre">XDataArray.nhm</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.nhs"><code class="docutils literal notranslate"><span class="pre">XDataArray.nhs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.plot"><code class="docutils literal notranslate"><span class="pre">XDataArray.plot()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.shm"><code class="docutils literal notranslate"><span class="pre">XDataArray.shm</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.shs"><code class="docutils literal notranslate"><span class="pre">XDataArray.shs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.somin"><code class="docutils literal notranslate"><span class="pre">XDataArray.somin</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.zm"><code class="docutils literal notranslate"><span class="pre">XDataArray.zm</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cesm-diagnostics">CESM Diagnostics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.calc"><code class="docutils literal notranslate"><span class="pre">Timeseries.calc()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.clear_ds"><code class="docutils literal notranslate"><span class="pre">Timeseries.clear_ds()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.gen_ts_spell"><code class="docutils literal notranslate"><span class="pre">Timeseries.gen_ts_spell()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.get_climo"><code class="docutils literal notranslate"><span class="pre">Timeseries.get_climo()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
