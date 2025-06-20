@@ -14,13 +14,13 @@ setup(
     url='https://github.com/NCAR/x4c',
     packages=find_packages(),
     include_package_data=True,
-    license='GPL-2.0',
+    license='Apache-2.0',
     zip_safe=False,
     keywords='Xarray, CESM, Climate Data Analysis and Visualization',
     classifiers=[
         'Natural Language :: English',
-        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
     ],
     install_requires=[
         'netCDF4',
