@@ -16,7 +16,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'x4c'
-copyright = f'2024, Feng Zhu, Jiang Zhu, Dan Amrhein, Sophia Macarewich, Bette Otto-Bliersner, Esther Brady'
+author = 'NSF NCAR'
+copyright = '2025, University Corporation for Atmospheric Research'
 
 
 # -- General configuration ---------------------------------------------------
@@ -67,11 +68,12 @@ html_theme = 'sphinx_book_theme'
 # html_theme = 'bootstrap'
 # html_theme = "sphinxawesome_theme"
 html_theme_options = {
-    'repository_url': 'https://github.com/fzhu2e/x4c',
+    'repository_url': 'https://github.com/NCAR/x4c',
     'use_edit_page_button': True,
     'use_repository_button': True,
     'use_issues_button': True,
     'use_fullscreen_button': False,
+    'extra_footer': '<em>The National Center for Atmospheric Research is sponsored by the National Science Foundation. Any opinions, findings and conclusions or recommendations expressed in this material do not necessarily reflect the views of the National Science Foundation.</em>',
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
