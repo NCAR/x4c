@@ -53,6 +53,8 @@ extensions = [
 ]
 
 html_logo = 'x4c-logo.png'
+html_favicon = 'x4c-logo.png'
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
