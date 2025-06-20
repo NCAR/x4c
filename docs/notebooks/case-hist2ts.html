@@ -1,0 +1,1341 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>&lt;no title&gt; &#8212; x4c  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=db61ab07" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=fca5bd30" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/case-hist2ts';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/x4c-logo.png" class="logo__image only-light" alt="x4c  documentation - Home"/>
+    <script>document.write(`<img src="../_static/x4c-logo.png" class="logo__image only-dark" alt="x4c  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../ug-installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="core-regrid.html">Regrid from a CESM grid to a lat/lon grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-geo_mean.html">Calculate the geo-spatial mean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-annualize.html">Annualize CESM output with flexible months</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-visualize.html">Basic visualizations</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ug-diags.html">CESM Diagnostics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diag-case.html">A “Timeseries Case” system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diag-spell.html">A “spell” system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diag-climo.html">Climatology (climo) files generation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../ug-api.html">API Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/fzhu2e/x4c" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fzhu2e/x4c/edit/main/notebooks/case-hist2ts.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fzhu2e/x4c/issues/new?title=Issue%20on%20page%20%2Fnotebooks/case-hist2ts.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/case-hist2ts.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1><no title></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="simple visible nav section-nav flex-column">
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
+
+import os
+os.chdir(&#39;/glade/u/home/fengzhu/Github/x4c/docsrc/notebooks&#39;)
+import numpy as np
+import x4c
+print(x4c.__version__)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2024.8.5.15
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>dirpath = &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2&#39;
+case = x4c.History(dirpath, casename=&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.root_dir: /glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.casename: b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.comps_info: {&#39;atm&#39;: (&#39;cam&#39;, &#39;h0&#39;), &#39;ocn&#39;: (&#39;pop&#39;, &#39;h&#39;), &#39;lnd&#39;: (&#39;clm2&#39;, &#39;h0&#39;), &#39;ice&#39;: (&#39;cice&#39;, &#39;h&#39;), &#39;rof&#39;: (&#39;rtm&#39;, &#39;h0&#39;)}</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;atm&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;ocn&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;lnd&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;ice&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;rof&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;atm&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;ocn&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;lnd&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;ice&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;rof&#34;] created</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>path_pattern = &#39;comp/hist/casename.mdl.h_str.date.nc&#39;
+paths = x4c.utils.find_paths(case.root_dir, path_pattern, comp=&#39;ocn&#39;, mdl=&#39;pop&#39;, h_str=&#39;h&#39;, verbose=True,
+                             avoid_list=[&#39;nday1&#39;, &#39;once&#39;])
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">path_pattern: ocn/*/*.pop.h.*[0-9].nc</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>case.get_paths(&#39;ocn&#39;, timespan=(5501, 5550))
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5501-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5502-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5503-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5504-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5505-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5506-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5507-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5508-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5509-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5510-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5511-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5512-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5513-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5514-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5515-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5516-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5517-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5518-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5519-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5520-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5521-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5522-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5523-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5524-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5525-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5526-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5527-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5528-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5529-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5530-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5531-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5532-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5533-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5534-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5535-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5536-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5537-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5538-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5539-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5540-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5541-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5542-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5543-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5544-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5545-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5546-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5547-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5548-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5549-12.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-01.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-02.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-03.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-04.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-05.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-06.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-07.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-08.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-09.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-10.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-11.nc&#39;,
+ &#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/archive/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2/ocn/hist/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2.pop.h.5550-12.nc&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>%%time
+
+case.gen_ts(
+    # comps={&#39;atm&#39;: [&#39;TS&#39;, &#39;T&#39;], &#39;ocn&#39;: [&#39;SALT&#39;]},
+    comps={&#39;atm&#39;: [&#39;TS&#39;]},
+    output_dirpath=&#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/timeseries&#39;,
+    scratch_dirpath=f&#39;/glade/derecho/scratch/fengzhu/x4c/gen_ts/test&#39;,
+    timespan=(5501, 5550),
+    timestep=50,
+    nproc=1,
+    overwrite=True,
+    compression=1,
+)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Processing component: atm</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Processing timespan: (5501, 5550)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Spliting history files: 100%|██████████| 600/600 [02:17&lt;00:00,  4.36it/s]
+Merging variables: 100%|██████████| 1/1 [00:02&lt;00:00,  2.87s/it]
+Moving generated files
+from: /glade/derecho/scratch/fengzhu/x4c/gen_ts/test
+Moving generated filesiv/uazn0034/fengzhu/CESM_output/timeseries: 0it [00:00, ?it/s]
+from: /glade/derecho/scratch/fengzhu/x4c/gen_ts/test
+to: /glade/campaign/univ/uazn0034/fengzhu/CESM_output/timeseries: 0it [00:00, ?it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+CPU times: user 1.02 s, sys: 391 ms, total: 1.41 s
+Wall time: 2min 30s
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>%%time
+
+case.gen_ts(
+    # comps={&#39;atm&#39;: [&#39;TS&#39;, &#39;T&#39;], &#39;ocn&#39;: [&#39;SALT&#39;]},
+    comps={&#39;atm&#39;: [&#39;TS&#39;], &#39;ocn&#39;: [&#39;SSH&#39;]},
+    output_dirpath=os.path.join(&#39;/glade/campaign/univ/uazn0034/fengzhu/CESM_output/timeseries&#39;, case.casename),
+    scratch_dirpath=f&#39;/glade/derecho/scratch/fengzhu/x4c/gen_ts/test&#39;,
+    timespan=(5501, 5501),
+    timestep=1,
+    nproc=1,
+    overwrite=True,
+    compression=1,
+)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Processing component: atm</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Processing timespan: (5501, 5501)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Spliting history files: 100%|██████████| 12/12 [00:00&lt;00:00, 15.09it/s]
+Merging variables: 100%|██████████| 1/1 [00:00&lt;00:00, 10.46it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Processing component: ocn</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Processing timespan: (5501, 5501)</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Spliting history files: 100%|██████████| 12/12 [00:03&lt;00:00,  3.10it/s]
+Merging variables: 100%|██████████| 1/1 [00:00&lt;00:00,  1.63it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Postprocessing component: atm</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+Moving generated files
+from: /glade/derecho/scratch/fengzhu/x4c/gen_ts/test
+to: /glade/campaign/univ/uazn0034/fengzhu/CESM_output/timeseries/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2
+Moving generated files [00:00&lt;?, ?it/s]
+from: /glade/derecho/scratch/fengzhu/x4c/gen_ts/test
+to: /glade/campaign/univ/uazn0034/fengzhu/CESM_output/timeseries/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2
+: 100%|██████████| 1/1 [00:00&lt;00:00, 706.47it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Postprocessing component: ocn</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+Moving generated files
+from: /glade/derecho/scratch/fengzhu/x4c/gen_ts/test
+to: /glade/campaign/univ/uazn0034/fengzhu/CESM_output/timeseries/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2
+Moving generated files [00:00&lt;?, ?it/s]
+from: /glade/derecho/scratch/fengzhu/x4c/gen_ts/test
+to: /glade/campaign/univ/uazn0034/fengzhu/CESM_output/timeseries/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.1.5xCO2.branch_461.2
+: 100%|██████████| 1/1 [00:00&lt;00:00, 753.02it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+CPU times: user 73.5 ms, sys: 152 ms, total: 225 ms
+Wall time: 5.69 s
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="simple visible nav section-nav flex-column">
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Feng Zhu, Jiang Zhu, Dan Amrhein, Sophia Macarewich, Bette Otto-Bliersner, Esther Brady.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

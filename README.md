@@ -5,15 +5,12 @@ x4c (xarray4cesm) is an Xarray extension that aims to support efficient and intu
 
 > **_Disclaimer:_**  This package is still in its early stage and under active development, and its API could be changed frequently.
 
-## Installation
+For more details, please refer to the documentation linked below.
 
-```bash
-# dependencies
-conda install -c conda-forge jupyter notebook xesmf
+## Documentation
 
-# x4c
-pip install git+https://github.com/NCAR/x4c.git
-```
++ Homepage: https://NCAR.github.io/x4c
++ Installation: https://NCAR.github.io/x4c/ug-installation.html
 
 
 ## License

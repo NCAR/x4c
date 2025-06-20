@@ -10,6 +10,9 @@ import datetime
 import collections.abc
 import cartopy.util
 import shutil
+import subprocess
+import warnings
+from scipy.spatial import cKDTree
 
 def p_header(text):
     print(ca.Fore.CYAN + ca.Style.BRIGHT + text + ca.Style.RESET_ALL)
@@ -95,7 +98,9 @@ def regrid_cam_se(ds, weight_file):
     )
 
     # Actually regrid, after renaming
-    regridded = regridder(updated.rename({"dummy": "lat", "ncol": "lon"}), keep_attrs=True)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        regridded = regridder(updated.rename({"dummy": "lat", "ncol": "lon"}), keep_attrs=True)
     # merge back any variables that didn't have the ncol dimension
     # And so were not regridded
     ds_out = xr.merge([dataset.drop_vars(regridded.variables, errors='ignore'), regridded])
@@ -193,7 +198,7 @@ def update_ds(ds, path, vn=None, comp=None, grid=None, adjust_month=False,
     if grid is not None: ds.attrs['grid'] = grid
 
     if 'comp' in ds.attrs:
-        grid_weight_dict = {
+        gw_dict = {
             'atm': 'area',
             'ocn': 'TAREA',
             'ice': 'tarea',
@@ -214,13 +219,13 @@ def update_ds(ds, path, vn=None, comp=None, grid=None, adjust_month=False,
             'lnd': 'lat',
         }
 
-        gw_name = grid_weight_dict[ds.attrs['comp']] if gw_name is None else gw_name
+        gw_name = gw_dict[ds.attrs['comp']] if gw_name is None else gw_name
         lat_name = lat_dict[ds.attrs['comp']] if lat_name is None else lat_name
         lon_name = lon_dict[ds.attrs['comp']] if lon_name is None else lon_name
 
-    if gw_name is not None and gw_name in ds: ds['gw'] = ds[gw_name]
-    if lat_name is not None and lat_name in ds: ds['lat'] = ds[lat_name]
-    if lon_name is not None and lon_name in ds: ds['lon'] = ds[lon_name]
+    if gw_name is not None and gw_name in ds: ds.attrs['gw'] = ds[gw_name]
+    if lat_name is not None and lat_name in ds: ds.attrs['lat'] = ds[lat_name]
+    if lon_name is not None and lon_name in ds: ds.attrs['lon'] = ds[lon_name]
 
     return ds
 
@@ -247,6 +252,13 @@ def add_cyclic_point(da):
     da_wrap = xr.DataArray(data_wrap, dims=da.dims, coords=da_new_coords)
     da_wrap.attrs = da.attrs.copy()
     return da_wrap
+
+def ds_lon360(ds, lon_name='lon'):
+    ''' Convert the longitude of an xarray.Dataset from (-180, 180) to (0, 360)
+    '''
+    ds_out = ds.assign_coords({lon_name: ((ds[lon_name] + 360) % 360)})
+    ds_out = ds_out.sortby(lon_name)
+    return ds_out
 
 def ann_modifier(da, ann_method, long_name=None):
     if long_name is None:
@@ -347,3 +359,60 @@ def move_with_overwrite(src, dst_dir):
         os.remove(dst)
 
     shutil.move(src, dst)
+
+def rsync_move(src_paths, dst_dir):
+    """
+    Move a file or directory from src to dst using rsync.
+    Equivalent to shutil.move, but more robust for large files and preserves metadata.
+    """
+    cmd = ['rsync', '-a']
+    for path in src_paths:
+        cmd += [str(path)]
+    cmd += [str(dst_dir)]
+    print('>>> {cmd}')
+    subprocess.run(cmd, check=True)
+
+
+def gcd(lat1, lon1, lat2, lon2, radius=6371.0):
+    ''' 2D Great Circle Distance [km]
+
+    Args:
+        radius (float): Earth radius
+    '''
+    # Convert degrees to radians
+    lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+    dlat, dlon = lat2 - lat1, lon2 - lon1
+    a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
+    c = 2 * np.arcsin(np.sqrt(a))
+    dist = radius * c
+    return dist
+
+
+def find_nearest2d(da:xr.DataArray, lat, lon, lat_name='lat', lon_name='lon', new_dim='sites', r=1):
+    da_res = da.sel({lat_name: lat, lon_name:lon}, method='nearest')
+    if da_res.isnull().any():
+        if isinstance(lat, (int, float)): lat = [lat]
+        if isinstance(lon, (int, float)): lon = [lon]
+        da_res_list = []
+        for la, lo in zip(lat, lon):
+            # da_sub = da.sel({lat_name: slice(la-r, la+r), lon_name: slice(lo-r, lo+r)})  # won't work for some cases
+            # mask_lat = (da.__dict__[lat_name] > la-r)&(da.__dict__[lat_name] < la+r)
+            # mask_lon = (da.__dict__[lon_name] > lo-r)&(da.__dict__[lon_name] < lo+r)
+            mask_lat = (da[lat_name] > la-r)&(da[lat_name] < la+r)
+            mask_lon = (da[lon_name] > lo-r)&(da[lon_name] < lo+r)
+            da_sub = da.sel({lat_name: mask_lat, lon_name: mask_lon})
+
+            dist = gcd(da_sub[lat_name], da_sub[lon_name], la, lo)
+            da_sub_valid = da_sub.where(~np.isnan(da_sub), drop=True)
+            valid_mask = ~np.isnan(da_sub_valid)
+            if valid_mask.sum() == 0:
+                raise ValueError('No valid values found. Please try larger `r` values.')
+
+            dist_min = dist.where(dist == dist.where(~np.isnan(da_sub_valid)).min(), drop=True)
+            nearest_lat = dist_min[lat_name].values.item()
+            nearest_lon = dist_min[lon_name].values.item()
+            da_res = da_sub_valid.sel({lat_name: nearest_lat, lon_name: nearest_lon}, method='nearest')
+            da_res_list.append(da_res)
+        da_res = xr.concat(da_res_list, dim=new_dim).squeeze()
+
+    return da_res

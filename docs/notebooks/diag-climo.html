@@ -1,0 +1,1117 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Climatology (climo) files generation &#8212; x4c  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=db61ab07" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=fca5bd30" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/diag-climo';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Reference" href="../ug-api.html" />
+    <link rel="prev" title="A “spell” system" href="diag-spell.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/x4c-logo.png" class="logo__image only-light" alt="x4c  documentation - Home"/>
+    <script>document.write(`<img src="../_static/x4c-logo.png" class="logo__image only-dark" alt="x4c  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../ug-installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="core-regrid.html">Regrid from a CESM grid to a lat/lon grid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-geo_mean.html">Calculate the geo-spatial mean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-annualize.html">Annualize CESM output with flexible months</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-visualize.html">Basic visualizations</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../ug-diags.html">CESM Diagnostics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="diag-case.html">A “Timeseries Case” system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diag-spell.html">A “spell” system</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Climatology (climo) files generation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../ug-api.html">API Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/fzhu2e/x4c" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fzhu2e/x4c/edit/main/notebooks/diag-climo.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/fzhu2e/x4c/issues/new?title=Issue%20on%20page%20%2Fnotebooks/diag-climo.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/diag-climo.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Climatology (climo) files generation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#SE2">SE2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#SE1">SE1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#FV2">FV2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#SE0.25">SE0.25</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Climatology-(climo)-files-generation">
+<h1>Climatology (climo) files generation<a class="headerlink" href="#Climatology-(climo)-files-generation" title="Link to this heading">#</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;/glade/u/home/fengzhu/Github/x4c/docsrc/notebooks&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">x4c</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x4c</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2024.6.6
+</pre></div></div>
+</div>
+<section id="SE2">
+<h2>SE2<a class="headerlink" href="#SE2" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/univ/ubrn0018/fengzhu/CESM_output/timeseries/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
+<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">Timeseries</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.root_dir: /glade/campaign/univ/ubrn0018/fengzhu/CESM_output/timeseries/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.path_pattern: comp/proc/tseries/month_1/casename.mdl.h_str.vn.timespan.nc</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.grid_dict: {&#39;atm&#39;: &#39;ne16&#39;, &#39;ocn&#39;: &#39;g16&#39;, &#39;lnd&#39;: &#39;ne16&#39;, &#39;rof&#39;: &#39;ne16&#39;, &#39;ice&#39;: &#39;g16&#39;}</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vars_info created</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vn_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ULONG&#39;</span><span class="p">,</span> <span class="s1">&#39;ULAT&#39;</span><span class="p">,</span> <span class="s1">&#39;TLONG&#39;</span><span class="p">,</span> <span class="s1">&#39;TLAT&#39;</span><span class="p">,</span> <span class="s1">&#39;KMT&#39;</span><span class="p">,</span> <span class="s1">&#39;KMU&#39;</span><span class="p">,</span> <span class="s1">&#39;REGION_MASK&#39;</span><span class="p">,</span> <span class="s1">&#39;UAREA&#39;</span><span class="p">,</span> <span class="s1">&#39;TAREA&#39;</span><span class="p">,</span> <span class="s1">&#39;HU&#39;</span><span class="p">,</span>
+<span class="s1">&#39;HT&#39;</span><span class="p">,</span> <span class="s1">&#39;DXU&#39;</span><span class="p">,</span> <span class="s1">&#39;DYU&#39;</span><span class="p">,</span> <span class="s1">&#39;DXT&#39;</span><span class="p">,</span> <span class="s1">&#39;DYT&#39;</span><span class="p">,</span> <span class="s1">&#39;HTN&#39;</span><span class="p">,</span> <span class="s1">&#39;HTE&#39;</span><span class="p">,</span> <span class="s1">&#39;HUS&#39;</span><span class="p">,</span> <span class="s1">&#39;HUW&#39;</span><span class="p">,</span> <span class="s1">&#39;ANGLE&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ANGLET&#39;</span><span class="p">,</span> <span class="s1">&#39;UVEL&#39;</span><span class="p">,</span> <span class="s1">&#39;UVEL2&#39;</span><span class="p">,</span> <span class="s1">&#39;VVEL&#39;</span><span class="p">,</span> <span class="s1">&#39;VVEL2&#39;</span><span class="p">,</span> <span class="s1">&#39;TEMP&#39;</span><span class="p">,</span> <span class="s1">&#39;dTEMP_POS_2D&#39;</span><span class="p">,</span> <span class="s1">&#39;dTEMP_NEG_2D&#39;</span><span class="p">,</span> <span class="s1">&#39;SALT&#39;</span><span class="p">,</span> <span class="s1">&#39;RHO&#39;</span><span class="p">,</span>
+<span class="s1">&#39;RHO_VINT&#39;</span><span class="p">,</span> <span class="s1">&#39;RESID_T&#39;</span><span class="p">,</span> <span class="s1">&#39;RESID_S&#39;</span><span class="p">,</span> <span class="s1">&#39;SU&#39;</span><span class="p">,</span> <span class="s1">&#39;SV&#39;</span><span class="p">,</span> <span class="s1">&#39;SSH&#39;</span><span class="p">,</span> <span class="s1">&#39;SSH2&#39;</span><span class="p">,</span> <span class="s1">&#39;SHF&#39;</span><span class="p">,</span> <span class="s1">&#39;SHF_QSW&#39;</span><span class="p">,</span> <span class="s1">&#39;SFWF&#39;</span><span class="p">,</span>
+<span class="s1">&#39;SFWF_WRST&#39;</span><span class="p">,</span> <span class="s1">&#39;TAUX&#39;</span><span class="p">,</span> <span class="s1">&#39;TAUX2&#39;</span><span class="p">,</span> <span class="s1">&#39;TAUY&#39;</span><span class="p">,</span> <span class="s1">&#39;TAUY2&#39;</span><span class="p">,</span> <span class="s1">&#39;FW&#39;</span><span class="p">,</span> <span class="s1">&#39;TFW_T&#39;</span><span class="p">,</span> <span class="s1">&#39;TFW_S&#39;</span><span class="p">,</span> <span class="s1">&#39;EVAP_F&#39;</span><span class="p">,</span> <span class="s1">&#39;PREC_F&#39;</span><span class="p">,</span>
+<span class="s1">&#39;SNOW_F&#39;</span><span class="p">,</span> <span class="s1">&#39;MELT_F&#39;</span><span class="p">,</span> <span class="s1">&#39;ROFF_F&#39;</span><span class="p">,</span> <span class="s1">&#39;IOFF_F&#39;</span><span class="p">,</span> <span class="s1">&#39;SALT_F&#39;</span><span class="p">,</span> <span class="s1">&#39;SENH_F&#39;</span><span class="p">,</span> <span class="s1">&#39;LWUP_F&#39;</span><span class="p">,</span> <span class="s1">&#39;LWDN_F&#39;</span><span class="p">,</span> <span class="s1">&#39;MELTH_F&#39;</span><span class="p">,</span> <span class="s1">&#39;IFRAC&#39;</span><span class="p">,</span>
+<span class="s1">&#39;PREC_16O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;PREC_18O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;PREC_HDO_F&#39;</span><span class="p">,</span> <span class="s1">&#39;EVAP_16O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;EVAP_18O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;EVAP_HDO_F&#39;</span><span class="p">,</span> <span class="s1">&#39;MELT_16O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;MELT_18O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;MELT_HDO_F&#39;</span><span class="p">,</span> <span class="s1">&#39;ROFF_16O_F&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ROFF_18O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;ROFF_HDO_F&#39;</span><span class="p">,</span> <span class="s1">&#39;IOFF_16O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;IOFF_18O_F&#39;</span><span class="p">,</span> <span class="s1">&#39;IOFF_HDO_F&#39;</span><span class="p">,</span> <span class="s1">&#39;R18O&#39;</span><span class="p">,</span> <span class="s1">&#39;FvPER_R18O&#39;</span><span class="p">,</span> <span class="s1">&#39;FvICE_R18O&#39;</span><span class="p">,</span> <span class="s1">&#39;RHDO&#39;</span><span class="p">,</span> <span class="s1">&#39;FvPER_RHDO&#39;</span><span class="p">,</span>
+<span class="s1">&#39;FvICE_RHDO&#39;</span><span class="p">,</span> <span class="s1">&#39;ND143&#39;</span><span class="p">,</span> <span class="s1">&#39;ND144&#39;</span><span class="p">,</span> <span class="s1">&#39;IAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;QSW_HBL&#39;</span><span class="p">,</span> <span class="s1">&#39;KVMIX&#39;</span><span class="p">,</span> <span class="s1">&#39;KVMIX_M&#39;</span><span class="p">,</span> <span class="s1">&#39;TPOWER&#39;</span><span class="p">,</span> <span class="s1">&#39;VDC_T&#39;</span><span class="p">,</span> <span class="s1">&#39;VDC_S&#39;</span><span class="p">,</span>
+<span class="s1">&#39;VVC&#39;</span><span class="p">,</span> <span class="s1">&#39;KAPPA_ISOP&#39;</span><span class="p">,</span> <span class="s1">&#39;KAPPA_THIC&#39;</span><span class="p">,</span> <span class="s1">&#39;HOR_DIFF&#39;</span><span class="p">,</span> <span class="s1">&#39;DIA_DEPTH&#39;</span><span class="p">,</span> <span class="s1">&#39;TLT&#39;</span><span class="p">,</span> <span class="s1">&#39;INT_DEPTH&#39;</span><span class="p">,</span> <span class="s1">&#39;UISOP&#39;</span><span class="p">,</span> <span class="s1">&#39;VISOP&#39;</span><span class="p">,</span> <span class="s1">&#39;WISOP&#39;</span><span class="p">,</span>
+<span class="s1">&#39;ADVT_ISOP&#39;</span><span class="p">,</span> <span class="s1">&#39;ADVS_ISOP&#39;</span><span class="p">,</span> <span class="s1">&#39;VNT_ISOP&#39;</span><span class="p">,</span> <span class="s1">&#39;VNS_ISOP&#39;</span><span class="p">,</span> <span class="s1">&#39;USUBM&#39;</span><span class="p">,</span> <span class="s1">&#39;VSUBM&#39;</span><span class="p">,</span> <span class="s1">&#39;WSUBM&#39;</span><span class="p">,</span> <span class="s1">&#39;HLS_SUBM&#39;</span><span class="p">,</span> <span class="s1">&#39;ADVT_SUBM&#39;</span><span class="p">,</span> <span class="s1">&#39;ADVS_SUBM&#39;</span><span class="p">,</span>
+<span class="s1">&#39;VNT_SUBM&#39;</span><span class="p">,</span> <span class="s1">&#39;VNS_SUBM&#39;</span><span class="p">,</span> <span class="s1">&#39;HDIFT&#39;</span><span class="p">,</span> <span class="s1">&#39;HDIFS&#39;</span><span class="p">,</span> <span class="s1">&#39;WVEL&#39;</span><span class="p">,</span> <span class="s1">&#39;WVEL2&#39;</span><span class="p">,</span> <span class="s1">&#39;UET&#39;</span><span class="p">,</span> <span class="s1">&#39;VNT&#39;</span><span class="p">,</span> <span class="s1">&#39;WTT&#39;</span><span class="p">,</span> <span class="s1">&#39;UES&#39;</span><span class="p">,</span>
+<span class="s1">&#39;VNS&#39;</span><span class="p">,</span> <span class="s1">&#39;WTS&#39;</span><span class="p">,</span> <span class="s1">&#39;ADVT&#39;</span><span class="p">,</span> <span class="s1">&#39;ADVS&#39;</span><span class="p">,</span> <span class="s1">&#39;PV&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;PD&#39;</span><span class="p">,</span> <span class="s1">&#39;QSW_HTP&#39;</span><span class="p">,</span> <span class="s1">&#39;QFLUX&#39;</span><span class="p">,</span> <span class="s1">&#39;HMXL&#39;</span><span class="p">,</span>
+<span class="s1">&#39;XMXL&#39;</span><span class="p">,</span> <span class="s1">&#39;TMXL&#39;</span><span class="p">,</span> <span class="s1">&#39;HBLT&#39;</span><span class="p">,</span> <span class="s1">&#39;XBLT&#39;</span><span class="p">,</span> <span class="s1">&#39;TBLT&#39;</span><span class="p">,</span> <span class="s1">&#39;BSF&#39;</span><span class="p">,</span> <span class="s1">&#39;MOC&#39;</span><span class="p">,</span> <span class="s1">&#39;N_HEAT&#39;</span><span class="p">,</span> <span class="s1">&#39;N_SALT&#39;</span><span class="p">]</span>
+
+<span class="n">vn_list2</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">case</span><span class="o">.</span><span class="n">vars_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">vn</span><span class="p">,</span> <span class="n">comp</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="n">vn_list2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vn</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="n">vn_list</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">vn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vn_list2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">vn</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ULONG
+ULAT
+TLONG
+TLAT
+KMT
+KMU
+REGION_MASK
+UAREA
+TAREA
+HU
+HT
+DXU
+DYU
+DXT
+DYT
+HTN
+HTE
+HUS
+HUW
+ANGLE
+ANGLET
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">6901</span><span class="p">,</span> <span class="mi">7000</span><span class="p">),</span>
+    <span class="c1"># vns=[&#39;TS&#39;, &#39;U&#39;, &#39;V&#39;],</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;ocn&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">regrid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Generating climo for 123 variables:</span>
+[&#39;ADVS&#39;, &#39;ADVS_ISOP&#39;, &#39;ADVS_SUBM&#39;, &#39;ADVT&#39;, &#39;ADVT_ISOP&#39;, &#39;ADVT_SUBM&#39;, &#39;BSF&#39;, &#39;DIA_DEPTH&#39;, &#39;EVAP_16O_F&#39;, &#39;EVAP_18O_F&#39;]
+[&#39;EVAP_F&#39;, &#39;EVAP_HDO_F&#39;, &#39;FW&#39;, &#39;FvICE_R18O&#39;, &#39;FvICE_RHDO&#39;, &#39;FvPER_R18O&#39;, &#39;FvPER_RHDO&#39;, &#39;HBLT&#39;, &#39;HDIFS&#39;, &#39;HDIFT&#39;]
+[&#39;HLS_SUBM&#39;, &#39;HMXL&#39;, &#39;HOR_DIFF&#39;, &#39;IAGE&#39;, &#39;IFRAC&#39;, &#39;INT_DEPTH&#39;, &#39;IOFF_16O_F&#39;, &#39;IOFF_18O_F&#39;, &#39;IOFF_F&#39;, &#39;IOFF_HDO_F&#39;]
+[&#39;KAPPA_ISOP&#39;, &#39;KAPPA_THIC&#39;, &#39;KVMIX&#39;, &#39;KVMIX_M&#39;, &#39;LWDN_F&#39;, &#39;LWUP_F&#39;, &#39;MELTH_F&#39;, &#39;MELT_16O_F&#39;, &#39;MELT_18O_F&#39;, &#39;MELT_F&#39;]
+[&#39;MELT_HDO_F&#39;, &#39;MOC&#39;, &#39;ND143&#39;, &#39;ND144&#39;, &#39;N_HEAT&#39;, &#39;N_SALT&#39;, &#39;PD&#39;, &#39;PREC_16O_F&#39;, &#39;PREC_18O_F&#39;, &#39;PREC_F&#39;]
+[&#39;PREC_HDO_F&#39;, &#39;PV&#39;, &#39;Q&#39;, &#39;QFLUX&#39;, &#39;QSW_HBL&#39;, &#39;QSW_HTP&#39;, &#39;RESID_S&#39;, &#39;RESID_T&#39;, &#39;RHDO&#39;, &#39;RHO&#39;]
+[&#39;RHO_VINT&#39;, &#39;ROFF_16O_F&#39;, &#39;ROFF_18O_F&#39;, &#39;ROFF_F&#39;, &#39;ROFF_HDO_F&#39;, &#39;SALT_F&#39;, &#39;SENH_F&#39;, &#39;SFWF&#39;, &#39;SFWF_WRST&#39;, &#39;SHF&#39;]
+[&#39;SHF_QSW&#39;, &#39;SNOW_F&#39;, &#39;SSH&#39;, &#39;SSH2&#39;, &#39;SSR18O&#39;, &#39;SSS&#39;, &#39;SU&#39;, &#39;SV&#39;, &#39;TAUX&#39;, &#39;TAUX2&#39;]
+[&#39;TAUY&#39;, &#39;TAUY2&#39;, &#39;TBLT&#39;, &#39;TFW_S&#39;, &#39;TFW_T&#39;, &#39;TLT&#39;, &#39;TMXL&#39;, &#39;TPOWER&#39;, &#39;UES&#39;, &#39;UET&#39;]
+[&#39;UISOP&#39;, &#39;USUBM&#39;, &#39;UVEL&#39;, &#39;UVEL2&#39;, &#39;VDC_S&#39;, &#39;VDC_T&#39;, &#39;VISOP&#39;, &#39;VNS&#39;, &#39;VNS_ISOP&#39;, &#39;VNS_SUBM&#39;]
+[&#39;VNT&#39;, &#39;VNT_ISOP&#39;, &#39;VNT_SUBM&#39;, &#39;VSUBM&#39;, &#39;VVC&#39;, &#39;VVEL&#39;, &#39;VVEL2&#39;, &#39;WISOP&#39;, &#39;WSUBM&#39;, &#39;WTS&#39;]
+[&#39;WTT&#39;, &#39;WVEL&#39;, &#39;WVEL2&#39;, &#39;XBLT&#39;, &#39;XMXL&#39;, &#39;dTEMP_NEG_2D&#39;, &#39;dTEMP_POS_2D&#39;, &#39;BWS_z49&#39;, &#39;BWT_z49&#39;, &#39;R18O&#39;]
+[&#39;SALT&#39;, &#39;SST&#39;, &#39;TEMP&#39;]
+<span class="ansi-black-intense-fg ansi-bold">&gt;&gt;&gt; nproc: 16</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Generating climo files:  26%|██▌       | 32/123 [00:01&lt;00:05, 16.53it/s]Process ForkPoolWorker-8:
+Process ForkPoolWorker-9:
+Process ForkPoolWorker-10:
+Process ForkPoolWorker-2:
+Process ForkPoolWorker-5:
+Process ForkPoolWorker-7:
+Process ForkPoolWorker-4:
+Process ForkPoolWorker-3:
+Process ForkPoolWorker-6:
+Process ForkPoolWorker-16:
+Process ForkPoolWorker-1:
+Process ForkPoolWorker-12:
+Process ForkPoolWorker-13:
+Generating climo files:  28%|██▊       | 35/123 [00:02&lt;00:07, 11.74it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">KeyboardInterrupt</span>                         Traceback (most recent call last)
+File <span class="ansi-green-fg">&lt;timed exec&gt;:2</span>
+
+File <span class="ansi-green-fg">~/Github/x4c/x4c/case.py:537</span>, in <span class="ansi-cyan-fg">Timeseries.gen_climo</span><span class="ansi-blue-fg">(self, output_dirpath, comp, timespan, vns, adjust_month, nproc, slicing, regrid, dlat, dlon, overwrite, chunk_nt)</span>
+<span class="ansi-green-intense-fg ansi-bold">    535</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">with</span> mp<span style="color: rgb(98,98,98)">.</span>Pool(processes<span style="color: rgb(98,98,98)">=</span>nproc) <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> p:
+<span class="ansi-green-intense-fg ansi-bold">    536</span>         arg_list <span style="color: rgb(98,98,98)">=</span> [(output_dirpath, v, comp, timespan, adjust_month, slicing, regrid, dlat, dlon, overwrite, chunk_nt) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> v <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> vns]
+<span class="ansi-green-fg">--&gt; 537</span>         <span class="ansi-yellow-bg">p</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">starmap</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">save_climo</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">tqdm</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">arg_list</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">total</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">len</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">vns</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">desc</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">f</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">Generating climo files</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    539</span> utils<span style="color: rgb(98,98,98)">.</span>p_success(<span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">&gt;&gt;&gt; </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span><span style="color: rgb(0,135,0)">len</span>(vns)<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)"> climo files created in: </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>output_dirpath<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)">&#39;</span>)
+
+File <span class="ansi-green-fg">/glade/work/fengzhu/conda-envs/xpp-env/lib/python3.11/multiprocessing/pool.py:375</span>, in <span class="ansi-cyan-fg">Pool.starmap</span><span class="ansi-blue-fg">(self, func, iterable, chunksize)</span>
+<span class="ansi-green-intense-fg ansi-bold">    369</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">starmap</span>(<span style="color: rgb(0,135,0)">self</span>, func, iterable, chunksize<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-intense-fg ansi-bold">    370</span> <span style="color: rgb(188,188,188)">    </span><span style="color: rgb(175,0,0)">&#39;&#39;&#39;</span>
+<span class="ansi-green-intense-fg ansi-bold">    371</span> <span style="color: rgb(175,0,0)">    Like `map()` method but the elements of the `iterable` are expected to</span>
+<span class="ansi-green-intense-fg ansi-bold">    372</span> <span style="color: rgb(175,0,0)">    be iterables as well and will be unpacked as arguments. Hence</span>
+<span class="ansi-green-intense-fg ansi-bold">    373</span> <span style="color: rgb(175,0,0)">    `func` and (a, b) becomes func(a, b).</span>
+<span class="ansi-green-intense-fg ansi-bold">    374</span> <span style="color: rgb(175,0,0)">    &#39;&#39;&#39;</span>
+<span class="ansi-green-fg">--&gt; 375</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_map_async</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">func</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">iterable</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">starmapstar</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">chunksize</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">/glade/work/fengzhu/conda-envs/xpp-env/lib/python3.11/multiprocessing/pool.py:768</span>, in <span class="ansi-cyan-fg">ApplyResult.get</span><span class="ansi-blue-fg">(self, timeout)</span>
+<span class="ansi-green-intense-fg ansi-bold">    767</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">get</span>(<span style="color: rgb(0,135,0)">self</span>, timeout<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-fg">--&gt; 768</span>     <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">wait</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">timeout</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    769</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>ready():
+<span class="ansi-green-intense-fg ansi-bold">    770</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">TimeoutError</span>
+
+File <span class="ansi-green-fg">/glade/work/fengzhu/conda-envs/xpp-env/lib/python3.11/multiprocessing/pool.py:765</span>, in <span class="ansi-cyan-fg">ApplyResult.wait</span><span class="ansi-blue-fg">(self, timeout)</span>
+<span class="ansi-green-intense-fg ansi-bold">    764</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">wait</span>(<span style="color: rgb(0,135,0)">self</span>, timeout<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-fg">--&gt; 765</span>     <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_event</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">wait</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">timeout</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">/glade/work/fengzhu/conda-envs/xpp-env/lib/python3.11/threading.py:629</span>, in <span class="ansi-cyan-fg">Event.wait</span><span class="ansi-blue-fg">(self, timeout)</span>
+<span class="ansi-green-intense-fg ansi-bold">    627</span> signaled <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_flag
+<span class="ansi-green-intense-fg ansi-bold">    628</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> signaled:
+<span class="ansi-green-fg">--&gt; 629</span>     signaled <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_cond</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">wait</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">timeout</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    630</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> signaled
+
+File <span class="ansi-green-fg">/glade/work/fengzhu/conda-envs/xpp-env/lib/python3.11/threading.py:327</span>, in <span class="ansi-cyan-fg">Condition.wait</span><span class="ansi-blue-fg">(self, timeout)</span>
+<span class="ansi-green-intense-fg ansi-bold">    325</span> <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:    <span style="color: rgb(95,135,135)"># restore state no matter what (e.g., KeyboardInterrupt)</span>
+<span class="ansi-green-intense-fg ansi-bold">    326</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> timeout <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg">--&gt; 327</span>         <span class="ansi-yellow-bg">waiter</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">acquire</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    328</span>         gotit <span style="color: rgb(98,98,98)">=</span> <span class="ansi-bold" style="color: rgb(0,135,0)">True</span>
+<span class="ansi-green-intense-fg ansi-bold">    329</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+
+<span class="ansi-red-fg">KeyboardInterrupt</span>:
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">6901</span><span class="p">,</span> <span class="mi">7000</span><span class="p">),</span>
+    <span class="c1"># vns=[&#39;TS&#39;, &#39;U&#39;, &#39;V&#39;],</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">regrid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Generating climo for 184 variables:</span>
+[&#39;ADRAIN&#39;, &#39;ADSNOW&#39;, &#39;AEROD_v&#39;, &#39;ANRAIN&#39;, &#39;ANSNOW&#39;, &#39;AODDUST1&#39;, &#39;AODDUST3&#39;, &#39;AODVIS&#39;, &#39;AQRAIN&#39;, &#39;AQSNOW&#39;]
+[&#39;AREI&#39;, &#39;AREL&#39;, &#39;AWNC&#39;, &#39;AWNI&#39;, &#39;BURDEN1&#39;, &#39;BURDEN2&#39;, &#39;BURDEN3&#39;, &#39;BURDENBC&#39;, &#39;BURDENDUST&#39;, &#39;BURDENPOM&#39;]
+[&#39;BURDENSEASALT&#39;, &#39;BURDENSO4&#39;, &#39;BURDENSOA&#39;, &#39;CCN3&#39;, &#39;CDNUMC&#39;, &#39;CLDHGH&#39;, &#39;CLDICE&#39;, &#39;CLDLIQ&#39;, &#39;CLDLOW&#39;, &#39;CLDMED&#39;]
+[&#39;CLDTOT&#39;, &#39;CLOUD&#39;, &#39;DCQ&#39;, &#39;DMS_SRF&#39;, &#39;DTCOND&#39;, &#39;DTV&#39;, &#39;DTWR_H2O2&#39;, &#39;DTWR_H2SO4&#39;, &#39;DTWR_SO2&#39;, &#39;FICE&#39;]
+[&#39;FLDS&#39;, &#39;FLNS&#39;, &#39;FLNSC&#39;, &#39;FLNT&#39;, &#39;FLNTC&#39;, &#39;FLUT&#39;, &#39;FLUTC&#39;, &#39;FREQI&#39;, &#39;FREQL&#39;, &#39;FREQR&#39;]
+[&#39;FREQS&#39;, &#39;FSDS&#39;, &#39;FSDSC&#39;, &#39;FSNS&#39;, &#39;FSNSC&#39;, &#39;FSNT&#39;, &#39;FSNTC&#39;, &#39;FSNTOA&#39;, &#39;FSNTOAC&#39;, &#39;FSUTOA&#39;]
+[&#39;H216OI&#39;, &#39;H216OL&#39;, &#39;H216OR&#39;, &#39;H216OS&#39;, &#39;H216OV&#39;, &#39;H216Or&#39;, &#39;H216Os&#39;, &#39;H218OI&#39;, &#39;H218OL&#39;, &#39;H218OR&#39;]
+[&#39;H218OS&#39;, &#39;H218OV&#39;, &#39;H218Or&#39;, &#39;H218Os&#39;, &#39;H2O2_SRF&#39;, &#39;H2OI&#39;, &#39;H2OL&#39;, &#39;H2OR&#39;, &#39;H2OS&#39;, &#39;H2OV&#39;]
+[&#39;H2Or&#39;, &#39;H2Os&#39;, &#39;H2SO4_SRF&#39;, &#39;HDOI&#39;, &#39;HDOL&#39;, &#39;HDOR&#39;, &#39;HDOS&#39;, &#39;HDOV&#39;, &#39;HDOr&#39;, &#39;HDOs&#39;]
+[&#39;ICEFRAC&#39;, &#39;ICIMR&#39;, &#39;ICWMR&#39;, &#39;IVT&#39;, &#39;IWC&#39;, &#39;LANDFRAC&#39;, &#39;LHFLX&#39;, &#39;LWCF&#39;, &#39;NUMICE&#39;, &#39;NUMLIQ&#39;]
+[&#39;OCNFRAC&#39;, &#39;OMEGA&#39;, &#39;OMEGAT&#39;, &#39;PBLH&#39;, &#39;PHIS&#39;, &#39;PRECC&#39;, &#39;PRECL&#39;, &#39;PRECRC_H216Or&#39;, &#39;PRECRC_H218Or&#39;, &#39;PRECRC_H2Or&#39;]
+[&#39;PRECRC_HDOr&#39;, &#39;PRECRL_H216OR&#39;, &#39;PRECRL_H218OR&#39;, &#39;PRECRL_H2OR&#39;, &#39;PRECRL_HDOR&#39;, &#39;PRECSC&#39;, &#39;PRECSC_H216Os&#39;, &#39;PRECSC_H218Os&#39;, &#39;PRECSC_H2Os&#39;, &#39;PRECSC_HDOs&#39;]
+[&#39;PRECSL&#39;, &#39;PRECSL_H216OS&#39;, &#39;PRECSL_H218OS&#39;, &#39;PRECSL_H2OS&#39;, &#39;PRECSL_HDOS&#39;, &#39;PS&#39;, &#39;PSL&#39;, &#39;Q&#39;, &#39;QFLX&#39;, &#39;QRAINC&#39;]
+[&#39;QRAINS&#39;, &#39;QREFHT&#39;, &#39;QRL&#39;, &#39;QRS&#39;, &#39;QSNOWC&#39;, &#39;QSNOWS&#39;, &#39;RELHUM&#39;, &#39;SHFLX&#39;, &#39;SNOWHICE&#39;, &#39;SNOWHLND&#39;]
+[&#39;SO2_SRF&#39;, &#39;SOAG_SRF&#39;, &#39;SOLIN&#39;, &#39;SWCF&#39;, &#39;T&#39;, &#39;TAUGWX&#39;, &#39;TAUGWY&#39;, &#39;TAUX&#39;, &#39;TAUY&#39;, &#39;TGCLDCWP&#39;]
+[&#39;TGCLDIWP&#39;, &#39;TGCLDLWP&#39;, &#39;TMQ&#39;, &#39;TREFHT&#39;, &#39;TS&#39;, &#39;TSMN&#39;, &#39;TSMX&#39;, &#39;U&#39;, &#39;U10&#39;, &#39;UU&#39;]
+[&#39;V&#39;, &#39;VD01&#39;, &#39;VQ&#39;, &#39;VT&#39;, &#39;VU&#39;, &#39;VV&#39;, &#39;WGUSTD&#39;, &#39;WSUB&#39;, &#39;Z3&#39;, &#39;bc_a1_SRF&#39;]
+[&#39;dst_a1_SRF&#39;, &#39;dst_a3_SRF&#39;, &#39;ncl_a1_SRF&#39;, &#39;ncl_a2_SRF&#39;, &#39;ncl_a3_SRF&#39;, &#39;num_a1_SRF&#39;, &#39;num_a2_SRF&#39;, &#39;num_a3_SRF&#39;, &#39;pom_a1_SRF&#39;, &#39;so4_a1_SRF&#39;]
+[&#39;so4_a2_SRF&#39;, &#39;so4_a3_SRF&#39;, &#39;soa_a1_SRF&#39;, &#39;soa_a2_SRF&#39;]
+<span class="ansi-black-intense-fg ansi-bold">&gt;&gt;&gt; nproc: 16</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Generating climo files: 100%|██████████| 184/184 [01:09&lt;00:00,  2.65it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; 184 climo files created in: /glade/derecho/scratch/fengzhu/ADF/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005/climo</span>
+CPU times: user 2.99 s, sys: 669 ms, total: 3.66 s
+Wall time: 1min 32s
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">6901</span><span class="p">,</span> <span class="mi">7000</span><span class="p">),</span>
+    <span class="n">vns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TS&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">],</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">6501</span><span class="p">,</span> <span class="mi">7000</span><span class="p">),</span>
+    <span class="n">vns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TS&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">],</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">6501</span><span class="p">,</span> <span class="mi">7000</span><span class="p">),</span>
+    <span class="n">vns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TS&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">],</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">6901</span><span class="p">,</span> <span class="mi">7000</span><span class="p">),</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="SE1">
+<h2>SE1<a class="headerlink" href="#SE1" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/cgd/ppc/jiangzhu/iCESM1.3_hires/b.e13.B1850C5.ne30_g16.icesm13_ihesp.PI.002&#39;</span>
+<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">Timeseries</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">grid_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;atm&#39;</span><span class="p">:</span> <span class="s1">&#39;ne30&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.root_dir: /glade/campaign/cgd/ppc/jiangzhu/iCESM1.3_hires/b.e13.B1850C5.ne30_g16.icesm13_ihesp.PI.002</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.path_pattern: comp/proc/tseries/month_1/casename.mdl.h_str.vn.timespan.nc</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.grid_dict: {&#39;atm&#39;: &#39;ne30&#39;, &#39;ocn&#39;: &#39;g16&#39;, &#39;lnd&#39;: &#39;ne30&#39;, &#39;rof&#39;: &#39;ne30&#39;, &#39;ice&#39;: &#39;g16&#39;}</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vars_info created</span>
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne30_g16.icesm13_ihesp.PI.002&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+    <span class="n">vns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TS&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">],</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne30_g16.icesm13_ihesp.PI.002&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">casename</span><span class="o">=</span><span class="n">casename</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+    <span class="n">vns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TS&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">],</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne30_g16.icesm13_ihesp.PI.002&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="FV2">
+<h2>FV2<a class="headerlink" href="#FV2" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/cgd/ppc/jiangzhu/iCESM1.3/b.e13.Bi1850C5.f19_g16.05&#39;</span>
+<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">Timeseries</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">grid_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;atm&#39;</span><span class="p">:</span> <span class="s1">&#39;f19&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.Bi1850C5.f19_g16.05&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+    <span class="n">slicing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="SE0.25">
+<h2>SE0.25<a class="headerlink" href="#SE0.25" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/cgd/ppc/jiangzhu/paleoweather/b.e13.B1850C5.ne120_g16.icesm13_ihesp.PI.003&#39;</span>
+<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">Timeseries</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">grid_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;atm&#39;</span><span class="p">:</span> <span class="s1">&#39;ne120&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.root_dir: /glade/campaign/cgd/ppc/jiangzhu/paleoweather/b.e13.B1850C5.ne120_g16.icesm13_ihesp.PI.003</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.path_pattern: comp/proc/tseries/month_1/casename.mdl.h_str.vn.timespan.nc</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.grid_dict: {&#39;atm&#39;: &#39;ne120&#39;, &#39;ocn&#39;: &#39;g16&#39;, &#39;lnd&#39;: &#39;ne120&#39;, &#39;rof&#39;: &#39;ne120&#39;, &#39;ice&#39;: &#39;g16&#39;}</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vars_info created</span>
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne120_g16.icesm13_ihesp.PI.003&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">41</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+    <span class="c1"># vns=[&#39;TS&#39;],</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">regrid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Generating climo for 193 variables:</span>
+[&#39;ADRAIN&#39;, &#39;ADSNOW&#39;, &#39;AEROD_v&#39;, &#39;ANRAIN&#39;, &#39;ANSNOW&#39;, &#39;AODDUST1&#39;, &#39;AODDUST3&#39;, &#39;AODVIS&#39;, &#39;AQRAIN&#39;, &#39;AQSNOW&#39;]
+[&#39;AREI&#39;, &#39;AREL&#39;, &#39;AWNC&#39;, &#39;AWNI&#39;, &#39;BURDEN1&#39;, &#39;BURDEN2&#39;, &#39;BURDEN3&#39;, &#39;BURDENBC&#39;, &#39;BURDENDUST&#39;, &#39;BURDENPOM&#39;]
+[&#39;BURDENSEASALT&#39;, &#39;BURDENSO4&#39;, &#39;BURDENSOA&#39;, &#39;CCN3&#39;, &#39;CDNUMC&#39;, &#39;CLDHGH&#39;, &#39;CLDICE&#39;, &#39;CLDLIQ&#39;, &#39;CLDLOW&#39;, &#39;CLDMED&#39;]
+[&#39;CLDTOT&#39;, &#39;CLOUD&#39;, &#39;CMFMC&#39;, &#39;CMFMCDZM&#39;, &#39;DCQ&#39;, &#39;DMS_SRF&#39;, &#39;DTCOND&#39;, &#39;DTV&#39;, &#39;DTWR_H2O2&#39;, &#39;DTWR_H2SO4&#39;]
+[&#39;DTWR_SO2&#39;, &#39;EMISCLD&#39;, &#39;FICE&#39;, &#39;FLDS&#39;, &#39;FLDSC&#39;, &#39;FLNS&#39;, &#39;FLNSC&#39;, &#39;FLNT&#39;, &#39;FLNTC&#39;, &#39;FLUT&#39;]
+[&#39;FLUTC&#39;, &#39;FREQI&#39;, &#39;FREQL&#39;, &#39;FREQR&#39;, &#39;FREQS&#39;, &#39;FREQZM&#39;, &#39;FSDS&#39;, &#39;FSDSC&#39;, &#39;FSNS&#39;, &#39;FSNSC&#39;]
+[&#39;FSNT&#39;, &#39;FSNTC&#39;, &#39;FSNTOA&#39;, &#39;FSNTOAC&#39;, &#39;FSUTOA&#39;, &#39;H216OI&#39;, &#39;H216OL&#39;, &#39;H216OR&#39;, &#39;H216OS&#39;, &#39;H216OV&#39;]
+[&#39;H216Or&#39;, &#39;H216Os&#39;, &#39;H218OI&#39;, &#39;H218OL&#39;, &#39;H218OR&#39;, &#39;H218OS&#39;, &#39;H218OV&#39;, &#39;H218Or&#39;, &#39;H218Os&#39;, &#39;H2O2_SRF&#39;]
+[&#39;H2OI&#39;, &#39;H2OL&#39;, &#39;H2OR&#39;, &#39;H2OS&#39;, &#39;H2OV&#39;, &#39;H2Or&#39;, &#39;H2Os&#39;, &#39;H2SO4_SRF&#39;, &#39;HDOI&#39;, &#39;HDOL&#39;]
+[&#39;HDOR&#39;, &#39;HDOS&#39;, &#39;HDOV&#39;, &#39;HDOr&#39;, &#39;HDOs&#39;, &#39;ICEFRAC&#39;, &#39;ICIMR&#39;, &#39;ICWMR&#39;, &#39;IVT&#39;, &#39;IWC&#39;]
+[&#39;LANDFRAC&#39;, &#39;LHFLX&#39;, &#39;LWCF&#39;, &#39;NUMICE&#39;, &#39;NUMLIQ&#39;, &#39;OCNFRAC&#39;, &#39;OMEGA&#39;, &#39;OMEGAT&#39;, &#39;PBLH&#39;, &#39;PCLDBOT&#39;]
+[&#39;PCLDTOP&#39;, &#39;PHIS&#39;, &#39;PRECC&#39;, &#39;PRECL&#39;, &#39;PRECRC_H216Or&#39;, &#39;PRECRC_H218Or&#39;, &#39;PRECRC_H2Or&#39;, &#39;PRECRC_HDOr&#39;, &#39;PRECRL_H216OR&#39;, &#39;PRECRL_H218OR&#39;]
+[&#39;PRECRL_H2OR&#39;, &#39;PRECRL_HDOR&#39;, &#39;PRECSC&#39;, &#39;PRECSC_H216Os&#39;, &#39;PRECSC_H218Os&#39;, &#39;PRECSC_H2Os&#39;, &#39;PRECSC_HDOs&#39;, &#39;PRECSL&#39;, &#39;PRECSL_H216OS&#39;, &#39;PRECSL_H218OS&#39;]
+[&#39;PRECSL_H2OS&#39;, &#39;PRECSL_HDOS&#39;, &#39;PS&#39;, &#39;PSL&#39;, &#39;Q&#39;, &#39;QFLX&#39;, &#39;QRAINC&#39;, &#39;QRAINS&#39;, &#39;QREFHT&#39;, &#39;QRL&#39;]
+[&#39;QRS&#39;, &#39;QSNOWC&#39;, &#39;QSNOWS&#39;, &#39;RELHUM&#39;, &#39;SHFLX&#39;, &#39;SNOWHICE&#39;, &#39;SNOWHLND&#39;, &#39;SO2_SRF&#39;, &#39;SOAG_SRF&#39;, &#39;SOLIN&#39;]
+[&#39;SWCF&#39;, &#39;T&#39;, &#39;TAUGWX&#39;, &#39;TAUGWY&#39;, &#39;TAUX&#39;, &#39;TAUY&#39;, &#39;TGCLDCWP&#39;, &#39;TGCLDIWP&#39;, &#39;TGCLDLWP&#39;, &#39;TMQ&#39;]
+[&#39;TREFHT&#39;, &#39;TREFHTMN&#39;, &#39;TREFHTMX&#39;, &#39;TS&#39;, &#39;TSMN&#39;, &#39;TSMX&#39;, &#39;U&#39;, &#39;U10&#39;, &#39;UU&#39;, &#39;V&#39;]
+[&#39;VD01&#39;, &#39;VQ&#39;, &#39;VT&#39;, &#39;VU&#39;, &#39;VV&#39;, &#39;WGUSTD&#39;, &#39;WSUB&#39;, &#39;Z3&#39;, &#39;bc_a1_SRF&#39;, &#39;dst_a1_SRF&#39;]
+[&#39;dst_a3_SRF&#39;, &#39;ncl_a1_SRF&#39;, &#39;ncl_a2_SRF&#39;, &#39;ncl_a3_SRF&#39;, &#39;num_a1_SRF&#39;, &#39;num_a2_SRF&#39;, &#39;num_a3_SRF&#39;, &#39;pom_a1_SRF&#39;, &#39;so4_a1_SRF&#39;, &#39;so4_a2_SRF&#39;]
+[&#39;so4_a3_SRF&#39;, &#39;soa_a1_SRF&#39;, &#39;soa_a2_SRF&#39;]
+<span class="ansi-black-intense-fg ansi-bold">&gt;&gt;&gt; nproc: 16</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Generating climo files: 100%|██████████| 193/193 [10:38&lt;00:00,  3.31s/it]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; 193 climo files created in: /glade/derecho/scratch/fengzhu/ADF/b.e13.B1850C5.ne120_g16.icesm13_ihesp.PI.003/climo</span>
+CPU times: user 166 ms, sys: 242 ms, total: 408 ms
+Wall time: 20min 39s
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">case</span><span class="o">.</span><span class="n">casename</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne120_g16.icesm13_ihesp.PI.003&#39;</span>
+<span class="k">case</span><span class="o">.</span><span class="n">gen_climo</span><span class="p">(</span>
+    <span class="n">output_dirpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/glade/derecho/scratch/fengzhu/ADF/</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">casename</span><span class="si">}</span><span class="s1">/climo_30yrs_noChunks&#39;</span><span class="p">,</span>
+    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">regrid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; output directory created at: /glade/derecho/scratch/fengzhu/ADF/b.e13.B1850C5.ne120_g16.icesm13_ihesp.PI.003/climo_30yrs_noChunks</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; Generating climo for 193 variables:</span>
+[&#39;ADRAIN&#39;, &#39;ADSNOW&#39;, &#39;AEROD_v&#39;, &#39;ANRAIN&#39;, &#39;ANSNOW&#39;, &#39;AODDUST1&#39;, &#39;AODDUST3&#39;, &#39;AODVIS&#39;, &#39;AQRAIN&#39;, &#39;AQSNOW&#39;]
+[&#39;AREI&#39;, &#39;AREL&#39;, &#39;AWNC&#39;, &#39;AWNI&#39;, &#39;BURDEN1&#39;, &#39;BURDEN2&#39;, &#39;BURDEN3&#39;, &#39;BURDENBC&#39;, &#39;BURDENDUST&#39;, &#39;BURDENPOM&#39;]
+[&#39;BURDENSEASALT&#39;, &#39;BURDENSO4&#39;, &#39;BURDENSOA&#39;, &#39;CCN3&#39;, &#39;CDNUMC&#39;, &#39;CLDHGH&#39;, &#39;CLDICE&#39;, &#39;CLDLIQ&#39;, &#39;CLDLOW&#39;, &#39;CLDMED&#39;]
+[&#39;CLDTOT&#39;, &#39;CLOUD&#39;, &#39;CMFMC&#39;, &#39;CMFMCDZM&#39;, &#39;DCQ&#39;, &#39;DMS_SRF&#39;, &#39;DTCOND&#39;, &#39;DTV&#39;, &#39;DTWR_H2O2&#39;, &#39;DTWR_H2SO4&#39;]
+[&#39;DTWR_SO2&#39;, &#39;EMISCLD&#39;, &#39;FICE&#39;, &#39;FLDS&#39;, &#39;FLDSC&#39;, &#39;FLNS&#39;, &#39;FLNSC&#39;, &#39;FLNT&#39;, &#39;FLNTC&#39;, &#39;FLUT&#39;]
+[&#39;FLUTC&#39;, &#39;FREQI&#39;, &#39;FREQL&#39;, &#39;FREQR&#39;, &#39;FREQS&#39;, &#39;FREQZM&#39;, &#39;FSDS&#39;, &#39;FSDSC&#39;, &#39;FSNS&#39;, &#39;FSNSC&#39;]
+[&#39;FSNT&#39;, &#39;FSNTC&#39;, &#39;FSNTOA&#39;, &#39;FSNTOAC&#39;, &#39;FSUTOA&#39;, &#39;H216OI&#39;, &#39;H216OL&#39;, &#39;H216OR&#39;, &#39;H216OS&#39;, &#39;H216OV&#39;]
+[&#39;H216Or&#39;, &#39;H216Os&#39;, &#39;H218OI&#39;, &#39;H218OL&#39;, &#39;H218OR&#39;, &#39;H218OS&#39;, &#39;H218OV&#39;, &#39;H218Or&#39;, &#39;H218Os&#39;, &#39;H2O2_SRF&#39;]
+[&#39;H2OI&#39;, &#39;H2OL&#39;, &#39;H2OR&#39;, &#39;H2OS&#39;, &#39;H2OV&#39;, &#39;H2Or&#39;, &#39;H2Os&#39;, &#39;H2SO4_SRF&#39;, &#39;HDOI&#39;, &#39;HDOL&#39;]
+[&#39;HDOR&#39;, &#39;HDOS&#39;, &#39;HDOV&#39;, &#39;HDOr&#39;, &#39;HDOs&#39;, &#39;ICEFRAC&#39;, &#39;ICIMR&#39;, &#39;ICWMR&#39;, &#39;IVT&#39;, &#39;IWC&#39;]
+[&#39;LANDFRAC&#39;, &#39;LHFLX&#39;, &#39;LWCF&#39;, &#39;NUMICE&#39;, &#39;NUMLIQ&#39;, &#39;OCNFRAC&#39;, &#39;OMEGA&#39;, &#39;OMEGAT&#39;, &#39;PBLH&#39;, &#39;PCLDBOT&#39;]
+[&#39;PCLDTOP&#39;, &#39;PHIS&#39;, &#39;PRECC&#39;, &#39;PRECL&#39;, &#39;PRECRC_H216Or&#39;, &#39;PRECRC_H218Or&#39;, &#39;PRECRC_H2Or&#39;, &#39;PRECRC_HDOr&#39;, &#39;PRECRL_H216OR&#39;, &#39;PRECRL_H218OR&#39;]
+[&#39;PRECRL_H2OR&#39;, &#39;PRECRL_HDOR&#39;, &#39;PRECSC&#39;, &#39;PRECSC_H216Os&#39;, &#39;PRECSC_H218Os&#39;, &#39;PRECSC_H2Os&#39;, &#39;PRECSC_HDOs&#39;, &#39;PRECSL&#39;, &#39;PRECSL_H216OS&#39;, &#39;PRECSL_H218OS&#39;]
+[&#39;PRECSL_H2OS&#39;, &#39;PRECSL_HDOS&#39;, &#39;PS&#39;, &#39;PSL&#39;, &#39;Q&#39;, &#39;QFLX&#39;, &#39;QRAINC&#39;, &#39;QRAINS&#39;, &#39;QREFHT&#39;, &#39;QRL&#39;]
+[&#39;QRS&#39;, &#39;QSNOWC&#39;, &#39;QSNOWS&#39;, &#39;RELHUM&#39;, &#39;SHFLX&#39;, &#39;SNOWHICE&#39;, &#39;SNOWHLND&#39;, &#39;SO2_SRF&#39;, &#39;SOAG_SRF&#39;, &#39;SOLIN&#39;]
+[&#39;SWCF&#39;, &#39;T&#39;, &#39;TAUGWX&#39;, &#39;TAUGWY&#39;, &#39;TAUX&#39;, &#39;TAUY&#39;, &#39;TGCLDCWP&#39;, &#39;TGCLDIWP&#39;, &#39;TGCLDLWP&#39;, &#39;TMQ&#39;]
+[&#39;TREFHT&#39;, &#39;TREFHTMN&#39;, &#39;TREFHTMX&#39;, &#39;TS&#39;, &#39;TSMN&#39;, &#39;TSMX&#39;, &#39;U&#39;, &#39;U10&#39;, &#39;UU&#39;, &#39;V&#39;]
+[&#39;VD01&#39;, &#39;VQ&#39;, &#39;VT&#39;, &#39;VU&#39;, &#39;VV&#39;, &#39;WGUSTD&#39;, &#39;WSUB&#39;, &#39;Z3&#39;, &#39;bc_a1_SRF&#39;, &#39;dst_a1_SRF&#39;]
+[&#39;dst_a3_SRF&#39;, &#39;ncl_a1_SRF&#39;, &#39;ncl_a2_SRF&#39;, &#39;ncl_a3_SRF&#39;, &#39;num_a1_SRF&#39;, &#39;num_a2_SRF&#39;, &#39;num_a3_SRF&#39;, &#39;pom_a1_SRF&#39;, &#39;so4_a1_SRF&#39;, &#39;so4_a2_SRF&#39;]
+[&#39;so4_a3_SRF&#39;, &#39;soa_a1_SRF&#39;, &#39;soa_a2_SRF&#39;]
+<span class="ansi-black-intense-fg ansi-bold">&gt;&gt;&gt; nproc: 16</span>
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Generating climo files:   0%|          | 0/193 [00:00&lt;?, ?it/s]/glade/work/fengzhu/conda-envs/xpp-env/lib/python3.11/site-packages/xesmf/backend.py:56: UserWarning: Latitude is outside of [-90, 90]
+  warnings.warn(&#39;Latitude is outside of [-90, 90]&#39;)
+Generating climo files:  48%|████▊     | 92/193 [08:58&lt;27:15, 16.19s/it]/glade/work/fengzhu/conda-envs/xpp-env/lib/python3.11/site-packages/xesmf/backend.py:56: UserWarning: Latitude is outside of [-90, 90]
+  warnings.warn(&#39;Latitude is outside of [-90, 90]&#39;)
+Generating climo files:  50%|████▉     | 96/193 [09:58&lt;25:46, 15.94s/it]/glade/work/fengzhu/conda-envs/xpp-env/lib/python3.11/site-packages/xesmf/backend.py:56: UserWarning: Latitude is outside of [-90, 90]
+  warnings.warn(&#39;Latitude is outside of [-90, 90]&#39;)
+Generating climo files: 100%|██████████| 193/193 [26:26&lt;00:00,  8.22s/it]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; 193 climo files created in: /glade/derecho/scratch/fengzhu/ADF/b.e13.B1850C5.ne120_g16.icesm13_ihesp.PI.003/climo_30yrs_noChunks</span>
+CPU times: user 255 ms, sys: 257 ms, total: 513 ms
+Wall time: 43min 51s
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="diag-spell.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">A “spell” system</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../ug-api.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API Reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#SE2">SE2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#SE1">SE1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#FV2">FV2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#SE0.25">SE0.25</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Feng Zhu, Jiang Zhu, Dan Amrhein, Sophia Macarewich, Bette Otto-Bliersner, Esther Brady.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
