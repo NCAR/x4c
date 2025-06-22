@@ -1,5 +1,6 @@
 import os
 import glob
+import itertools
 import numpy as np
 import xarray as xr
 import xesmf as xe
@@ -297,7 +298,7 @@ def convert_units(da, units=None):
 
     return da
 
-def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hstr.vn.timespan.nc', delimiters=['/', '.'],
+def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdV.hstr.vn.timespan.nc', delimiters=['/', '.'],
                avoid_list=None, verbose=False, **kws):
     s = path_pattern
     for d in delimiters:
@@ -306,7 +307,12 @@ def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hs
 
     for e in path_elements:
         if e in kws:
-            path_pattern = path_pattern.replace(e, kws[e])
+            value = kws[e]
+            if isinstance(value, list):
+                pattern_str = '{' + ','.join(value) + '}'
+                path_pattern = path_pattern.replace(e, pattern_str)
+            else:
+                path_pattern = path_pattern.replace(e, value)
         elif e in ['proc', 'tseries', 'month_1', 'nc']:
             pass
         elif e in ['timespan', 'date']:
@@ -314,9 +320,15 @@ def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hs
         else:
             path_pattern = path_pattern.replace(e, '*')
 
-    if verbose: p_header(f'path_pattern: {path_pattern}')
-    # sort based on timespan
-    paths = sorted(glob.glob(os.path.join(root_dir, path_pattern)), key=lambda x: x.split('.')[-2])
+    path_patterns = expand_braces(path_pattern)
+    if verbose: p_header(f'path_patterns: {path_patterns}')
+    paths = []
+    for pat in path_patterns:
+        paths_tmp = glob.glob(os.path.join(root_dir, pat))
+        paths.extend(paths_tmp)
+
+    # sort based on timespak h
+    paths = sorted(paths, key=lambda x: x.split('.')[-2])
     if avoid_list is not None:
         paths_new = [] 
         for path in paths:
@@ -325,7 +337,6 @@ def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hs
                 if avoid_str in path:
                     add_path = False
                     break
-                    
             if add_path: paths_new.append(path)
         paths = paths_new
     return paths
@@ -416,3 +427,39 @@ def find_nearest2d(da:xr.DataArray, lat, lon, lat_name='lat', lon_name='lon', ne
         da_res = xr.concat(da_res_list, dim=new_dim).squeeze()
 
     return da_res
+
+def expand_braces(pattern):
+    """
+    Expands a string with brace-enclosed options like:
+    'atm/*/*.cam.{h0a,h0i}.*.nc' → [
+        'atm/*/*.cam.h0a.*.nc',
+        'atm/*/*.cam.h0i.*.nc'
+    ]
+    Supports multiple sets of {}.
+    """
+    import re
+
+    # Find all brace-enclosed segments
+    matches = list(re.finditer(r'\{([^}]+)\}', pattern))
+    if not matches:
+        return [pattern]
+
+    # Extract options for each set of braces
+    segments = []
+    last_end = 0
+    static_parts = []
+
+    for match in matches:
+        static_parts.append(pattern[last_end:match.start()])
+        segments.append(match.group(1).split(','))
+        last_end = match.end()
+
+    static_parts.append(pattern[last_end:])  # tail
+
+    # Generate combinations
+    expanded = []
+    for combo in itertools.product(*segments):
+        s = ''.join([sp + c for sp, c in zip(static_parts, combo)] + [static_parts[-1]])
+        expanded.append(s)
+
+    return expanded

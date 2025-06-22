@@ -41,8 +41,8 @@ class History:
             }
         else:
             _hstr_dict = {
-                'atm': ('cam', 'h0a'),
-                'ocn': ('mom6', 'h.native'),
+                'atm': ('cam', ['h0a', 'h0i']),
+                'ocn': ('mom6', ['h.sfc', 'h.z']),
                 'lnd': ('clm2', 'h0'),
                 'ice': ('cice', 'h'),
                 'rof': ('mosart', 'h0'),
