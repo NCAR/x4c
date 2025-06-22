@@ -1,5 +1,6 @@
 import os
 import glob
+import re
 import itertools
 import numpy as np
 import xarray as xr
@@ -294,9 +295,43 @@ def convert_units(da, units=None):
             elif da.attrs['units'] == 'degC' and units == 'degC' or units is None:
                 da.attrs['units'] = '°C'
         else:
-            p_warning("The inpu `xarray.DataArray` doesn't have a unit.")
+            p_warning("The input `xarray.DataArray` doesn't have units.")
 
     return da
+
+def expand_braces(pattern):
+    '''
+    Expands a string with brace-enclosed options like:
+    'atm/*/*.cam.{h0a,h0i}.*.nc' --> [
+        'atm/*/*.cam.h0a.*.nc',
+        'atm/*/*.cam.h0i.*.nc'
+    ]
+    Supports multiple sets of {}.
+    '''
+    # Find all brace-enclosed segments
+    matches = list(re.finditer(r'\{([^}]+)\}', pattern))
+    if not matches:
+        return [pattern]
+
+    # Extract options for each set of braces
+    segments = []
+    last_end = 0
+    static_parts = []
+
+    for match in matches:
+        static_parts.append(pattern[last_end:match.start()])
+        segments.append(match.group(1).split(','))
+        last_end = match.end()
+
+    static_parts.append(pattern[last_end:])  # tail
+
+    # Generate combinations
+    expanded = []
+    for combo in itertools.product(*segments):
+        s = ''.join([sp + c for sp, c in zip(static_parts, combo)] + [static_parts[-1]])
+        expanded.append(s)
+
+    return expanded
 
 def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdV.hstr.vn.timespan.nc', delimiters=['/', '.'],
                avoid_list=None, verbose=False, **kws):
@@ -427,39 +462,3 @@ def find_nearest2d(da:xr.DataArray, lat, lon, lat_name='lat', lon_name='lon', ne
         da_res = xr.concat(da_res_list, dim=new_dim).squeeze()
 
     return da_res
-
-def expand_braces(pattern):
-    """
-    Expands a string with brace-enclosed options like:
-    'atm/*/*.cam.{h0a,h0i}.*.nc' → [
-        'atm/*/*.cam.h0a.*.nc',
-        'atm/*/*.cam.h0i.*.nc'
-    ]
-    Supports multiple sets of {}.
-    """
-    import re
-
-    # Find all brace-enclosed segments
-    matches = list(re.finditer(r'\{([^}]+)\}', pattern))
-    if not matches:
-        return [pattern]
-
-    # Extract options for each set of braces
-    segments = []
-    last_end = 0
-    static_parts = []
-
-    for match in matches:
-        static_parts.append(pattern[last_end:match.start()])
-        segments.append(match.group(1).split(','))
-        last_end = match.end()
-
-    static_parts.append(pattern[last_end:])  # tail
-
-    # Generate combinations
-    expanded = []
-    for combo in itertools.product(*segments):
-        s = ''.join([sp + c for sp, c in zip(static_parts, combo)] + [static_parts[-1]])
-        expanded.append(s)
-
-    return expanded

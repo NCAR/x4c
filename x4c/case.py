@@ -183,18 +183,20 @@ class History:
                     arg_list.append((vn, input_dirpath, output_dirpath, timespan, overwrite, compression))
                 p.starmap(self.merge_vn, tqdm(arg_list, total=len(arg_list), desc=desc))
 
-    def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], years_per_file=50, timespan=None,
+    def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], years_per_file=None, timestep=None, timespan=None,
                dir_structure='comp/proc/tseries/month_1' , overwrite=True, nproc=1, compression=1):
 
         if staging_dirpath is None: staging_dirpath = output_dirpath
         if timespan is None: raise ValueError('Please specify `timespan`.')
+        if years_per_file is None and timestep is None: raise ValueError('Please specify `years_per_file` or the equivalent `timestep`.')
+        if years_per_file is not None and timestep is None: timestep = years_per_file
 
         syr = timespan[0]
-        nt = (timespan[-1] - timespan[0] + 1) // years_per_file
+        nt = (timespan[-1] - timespan[0] + 1) // timestep
         timespan_list = []
         for i in range(nt):
-            timespan_list.append((syr, syr+years_per_file-1))
-            syr += years_per_file 
+            timespan_list.append((syr, syr+timestep-1))
+            syr += timestep 
 
         if type(comps) is not dict:
             comps = {comp: None for comp in comps}
