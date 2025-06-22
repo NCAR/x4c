@@ -1,8 +1,6 @@
 from . import utils
 import xarray as xr
 import numpy as np
-import pop_tools
-from xhistogram.xarray import histogram
 
 class DiagCalc:
     # General calculations

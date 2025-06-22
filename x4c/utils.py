@@ -297,7 +297,7 @@ def convert_units(da, units=None):
 
     return da
 
-def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.h_str.vn.timespan.nc', delimiters=['/', '.'],
+def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hstr.vn.timespan.nc', delimiters=['/', '.'],
                avoid_list=None, verbose=False, **kws):
     s = path_pattern
     for d in delimiters:

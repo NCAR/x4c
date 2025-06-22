@@ -36,7 +36,7 @@ def open_dataset(path, adjust_month=False, comp=None, grid=None, vn=None, **kws)
     Args:
         path (str): path to the netCDF file
         adjust_month (bool): adjust the month of the `xarray.Dataset` (the default CESM output has a month shift)
-        comp (str): the tag for CESM component, including "atm", "ocn", "lnd", "ice", and "rof"
+        comp (str): the tag for general CESM components, including "atm", "ocn", "lnd", "ice", and "rof"
         grid (str): the grid tag for the CESM output (e.g., ne16, g16)
         vn (str): variable name
 
@@ -53,7 +53,7 @@ def open_mfdataset(paths, adjust_month=False, comp=None, grid=None, vn=None, **k
     Args:
         path (str): path to the netCDF file
         adjust_month (bool): adjust the month of the `xarray.Dataset` (the default CESM output has a month shift)
-        comp (str): the tag for CESM component, including "atm", "ocn", "lnd", "ice", and "rof"
+        comp (str): the tag for general CESM components, including "atm", "ocn", "lnd", "ice", and "rof"
         grid (str): the grid tag for the CESM output (e.g., ne16, g16)
         vn (str): variable name
 

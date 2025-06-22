@@ -23,8 +23,8 @@ from . import core, utils, diags
 from .spell import Spell
 
 class History:
-    def __init__(self, root_dir, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], mdl_hstr_dict=None, casename=None,
-                 path_pattern='comp/hist/casename.mdl.h_str.date.nc', avoid_list=['nday1', 'once'], cesm_ver=1):
+    def __init__(self, root_dir, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], hstr_dict=None, casename=None,
+                 path_pattern='comp/hist/casename.mdl.hstr.date.nc', avoid_list=['nday1', 'once'], cesm_ver=1):
         self.path_pattern = path_pattern
         self.root_dir = root_dir
         self.casename = casename
@@ -32,7 +32,7 @@ class History:
         utils.p_header(f'>>> case.casename: {self.casename}')
 
         if cesm_ver == 1:
-            _mdl_hstr_dict = {
+            _hstr_dict = {
                 'atm': ('cam', 'h0'),
                 'ocn': ('pop', 'h'),
                 'lnd': ('clm2', 'h0'),
@@ -40,25 +40,25 @@ class History:
                 'rof': ('rtm', 'h0'),
             }
         else:
-            _mdl_hstr_dict = {
+            _hstr_dict = {
                 'atm': ('cam', 'h0a'),
                 'ocn': ('mom6', 'h.native'),
                 'lnd': ('clm2', 'h0'),
                 'ice': ('cice', 'h'),
                 'rof': ('mosart', 'h0'),
             }
-        if mdl_hstr_dict is not None:
-            _mdl_hstr_dict.update(mdl_hstr_dict)
+        if hstr_dict is not None:
+            _hstr_dict.update(hstr_dict)
 
-        self.comps_info = _mdl_hstr_dict
+        self.comps_info = _hstr_dict
         utils.p_header(f'>>> case.comps_info: {self.comps_info}')
 
         self.paths = {}
         for comp in comps:
-            mdl, h_str = _mdl_hstr_dict[comp]
+            mdl, hstr = _hstr_dict[comp]
             self.paths[comp] = utils.find_paths(
                 self.root_dir, self.path_pattern,
-                comp=comp, mdl=mdl, h_str=h_str,
+                comp=comp, mdl=mdl, hstr=hstr,
                 avoid_list=avoid_list,
             )
             utils.p_success(f'>>> case.paths["{comp}"] created')
@@ -183,18 +183,18 @@ class History:
                     arg_list.append((vn, input_dirpath, output_dirpath, timespan, overwrite, compression))
                 p.starmap(self.merge_vn, tqdm(arg_list, total=len(arg_list), desc=desc))
 
-    def gen_ts(self, output_dirpath, scratch_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], timestep=50, timespan=None,
+    def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], years_per_file=50, timespan=None,
                dir_structure='comp/proc/tseries/month_1' , overwrite=True, nproc=1, compression=1):
 
-        if scratch_dirpath is None: scratch_dirpath = output_dirpath
+        if staging_dirpath is None: staging_dirpath = output_dirpath
         if timespan is None: raise ValueError('Please specify `timespan`.')
 
         syr = timespan[0]
-        nt = (timespan[-1] - timespan[0] + 1) // timestep
+        nt = (timespan[-1] - timespan[0] + 1) // years_per_file
         timespan_list = []
         for i in range(nt):
-            timespan_list.append((syr, syr+timestep-1))
-            syr += timestep 
+            timespan_list.append((syr, syr+years_per_file-1))
+            syr += years_per_file 
 
         if type(comps) is not dict:
             comps = {comp: None for comp in comps}
@@ -204,11 +204,11 @@ class History:
             utils.p_header(f'>>> Processing component: {comp}')
             for timespan_tmp in timespan_list:
                 utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
-                bigbang_dir = os.path.join(scratch_dirpath, f'.bigbang_{comp}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
+                bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
                 if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
                 self.bigbang(comp=comp, output_dirpath=bigbang_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, vns=vns)
 
-                bigcrunch_dir = os.path.join(scratch_dirpath, dir_structure.replace('comp', comp))
+                bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
                 self.bigcrunch(comp=comp, input_dirpath=bigbang_dir, output_dirpath=bigcrunch_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, compression=compression, vns=vns)
 
         for comp, vns in comps.items():
@@ -216,11 +216,11 @@ class History:
             utils.p_header(f'>>> Postprocessing component: {comp}')
             for timespan_tmp in timespan_list:
                 utils.p_header(f'>>> Postprocessing timespan: {timespan_tmp}')
-                bigbang_dir = os.path.join(scratch_dirpath, f'.bigbang_{comp}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
-                bigcrunch_dir = os.path.join(scratch_dirpath, dir_structure.replace('comp', comp))
+                bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
+                bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
                 if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-                if scratch_dirpath != output_dirpath:
-                    # move files from scratch to destination
+                if staging_dirpath != output_dirpath:
+                    # move files from staging to destination
                     dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp))
                     dst_dir = pathlib.Path(dst_dir)
                     dst_dir.mkdir(parents=True, exist_ok=True)
@@ -235,9 +235,9 @@ class History:
                             
                     with mp.Pool(processes=nproc) as p:
                         arg_list = [(src_path, dst_dir) for src_path in src_paths]
-                        p.starmap(shutil.move, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {scratch_dirpath}\nto: {output_dirpath}\n'))
+                        p.starmap(shutil.move, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
 
-                    # utils.p_header(f'>>> Moving generated files\nfrom: {scratch_dirpath}\nto: {output_dirpath}\n ')
+                    # utils.p_header(f'>>> Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n ')
                     # # utils.rsync_move(src_paths, dst_dir)
                     # src_paths =  f'{bigcrunch_dir}/*.{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12.nc'
                     # cmd = f'rsync -a --remove-source-files {src_paths} {str(dst_dir)}'
@@ -1149,50 +1149,50 @@ class Timeseries:
     def copy(self):
         return deepcopy(self)
 
-    @dask.delayed
-    def save_spell(self, spell:str, vn:str, output_path:str, timespan=None, overwrite=True, long_name=None, **kws):
-        case = self.copy()
-        if overwrite or not os.path.exists(output_path):
-            case.calc(spell, timespan=timespan)
-            case.diags[spell].name = vn
-            da = case.diags[spell]
-            if long_name is not None: da.attrs['long_name'] = long_name
-            if os.path.exists(output_path): os.remove(output_path)
-            da.x.to_netcdf(output_path, **kws)
+    # @dask.delayed
+    # def save_spell(self, spell:str, vn:str, output_path:str, timespan=None, overwrite=True, long_name=None, **kws):
+    #     case = self.copy()
+    #     if overwrite or not os.path.exists(output_path):
+    #         case.calc(spell, timespan=timespan)
+    #         case.diags[spell].name = vn
+    #         da = case.diags[spell]
+    #         if long_name is not None: da.attrs['long_name'] = long_name
+    #         if os.path.exists(output_path): os.remove(output_path)
+    #         da.x.to_netcdf(output_path, **kws)
 
-    def gen_ts_spell(self, spell:str, vn:str, comp:str, output_dirpath:str, long_name=None, timespan=None, timestep=50, overwrite=True):
-        ''' Generate timeseries based on a spell
-        '''
-        _mdl_hstr_dict = {
-            'atm': ('cam', 'h0'),
-            'ocn': ('pop', 'h'),
-            'lnd': ('clm2', 'h0'),
-            'ice': ('cice', 'h'),
-            'rof': ('rtm', 'h0'),
-        }
-        mdl, hstr = _mdl_hstr_dict[comp]
-        path_tmp = 'comp/proc/tseries/month_1/'.replace('comp', comp)
-        output_path = os.path.join(output_dirpath, path_tmp)
-        output_dir = pathlib.Path(os.path.dirname(output_path))
-        output_dir.mkdir(parents=True, exist_ok=True)
+    # def gen_ts_spell(self, spell:str, vn:str, comp:str, output_dirpath:str, long_name=None, timespan=None, timestep=50, overwrite=True):
+    #     ''' Generate timeseries based on a spell
+    #     '''
+    #     _mdl_hstr_dict = {
+    #         'atm': ('cam', 'h0'),
+    #         'ocn': ('pop', 'h'),
+    #         'lnd': ('clm2', 'h0'),
+    #         'ice': ('cice', 'h'),
+    #         'rof': ('rtm', 'h0'),
+    #     }
+    #     mdl, hstr = _mdl_hstr_dict[comp]
+    #     path_tmp = 'comp/proc/tseries/month_1/'.replace('comp', comp)
+    #     output_path = os.path.join(output_dirpath, path_tmp)
+    #     output_dir = pathlib.Path(os.path.dirname(output_path))
+    #     output_dir.mkdir(parents=True, exist_ok=True)
 
-        if timespan is None: raise ValueError('Please specify `timespan`.')
+    #     if timespan is None: raise ValueError('Please specify `timespan`.')
 
-        syr = timespan[0]
-        nt = (timespan[-1] - timespan[0] + 1) // timestep
-        timespan_list = []
-        for i in range(nt):
-            timespan_list.append((syr, syr+timestep-1))
-            syr += timestep 
+    #     syr = timespan[0]
+    #     nt = (timespan[-1] - timespan[0] + 1) // timestep
+    #     timespan_list = []
+    #     for i in range(nt):
+    #         timespan_list.append((syr, syr+timestep-1))
+    #         syr += timestep 
 
-        tasks = []
-        for timespan_tmp in timespan_list:
-            utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
-            filename = 'casename.mdl.h_str.vn.timespan.nc'.replace('casename', self.casename).replace('mdl', mdl).replace('h_str', hstr).replace('vn', vn).replace('timespan', f'{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12')
-            output_path = os.path.join(output_dir, filename)
-            tasks.append(self.save_spell(spell, vn, timespan=timespan_tmp, long_name=long_name, output_path=output_path, overwrite=overwrite))
+    #     tasks = []
+    #     for timespan_tmp in timespan_list:
+    #         utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
+    #         filename = 'casename.mdl.h_str.vn.timespan.nc'.replace('casename', self.casename).replace('mdl', mdl).replace('h_str', hstr).replace('vn', vn).replace('timespan', f'{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12')
+    #         output_path = os.path.join(output_dir, filename)
+    #         tasks.append(self.save_spell(spell, vn, timespan=timespan_tmp, long_name=long_name, output_path=output_path, overwrite=overwrite))
 
-        dask.compute(*tasks)
+    #     dask.compute(*tasks)
 
         
     
