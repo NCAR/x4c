@@ -225,7 +225,13 @@ def update_ds(ds, path, vn=None, comp=None, grid=None, adjust_month=False,
         lat_name = lat_dict[ds.attrs['comp']] if lat_name is None else lat_name
         lon_name = lon_dict[ds.attrs['comp']] if lon_name is None else lon_name
 
-    if gw_name is not None and gw_name in ds: ds.attrs['gw'] = ds[gw_name]
+    if gw_name is not None and gw_name in ds:
+        ds.attrs['gw'] = ds[gw_name]
+    elif 'gw' in ds.variables:
+        ds.attrs['gw'] = ds['gw']
+    elif 'lat' in ds.variables:
+        ds.attrs['gw'] = ds['lat']
+
     if lat_name is not None and lat_name in ds: ds.attrs['lat'] = ds[lat_name]
     if lon_name is not None and lon_name in ds: ds.attrs['lon'] = ds[lon_name]
 

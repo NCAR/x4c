@@ -52,7 +52,7 @@
     <link rel="icon" href="_static/x4c-logo.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Climatology (climo) files generation" href="notebooks/diag-climo.html" />
+    <link rel="prev" title="A “spell” system" href="notebooks/diags-spell.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -173,9 +173,8 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-diags.html">CESM Diagnostics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diag-case.html">A “Timeseries Case” system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diag-spell.html">A “spell” system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diag-climo.html">Climatology (climo) files generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-case.html">A “Timeseries Case” system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-spell.html">A “spell” system</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">API Reference</a></li>
@@ -407,7 +406,6 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.calc"><code class="docutils literal notranslate"><span class="pre">Timeseries.calc()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.clear_ds"><code class="docutils literal notranslate"><span class="pre">Timeseries.clear_ds()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.gen_ts_spell"><code class="docutils literal notranslate"><span class="pre">Timeseries.gen_ts_spell()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.get_climo"><code class="docutils literal notranslate"><span class="pre">Timeseries.get_climo()</span></code></a></li>
 </ul>
 </li>
@@ -454,7 +452,7 @@ document.write(`
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<em>str</em>) – path to the netCDF file</p></li>
 <li><p><strong>adjust_month</strong> (<em>bool</em>) – adjust the month of the <cite>xarray.Dataset</cite> (the default CESM output has a month shift)</p></li>
-<li><p><strong>comp</strong> (<em>str</em>) – the tag for CESM component, including “atm”, “ocn”, “lnd”, “ice”, and “rof”</p></li>
+<li><p><strong>comp</strong> (<em>str</em>) – the tag for general CESM components, including “atm”, “ocn”, “lnd”, “ice”, and “rof”</p></li>
 <li><p><strong>grid</strong> (<em>str</em>) – the grid tag for the CESM output (e.g., ne16, g16)</p></li>
 <li><p><strong>vn</strong> (<em>str</em>) – variable name</p></li>
 </ul>
@@ -689,12 +687,6 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="x4c.case.Timeseries.gen_ts_spell">
-<span class="sig-name descname"><span class="pre">gen_ts_spell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dirpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries.gen_ts_spell" title="Link to this definition">#</a></dt>
-<dd><p>Generate timeseries based on a spell</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="x4c.case.Timeseries.get_climo">
 <span class="sig-name descname"><span class="pre">get_climo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slicing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries.get_climo" title="Link to this definition">#</a></dt>
 <dd><p>Generate the climatology file for the given variable</p>
@@ -722,12 +714,12 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="notebooks/diag-climo.html"
+       href="notebooks/diags-spell.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Climatology (climo) files generation</p>
+        <p class="prev-next-title">A “spell” system</p>
       </div>
     </a>
 </div>
@@ -778,7 +770,6 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.calc"><code class="docutils literal notranslate"><span class="pre">Timeseries.calc()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.clear_ds"><code class="docutils literal notranslate"><span class="pre">Timeseries.clear_ds()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.gen_ts_spell"><code class="docutils literal notranslate"><span class="pre">Timeseries.gen_ts_spell()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.get_climo"><code class="docutils literal notranslate"><span class="pre">Timeseries.get_climo()</span></code></a></li>
 </ul>
 </li>
