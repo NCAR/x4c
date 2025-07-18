@@ -379,10 +379,12 @@ class XDataArray:
             lons1d = self.da.coords[lon_coord].values
             lons2d, lats2d = np.meshgrid(lons1d, lats1d)
 
-        other_dims = set(self.da.dims) - set([lat_dim, lon_dim])
-        isel_indexer = {dim: 0 for dim in other_dims}
-        da_latlon = self.da.isel(**isel_indexer)
-        mask = ~np.isnan(da_latlon.values)
+        # other_dims = set(self.da.dims) - set([lat_dim, lon_dim])
+        # isel_indexer = {dim: 0 for dim in other_dims}
+        # da_latlon = self.da.isel(**isel_indexer)
+        # mask = ~np.isnan(da_latlon.values)
+        reduce_dims = list(set(self.da.dims) - set([lat_dim, lon_dim]))
+        mask = ~self.da.isnull().any(dim=reduce_dims).values
 
         valid_lats = lats2d[mask]
         valid_lons = lons2d[mask]

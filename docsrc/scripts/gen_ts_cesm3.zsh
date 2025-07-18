@@ -1,0 +1,109 @@
+#!/bin/zsh
+
+export hist_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
+export ts_root=/glade/derecho/scratch/fengzhu/x4c/gen_ts
+export ts_staging=/glade/derecho/scratch/fengzhu/x4c/gen_ts
+export casename=b.e30_beta02.BLT1850.ne30_t232.104
+export syr=$1
+export eyr=$2
+export step=10
+export task_name=gts
+export nnodes=1
+export ncpus=128
+export compression=1
+export overwrite=True
+export account=P93300324
+export pyenv=x4c-py313
+export cesm_ver=3
+
+# =====================================================================
+# create d case directory
+# =====================================================================
+mkdir -p ${casename}
+cd ${casename}
+
+# =====================================================================
+# define functions
+# =====================================================================
+gen_py_script() {
+  local name=$1
+  local comps=$2
+  local comps_info=$3
+
+  cat >! ${task_name}_${name}_${syr}-${eyr}.py << EOF
+import os
+import x4c
+import time
+
+start = time.time()
+
+dirpath = '$hist_root/$casename'
+case = x4c.History(
+    dirpath,
+    casename='$casename',
+    comps_info=${comps_info},
+    cesm_ver=$cesm_ver
+)
+
+output_dirpath = '$ts_root/$casename'
+staging_dirpath = '$ts_staging/$casename'
+case.gen_ts(
+    comps=$comps,
+    output_dirpath=output_dirpath,
+    staging_dirpath=staging_dirpath,
+    timespan=($syr, $eyr),
+    timestep=$step,
+    nproc=$((nnodes * ncpus)),
+    overwrite=$overwrite,
+    compression=$compression,
+)
+
+end = time.time()
+print(f'Elapsed wall-clock time: {(end-start)/60:.1f} mins')
+EOF
+}
+
+gen_pbs_script() {
+  local name=$1
+
+  cat >! ${task_name}_${name}_${syr}-${eyr}.pbs << EOF
+#!/bin/bash
+#PBS -N ${task_name}_${name}_${syr}-${eyr}
+#PBS -q main
+#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1
+#PBS -l walltime=12:00:00
+#PBS -A ${account}
+
+source \$LMOD_ROOT/lmod/init/zsh
+
+module load ncarenv/23.09
+module load nco
+module load conda
+conda activate ${pyenv}
+
+python ${task_name}_${name}_${syr}-${eyr}.py
+EOF
+}
+
+# =====================================================================
+# call functions
+# =====================================================================
+# Define task entries: name|components|comps_info
+task_list=(
+  "o.sfc|['ocn']|{'ocn': ('mom6', ['h.sfc'])}"
+  "o.z|['ocn']|{'ocn': ('mom6', ['h.z'])}"
+  "o.rho2|['ocn']|{'ocn': ('mom6', ['h.rho2'])}"
+  "o.native|['ocn']|{'ocn': ('mom6', ['h.native'])}"
+#   "ai|['atm', 'ice']|{}"
+#   "lr|['lnd', 'rof']|{}"
+)
+
+for entry in "${task_list[@]}"; do
+  IFS='|' read -r name comps comps_info <<< "$entry"
+
+  gen_py_script "$name" "$comps" "${comps_info}"
+  gen_pbs_script "$name"
+  qsub "${task_name}_${name}_${syr}-${eyr}.pbs"
+done
+
+exit

@@ -6,7 +6,6 @@ from tqdm import tqdm
 import xarray as xr
 import multiprocessing as mp
 import pathlib
-import textwrap
 import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
@@ -17,13 +16,12 @@ import cftime
 from . import visual
 import subprocess
 from copy import deepcopy
-import dask
 
 from . import core, utils, diags
 from .spell import Spell
 
 class History:
-    def __init__(self, root_dir, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], hstr_dict=None, casename=None,
+    def __init__(self, root_dir, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], comps_info=None, casename=None,
                  path_pattern='comp/hist/casename.mdl.hstr.date.nc', avoid_list=['nday1', 'once'], cesm_ver=1):
         self.path_pattern = path_pattern
         self.root_dir = root_dir
@@ -32,50 +30,56 @@ class History:
         utils.p_header(f'>>> case.casename: {self.casename}')
 
         if cesm_ver == 1:
-            _hstr_dict = {
-                'atm': ('cam', 'h0'),
-                'ocn': ('pop', 'h'),
-                'lnd': ('clm2', 'h0'),
-                'ice': ('cice', 'h'),
-                'rof': ('rtm', 'h0'),
+            _comps_info = {
+                'atm': ('cam', ['h0']),
+                'ocn': ('pop', ['h']),
+                'lnd': ('clm2', ['h0']),
+                'ice': ('cice', ['h']),
+                'rof': ('rtm', ['h0']),
             }
         else:
-            _hstr_dict = {
+            _comps_info = {
                 'atm': ('cam', ['h0a', 'h0i']),
-                'ocn': ('mom6', ['h.sfc', 'h.z']),
-                'lnd': ('clm2', 'h0'),
-                'ice': ('cice', 'h'),
-                'rof': ('mosart', 'h0'),
+                'ocn': ('mom6', ['h.sfc', 'h.z', 'h.rho2']),
+                'lnd': ('clm2', ['h0']),
+                'ice': ('cice', ['h']),
+                'rof': ('mosart', ['h0']),
             }
-        if hstr_dict is not None:
-            _hstr_dict.update(hstr_dict)
+        if comps_info is not None:
+            _comps_info.update(comps_info)
 
-        self.comps_info = _hstr_dict
+        self.comps_info = _comps_info
         utils.p_header(f'>>> case.comps_info: {self.comps_info}')
 
         self.paths = {}
         for comp in comps:
-            mdl, hstr = _hstr_dict[comp]
-            self.paths[comp] = utils.find_paths(
-                self.root_dir, self.path_pattern,
-                comp=comp, mdl=mdl, hstr=hstr,
-                avoid_list=avoid_list,
-            )
-            utils.p_success(f'>>> case.paths["{comp}"] created')
+            mdl, hstr = self.comps_info[comp]
+            self.paths[comp] = {}
+            for hs in hstr:
+                self.paths[comp][hs] = utils.find_paths(
+                    self.root_dir, self.path_pattern,
+                    comp=comp, mdl=mdl, hstr=hs,
+                    avoid_list=avoid_list,
+                )
+                utils.p_success(f'>>> case.paths["{comp}"]["{hs}"] created')
 
         self.vns = {}
         for comp in comps:
-            self.vns[comp] = self.get_ts_vns(comp)
-            utils.p_success(f'>>> case.vns["{comp}"] created')
+            mdl, hstr = self.comps_info[comp]
+            self.vns[comp] = {}
+            for hs in hstr:
+                self.vns[comp][hs] = self.get_ts_vns(comp, hs)
+                utils.p_success(f'>>> case.vns["{comp}"]["{hs}"] created')
 
-    def get_ts_vns(self, comp):
+    def get_ts_vns(self, comp, hstr):
         vns_ts = []
-        ds0 = core.open_dataset(self.paths[comp][0])
+        ds0 = core.open_dataset(self.paths[comp][hstr][0])
         vns = list(ds0.variables)
         exclude_vars = ['time', 'time_bnds', 'time_written', 'date', 'datesec', 'date_written']
 
         for v in vns:
-            if len(ds0[v].dims) >= 2 and 'time' in ds0[v].dims and 'time' not in v and v not in exclude_vars:
+            # if len(ds0[v].dims) >= 2 and 'time' in ds0[v].dims and 'time' not in v and v not in exclude_vars:
+            if len(ds0[v].dims) >= 2 and 'time' in ds0[v].dims and v not in exclude_vars:
                 vns_ts.append(v)
         
         vns_ts = sorted(vns_ts)
@@ -83,8 +87,8 @@ class History:
         ds0.close()
         return vns_ts
 
-    def get_paths(self, comp, timespan=None):
-        paths = self.paths[comp]
+    def get_paths(self, comp, hstr, timespan=None):
+        paths = self.paths[comp][hstr]
 
         if timespan is None:
             paths_sub = paths
@@ -98,12 +102,13 @@ class History:
 
         return paths_sub
 
-    def isolate_vn(self, vn, comp, in_path, output_dirpath, overwrite=True):
+    def isolate_vn(self, vn, comp, hstr, in_path, output_dirpath, overwrite=True):
         bn_elements = os.path.basename(in_path).split('.')
         bn_elements.insert(-2, vn)
 
         if self.casename is not None:
-            fname = '.'.join(bn_elements[-5:])
+            dot_in_hstr = hstr.count('.')
+            fname = '.'.join(bn_elements[-5-dot_in_hstr:])
             fname = f'{self.casename}.{fname}'
         else:
             fname = '.'.join(bn_elements)
@@ -111,30 +116,36 @@ class History:
         out_path = os.path.join(output_dirpath, fname)
         if overwrite or not os.path.exists(out_path):
             if os.path.exists(out_path): os.remove(out_path)
-            vns = self.vns[comp].copy()
+            vns = self.vns[comp][hstr].copy()
             vns.remove(vn)
             cmd = f'ncks -h -C -x -v {",".join(vns)} {in_path} -o {out_path}'
             subprocess.run(cmd, shell=True)
 
-    def bigbang(self, comp, output_dirpath, timespan=None, overwrite=True, nproc=1, vns=None):
+    def bigbang(self, comp, hstr, output_dirpath, timespan=None, overwrite=True, nproc=1, vns=None):
         output_dirpath = pathlib.Path(output_dirpath)
         output_dirpath.mkdir(parents=True, exist_ok=True)
 
-        paths = self.get_paths(comp, timespan=timespan)
+        paths = self.get_paths(comp, hstr, timespan=timespan)
 
-        if vns is None: vns = self.vns[comp]
+        if vns is None: vns = self.vns[comp][hstr]
         if nproc == 1:
             for path in tqdm(paths, desc=f'Spliting {len(paths)} history files'):
                 for vn in vns:
-                    self.isolate_vn(vn, comp, in_path=path, output_dirpath=output_dirpath, overwrite=overwrite)
+                    self.isolate_vn(vn, comp, hstr, in_path=path, output_dirpath=output_dirpath, overwrite=overwrite)
         else:
             utils.p_hint(f'>>> nproc: {nproc}')
             with mp.Pool(processes=nproc) as p:
                 arg_list = []
                 for path in paths:
                     for vn in vns:
-                        arg_list.append((vn, comp, path, output_dirpath, overwrite))
+                        arg_list.append((vn, comp, hstr, path, output_dirpath, overwrite))
                 p.starmap(self.isolate_vn, tqdm(arg_list, total=len(arg_list), desc=f'Spliting {len(paths)} history files for {len(vns)} variables'))
+    
+    def get_hstr(self, vn):
+        for comp, hstrs in self.vns.items():
+            for hstr, vns in hstrs.items():
+                if vn in vns:
+                    return hstr
 
     def merge_vn(self, vn, input_dirpath, output_dirpath, timespan=None, overwrite=True, compression=1):
         paths = sorted(glob.glob(os.path.join(input_dirpath, f'*.{vn}.*.nc')))
@@ -155,7 +166,9 @@ class History:
         bn_elements[-2] = f'{date_start}-{date_end}'
 
         if self.casename is not None:
-            fname = '.'.join(bn_elements[-5:])
+            hstr = self.get_hstr(vn)
+            dot_in_hstr = hstr.count('.')
+            fname = '.'.join(bn_elements[-5-dot_in_hstr:])
             fname = f'{self.casename}.{fname}'
         else:
             fname = '.'.join(bn_elements)
@@ -163,14 +176,14 @@ class History:
 
         if overwrite or not os.path.exists(out_path):
             if os.path.exists(out_path): os.remove(out_path)
-            cmd = f'ncrcat -O -4 -h --no_cll_mth -L {compression} {" ".join(paths_sub)} -o {out_path}'
+            cmd = f'ncrcat -O -4 -h --no_cll_mth -L {compression} {" ".join(paths_sub)} -o {out_path} 2>/dev/null'
             subprocess.run(cmd, shell=True)
 
-    def bigcrunch(self, comp, input_dirpath, output_dirpath, timespan=None, overwrite=True, nproc=1, compression=1, vns=None):
+    def bigcrunch(self, comp, hstr, input_dirpath, output_dirpath, timespan=None, overwrite=True, nproc=1, compression=1, vns=None):
         output_dirpath = pathlib.Path(output_dirpath)
         output_dirpath.mkdir(parents=True, exist_ok=True)
 
-        if vns is None: vns = self.vns[comp]
+        if vns is None: vns = self.vns[comp][hstr]
         desc = 'Merging variables'
         if nproc == 1:
             for vn in tqdm(vns, desc=desc):
@@ -202,49 +215,66 @@ class History:
             comps = {comp: None for comp in comps}
 
         for comp, vns in comps.items():
+            mdl, hstr = self.comps_info[comp]
             # generate timeseries files for each component and each sub-timespan
             utils.p_header(f'>>> Processing component: {comp}')
-            for timespan_tmp in timespan_list:
-                utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
-                bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
-                if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-                self.bigbang(comp=comp, output_dirpath=bigbang_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, vns=vns)
+            for hs in hstr:
+                if vns is None:
+                    vns_in = self.vns[comp][hs]
+                else:
+                    vns_in = list(set(self.vns[comp][hs]) & set(vns))
+                if len(vns_in) == 0: continue
 
-                bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
-                self.bigcrunch(comp=comp, input_dirpath=bigbang_dir, output_dirpath=bigcrunch_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, compression=compression, vns=vns)
+                utils.p_header(f'>>> Processing hstr: {hs}')
+                for timespan_tmp in timespan_list:
+                    utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
+                    bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
+                    if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
+                    self.bigbang(comp=comp, hstr=hs, output_dirpath=bigbang_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, vns=vns_in)
+
+                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
+                    self.bigcrunch(comp=comp, hstr=hs, input_dirpath=bigbang_dir, output_dirpath=bigcrunch_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, compression=compression, vns=vns_in)
 
         for comp, vns in comps.items():
+            mdl, hstr = self.comps_info[comp]
             # delete the temporary files
             utils.p_header(f'>>> Postprocessing component: {comp}')
-            for timespan_tmp in timespan_list:
-                utils.p_header(f'>>> Postprocessing timespan: {timespan_tmp}')
-                bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
-                bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
-                if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-                if staging_dirpath != output_dirpath:
-                    # move files from staging to destination
-                    dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp))
-                    dst_dir = pathlib.Path(dst_dir)
-                    dst_dir.mkdir(parents=True, exist_ok=True)
-                    src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12.nc'))
-                    # [shutil.move(src_path, dst_dir) for src_path in src_paths]
-                    # print(f'{src_paths =}')
-                    # print(f'{dst_dir =}')
-                    # for src_path in src_paths:
-                    #     dst_path = os.path.join(dst_dir, os.path.basename(src_path))
-                    #     if os.path.exists(dst_path):
-                    #         os.remove(dst_path)
-                            
-                    with mp.Pool(processes=nproc) as p:
-                        arg_list = [(src_path, dst_dir) for src_path in src_paths]
-                        p.starmap(shutil.move, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
+            for hs in hstr:
+                if vns is None:
+                    vns_in = self.vns[comp][hs]
+                else:
+                    vns_in = list(set(self.vns[comp][hs]) & set(vns))
+                if len(vns_in) == 0: continue
 
-                    # utils.p_header(f'>>> Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n ')
-                    # # utils.rsync_move(src_paths, dst_dir)
-                    # src_paths =  f'{bigcrunch_dir}/*.{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12.nc'
-                    # cmd = f'rsync -a --remove-source-files {src_paths} {str(dst_dir)}'
-                    # print('>>> {cmd}')
-                    # subprocess.run(cmd, check=True, shell=True)
+                for timespan_tmp in timespan_list:
+                    utils.p_header(f'>>> Postprocessing timespan: {timespan_tmp}')
+                    bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
+                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
+                    if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
+                    if staging_dirpath != output_dirpath:
+                        # move files from staging to destination
+                        dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp))
+                        dst_dir = pathlib.Path(dst_dir)
+                        dst_dir.mkdir(parents=True, exist_ok=True)
+                        src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12.nc'))
+                        # [shutil.move(src_path, dst_dir) for src_path in src_paths]
+                        # print(f'{src_paths =}')
+                        # print(f'{dst_dir =}')
+                        # for src_path in src_paths:
+                        #     dst_path = os.path.join(dst_dir, os.path.basename(src_path))
+                        #     if os.path.exists(dst_path):
+                        #         os.remove(dst_path)
+
+                        with mp.Pool(processes=nproc) as p:
+                            arg_list = [(src_path, dst_dir) for src_path in src_paths]
+                            p.starmap(shutil.move, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
+
+                        # utils.p_header(f'>>> Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n ')
+                        # # utils.rsync_move(src_paths, dst_dir)
+                        # src_paths =  f'{bigcrunch_dir}/*.{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12.nc'
+                        # cmd = f'rsync -a --remove-source-files {src_paths} {str(dst_dir)}'
+                        # print('>>> {cmd}')
+                        # subprocess.run(cmd, check=True, shell=True)
 
 
     # def split_ds(self, comp, in_path, output_dirpath, overwrite=False, nco=True):
@@ -530,10 +560,11 @@ class Timeseries:
         grid_dict (dict): the grid dictionary for different components
         timestep (int): the number of years stored in a single timeseries file
     '''
-    def __init__(self, root_dir, grid_dict=None, casename=None):
+    def __init__(self, root_dir, grid_dict=None, casename=None, cesm_ver=1):
         self.path_pattern='comp/proc/tseries/month_1/casename.mdl.h_str.vn.timespan.nc'
         self.root_dir = os.path.abspath(root_dir)
         self.casename = casename
+        self.cesm_ver = cesm_ver
 
         self.grid_dict = {'atm': 'ne30pg3', 'ocn': 'g16'}
         if grid_dict is not None:
@@ -599,7 +630,9 @@ class Timeseries:
             raise ValueError('The input variable name belongs to multiple components. Please specify via the argument `comp`.')
 
     
-    def load(self, vn, comp=None, timespan=None, load_idx=-1, adjust_month=True, verbose=True, **kws):
+    def load(self, vn, comp=None, timespan=None, load_idx=-1, verbose=True, **kws):
+        adjust_month = True if self.cesm_ver == 1 else False
+
         if comp is None:
             comp = self.get_vn_comp(vn)
 
@@ -638,9 +671,11 @@ class Timeseries:
         else:
             if verbose: utils.p_warning(f'>>> Variable {vn} not existing')
 
-    def calc(self, spell:str, comp=None, timespan=None, load_idx=-1, adjust_month=True, recalculate=False, verbose=True):
+    def calc(self, spell:str, comp=None, timespan=None, load_idx=-1, recalculate=False, verbose=True):
         ''' Calculate a diagnostic spell
         '''
+        adjust_month = True if self.cesm_ver == 1 else False
+
         if spell in self.diags and not recalculate:
             utils.p_warning(f'>>> Spell `{spell}` is already calculated and the calculation is skipped.')
         else:
@@ -902,12 +937,14 @@ class Timeseries:
 
         return fig, ax
 
-    def get_climo(self, vn, comp=None, timespan=None, adjust_month=True, slicing=False, regrid=False, dlat=1, dlon=1):
+    def get_climo(self, vn, comp=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
         ''' Generate the climatology file for the given variable
 
         Args:
             slicing (bool): could be problematic
         '''
+        adjust_month = True if self.cesm_ver == 1 else False
+
         if comp is None: comp = self.get_vn_comp(vn)
         grid = self.grid_dict[comp]
         paths = self.get_paths(vn, comp=comp, timespan=timespan)
@@ -920,8 +957,8 @@ class Timeseries:
         if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
         return ds_out
 
-    def save_climo(self, output_dirpath, vn, comp=None, timespan=None, adjust_month=True,
-                   slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+    def save_climo(self, output_dirpath, vn, comp=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+        adjust_month = True if self.cesm_ver == 1 else False
 
         output_dirpath = pathlib.Path(output_dirpath)
         if not output_dirpath.exists():
@@ -941,8 +978,8 @@ class Timeseries:
             climo.to_netcdf(out_path)
             climo.close()
 
-    def gen_climo(self, output_dirpath, comp=None, timespan=None, vns=None, adjust_month=True,
-                  nproc=1, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+    def gen_climo(self, output_dirpath, comp=None, timespan=None, vns=None, nproc=1, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+        adjust_month = True if self.cesm_ver == 1 else False
 
         if comp is None:
             raise ValueError('Please specify component via the argument `comp`.')
@@ -1002,7 +1039,9 @@ class Timeseries:
     #         # ds.close()
     #         # utils.p_success(f'>>> Combined timeseries file created at: {out_path}')
 
-    def get_mean(self, vn, comp, months=list(range(1, 13)), timespan=None, adjust_month=True, slicing=False, regrid=False, dlat=1, dlon=1):
+    def get_mean(self, vn, comp, months=list(range(1, 13)), timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
+        adjust_month = True if self.cesm_ver == 1 else False
+
         grid = self.grid_dict[comp]
         paths = self.get_paths(vn, comp=comp, timespan=timespan)
         ds = core.open_mfdataset(paths, adjust_month=adjust_month)
@@ -1014,7 +1053,9 @@ class Timeseries:
         if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
         return ds_out
 
-    def get_ts(self, vn, comp, timespan=None, adjust_month=True, slicing=False, regrid=False, dlat=1, dlon=1):
+    def get_ts(self, vn, comp, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
+        adjust_month = True if self.cesm_ver == 1 else False
+
         grid = self.grid_dict[comp]
         paths = self.get_paths(vn, comp=comp, timespan=timespan)
         ds = core.open_mfdataset(paths, adjust_month=adjust_month)
@@ -1027,8 +1068,10 @@ class Timeseries:
         if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
         return ds_out
 
-    def save_means(self, vn, comp, output_dirpath, timespan, adjust_month=True, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+    def save_means(self, vn, comp, output_dirpath, timespan, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
         output_dirpath = pathlib.Path(output_dirpath)
+        adjust_month = True if self.cesm_ver == 1 else False
+
         if not output_dirpath.exists():
             output_dirpath.mkdir(parents=True, exist_ok=True)
             utils.p_success(f'>>> output directory created at: {output_dirpath}')
@@ -1062,8 +1105,8 @@ class Timeseries:
                 ds_ann.to_netcdf(out_path)
                 ds_ann.close()
 
-    def gen_means(self, output_dirpath, comp=None, vns=None, timespan=None, adjust_month=True, slicing=False,
-                  regrid=False, dlat=1, dlon=1, overwrite=False, nproc=1):
+    def gen_means(self, output_dirpath, comp=None, vns=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False, nproc=1):
+        adjust_month = True if self.cesm_ver == 1 else False
 
         if comp is None:
             raise ValueError('Please specify component via the argument `comp`.')
