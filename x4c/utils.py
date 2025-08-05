@@ -14,7 +14,6 @@ import cartopy.util
 import shutil
 import subprocess
 import warnings
-from scipy.spatial import cKDTree
 
 def p_header(text):
     print(ca.Fore.CYAN + ca.Style.BRIGHT + text + ca.Style.RESET_ALL)
@@ -339,7 +338,7 @@ def expand_braces(pattern):
 
     return expanded
 
-def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdV.hstr.vn.timespan.nc', delimiters=['/', '.'],
+def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hstr.vn.timespan.nc', delimiters=['/', '.'],
                avoid_list=None, verbose=False, **kws):
     s = path_pattern
     for d in delimiters:
@@ -381,6 +380,28 @@ def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdV.hs
             if add_path: paths_new.append(path)
         paths = paths_new
     return paths
+
+def get_hstr(paths, mdl):
+    hstr_set = set()
+
+    # Pattern to extract what's after mdl.
+    pattern = re.compile(rf'{re.escape(mdl)}\.((?:[^0-9][^.]*\.?)+)')
+
+    # Pattern to remove trailing date strings like .0001-01 or .0001-01-0001-12
+    date_like_pattern = re.compile(r'(\.?\d{4}-\d{2}(?:-\d{4}-\d{2})?)$')
+
+    for path in paths:
+        filename = os.path.basename(path)
+        match = pattern.search(filename)
+        if match:
+            hstr = match.group(1)
+            # Remove date-like suffix
+            hstr = date_like_pattern.sub('', hstr)
+            hstr = hstr.rstrip('.')
+            if 'h' in hstr:  # Only keep if 'h' is present
+                hstr_set.add(hstr)
+
+    return sorted(hstr_set)
 
 def download(url: str, fname: str, chunk_size=1024, show_bar=True):
     os.makedirs(os.path.dirname(fname), exist_ok=True)

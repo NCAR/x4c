@@ -29,22 +29,25 @@ class History:
         utils.p_header(f'>>> case.root_dir: {self.root_dir}')
         utils.p_header(f'>>> case.casename: {self.casename}')
 
-        if cesm_ver == 1:
+        if cesm_ver in [1, 2]:
             _comps_info = {
-                'atm': ('cam', ['h0']),
-                'ocn': ('pop', ['h']),
-                'lnd': ('clm2', ['h0']),
-                'ice': ('cice', ['h']),
-                'rof': ('rtm', ['h0']),
+                'atm': ('cam', '*'),
+                'ocn': ('pop', '*'),
+                'lnd': ('clm2', '*'),
+                'ice': ('cice', '*'),
+                'rof': ('rtm', '*'),
+            }
+        elif cesm_ver == 3:
+            _comps_info = {
+                'atm': ('cam', '*'),
+                'ocn': ('mom6', '*'),
+                'lnd': ('clm2', '*'),
+                'ice': ('cice', '*'),
+                'rof': ('mosart', '*'),
             }
         else:
-            _comps_info = {
-                'atm': ('cam', ['h0a', 'h0i']),
-                'ocn': ('mom6', ['h.sfc', 'h.z', 'h.rho2']),
-                'lnd': ('clm2', ['h0']),
-                'ice': ('cice', ['h']),
-                'rof': ('mosart', ['h0']),
-            }
+            raise ValueError(f'Unsupported CESM version: {cesm_ver}. Please specify `cesm_ver` as 1, 2, or 3.')
+
         if comps_info is not None:
             _comps_info.update(comps_info)
 
@@ -55,6 +58,16 @@ class History:
         for comp in comps:
             mdl, hstr = self.comps_info[comp]
             self.paths[comp] = {}
+
+            if hstr == '*':
+                paths = utils.find_paths(
+                    self.root_dir, self.path_pattern,
+                    comp=comp, mdl=mdl, hstr=hstr,
+                    avoid_list=avoid_list,
+                )
+                hstr = utils.get_hstr(paths, mdl=mdl)
+                self.comps_info[comp] = (mdl, hstr)
+
             for hs in hstr:
                 self.paths[comp][hs] = utils.find_paths(
                     self.root_dir, self.path_pattern,
