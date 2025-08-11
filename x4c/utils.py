@@ -338,7 +338,72 @@ def expand_braces(pattern):
 
     return expanded
 
-def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hstr.vn.timespan.nc', delimiters=['/', '.'],
+# def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hstr.vn.timespan.nc', delimiters=['/', '.'],
+#                avoid_list=None, verbose=False, **kws):
+#     s = path_pattern
+#     for d in delimiters:
+#         s = ' '.join(s.split(d))
+#     path_elements = s.split()
+
+#     for e in path_elements:
+#         if e in kws:
+#             value = kws[e]
+#             if isinstance(value, list):
+#                 pattern_str = '{' + ','.join(value) + '}'
+#                 path_pattern = path_pattern.replace(e, pattern_str)
+#             else:
+#                 path_pattern = path_pattern.replace(e, value)
+#         elif e in ['proc', 'tseries', 'month_1', 'nc']:
+#             pass
+#         elif e in ['timespan', 'date']:
+#             path_pattern = path_pattern.replace(e, '*[0-9]')
+#         else:
+#             path_pattern = path_pattern.replace(e, '*')
+
+#     path_patterns = expand_braces(path_pattern)
+#     if verbose: p_header(f'path_patterns: {path_patterns}')
+#     paths = []
+#     for pat in path_patterns:
+#         paths_tmp = glob.glob(os.path.join(root_dir, pat))
+#         paths.extend(paths_tmp)
+
+#     # sort based on timespak h
+#     paths = sorted(paths, key=lambda x: x.split('.')[-2])
+#     if avoid_list is not None:
+#         paths_new = [] 
+#         for path in paths:
+#             add_path = True
+#             for avoid_str in avoid_list:
+#                 if avoid_str in path:
+#                     add_path = False
+#                     break
+#             if add_path: paths_new.append(path)
+#         paths = paths_new
+#     return paths
+
+# def get_hstr(paths, mdl):
+#     hstr_set = set()
+
+#     # Pattern to extract what's after mdl.
+#     pattern = re.compile(rf'{re.escape(mdl)}\.((?:[^0-9][^.]*\.?)+)')
+
+#     # Pattern to remove trailing date strings like .0001-01 or .0001-01-0001-12
+#     date_like_pattern = re.compile(r'(\.?\d{4}-\d{2}(?:-\d{4}-\d{2})?)$')
+
+#     for path in paths:
+#         filename = os.path.basename(path)
+#         match = pattern.search(filename)
+#         if match:
+#             hstr = match.group(1)
+#             # Remove date-like suffix
+#             hstr = date_like_pattern.sub('', hstr)
+#             hstr = hstr.rstrip('.')
+#             if 'h' in hstr:  # Only keep if 'h' is present
+#                 hstr_set.add(hstr)
+
+#     return sorted(hstr_set)
+
+def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.hstr.vn.timespan.nc', delimiters=['/', '.'],
                avoid_list=None, verbose=False, **kws):
     s = path_pattern
     for d in delimiters:
@@ -381,11 +446,11 @@ def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hs
         paths = paths_new
     return paths
 
-def get_hstr(paths, mdl):
+def get_hstr(paths, casename):
     hstr_set = set()
 
     # Pattern to extract what's after mdl.
-    pattern = re.compile(rf'{re.escape(mdl)}\.((?:[^0-9][^.]*\.?)+)')
+    pattern = re.compile(rf'{re.escape(casename)}\.((?:[^0-9][^.]*\.?)+)')
 
     # Pattern to remove trailing date strings like .0001-01 or .0001-01-0001-12
     date_like_pattern = re.compile(r'(\.?\d{4}-\d{2}(?:-\d{4}-\d{2})?)$')

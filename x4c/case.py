@@ -22,63 +22,81 @@ from .spell import Spell
 
 class History:
     def __init__(self, root_dir, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], comps_info=None, casename=None,
-                 path_pattern='comp/hist/casename.mdl.hstr.date.nc', avoid_list=['nday1', 'once'], cesm_ver=1):
+                #  path_pattern='comp/hist/casename.mdl.hstr.date.nc',
+                 path_pattern='comp/hist/casename.hstr.date.nc', avoid_list=['nday1', 'once']):
         self.path_pattern = path_pattern
         self.root_dir = root_dir
-        self.casename = casename
+        self.casename = os.path.basename(root_dir) if casename is None else casename
         utils.p_header(f'>>> case.root_dir: {self.root_dir}')
         utils.p_header(f'>>> case.casename: {self.casename}')
 
-        if cesm_ver in [1, 2]:
-            _comps_info = {
-                'atm': ('cam', '*'),
-                'ocn': ('pop', '*'),
-                'lnd': ('clm2', '*'),
-                'ice': ('cice', '*'),
-                'rof': ('rtm', '*'),
-            }
-        elif cesm_ver == 3:
-            _comps_info = {
-                'atm': ('cam', '*'),
-                'ocn': ('mom6', '*'),
-                'lnd': ('clm2', '*'),
-                'ice': ('cice', '*'),
-                'rof': ('mosart', '*'),
-            }
-        else:
-            raise ValueError(f'Unsupported CESM version: {cesm_ver}. Please specify `cesm_ver` as 1, 2, or 3.')
+        # if cesm_ver in [1, 2]:
+        #     _comps_info = {
+        #         'atm': ('cam', '*'),
+        #         'ocn': ('pop', '*'),
+        #         'lnd': ('clm2', '*'),
+        #         'ice': ('cice', '*'),
+        #         'rof': ('rtm', '*'),
+        #     }
+        # elif cesm_ver == 3:
+        #     _comps_info = {
+        #         'atm': ('cam', '*'),
+        #         'ocn': ('mom6', '*'),
+        #         'lnd': ('clm2', '*'),
+        #         'ice': ('cice', '*'),
+        #         'rof': ('mosart', '*'),
+        #     }
+        # else:
+        #     raise ValueError(f'Unsupported CESM version: {cesm_ver}. Please specify `cesm_ver` as 1, 2, or 3.')
 
+        _comps_info = {
+            'atm': '*',
+            'ocn': '*',
+            'lnd': '*',
+            'ice': '*',
+            'rof': '*',
+        }
         if comps_info is not None:
             _comps_info.update(comps_info)
 
-        self.comps_info = _comps_info
-        utils.p_header(f'>>> case.comps_info: {self.comps_info}')
+        # self.comps_info = _comps_info
+        # utils.p_header(f'>>> case.comps_info: {self.comps_info}')
 
+        self.comps_info = {}
         self.paths = {}
         for comp in comps:
-            mdl, hstr = self.comps_info[comp]
+            # mdl, hstr = _comps_info[comp]
+            hstr = _comps_info[comp]
             self.paths[comp] = {}
 
             if hstr == '*':
                 paths = utils.find_paths(
                     self.root_dir, self.path_pattern,
-                    comp=comp, mdl=mdl, hstr=hstr,
+                    # comp=comp, mdl=mdl, hstr=hstr,
+                    comp=comp, hstr=hstr,
                     avoid_list=avoid_list,
                 )
-                hstr = utils.get_hstr(paths, mdl=mdl)
-                self.comps_info[comp] = (mdl, hstr)
+                hstr = utils.get_hstr(paths, casename=self.casename)
+                # self.comps_info[comp] = (mdl, hstr)
+                self.comps_info[comp] = hstr
+            else:
+                # self.comps_info[comp] = (mdl, hstr)
+                self.comps_info[comp] = hstr
+
 
             for hs in hstr:
                 self.paths[comp][hs] = utils.find_paths(
                     self.root_dir, self.path_pattern,
-                    comp=comp, mdl=mdl, hstr=hs,
+                    # comp=comp, mdl=mdl, hstr=hs,
+                    comp=comp, hstr=hs,
                     avoid_list=avoid_list,
                 )
                 utils.p_success(f'>>> case.paths["{comp}"]["{hs}"] created')
 
         self.vns = {}
         for comp in comps:
-            mdl, hstr = self.comps_info[comp]
+            # mdl, hstr = self.comps_info[comp]
+            hstr = self.comps_info[comp]
             self.vns[comp] = {}
             for hs in hstr:
                 self.vns[comp][hs] = self.get_ts_vns(comp, hs)
@@ -131,8 +149,16 @@ class History:
             if os.path.exists(out_path): os.remove(out_path)
             vns = self.vns[comp][hstr].copy()
             vns.remove(vn)
-            cmd = f'ncks -h -C -x -v {",".join(vns)} {in_path} -o {out_path}'
-            subprocess.run(cmd, shell=True)
+            # cmd = f'ncks -h -C -x -v {",".join(vns)} {in_path} -o {out_path}'
+            # subprocess.run(cmd, shell=True)
+            cmd = [
+                'ncks', '-h', '-C', '-x',
+                '-v', ','.join(vns),
+                in_path,
+                '-o', out_path
+            ]
+
+            subprocess.run(cmd, check=True)
 
     def bigbang(self, comp, hstr, output_dirpath, timespan=None, overwrite=True, nproc=1, vns=None):
         output_dirpath = pathlib.Path(output_dirpath)
@@ -154,14 +180,15 @@ class History:
                         arg_list.append((vn, comp, hstr, path, output_dirpath, overwrite))
                 p.starmap(self.isolate_vn, tqdm(arg_list, total=len(arg_list), desc=f'Spliting {len(paths)} history files for {len(vns)} variables'))
     
-    def get_hstr(self, vn):
+    def get_hstr_based_on_vn(self, vn):
         for comp, hstrs in self.vns.items():
             for hstr, vns in hstrs.items():
                 if vn in vns:
                     return hstr
 
-    def merge_vn(self, vn, input_dirpath, output_dirpath, timespan=None, overwrite=True, compression=1):
-        paths = sorted(glob.glob(os.path.join(input_dirpath, f'*.{vn}.*.nc')))
+    def merge_vn(self, hstr, vn, input_dirpath, output_dirpath, timespan=None, overwrite=True, compression=1):
+        # DEBUG
+        paths = sorted(glob.glob(os.path.join(input_dirpath, f'*.{hstr}.{vn}.*.nc')))
         if timespan is None:
             paths_sub = paths
         else:
@@ -179,7 +206,7 @@ class History:
         bn_elements[-2] = f'{date_start}-{date_end}'
 
         if self.casename is not None:
-            hstr = self.get_hstr(vn)
+            hstr = self.get_hstr_based_on_vn(vn)
             dot_in_hstr = hstr.count('.')
             fname = '.'.join(bn_elements[-5-dot_in_hstr:])
             fname = f'{self.casename}.{fname}'
@@ -189,8 +216,16 @@ class History:
 
         if overwrite or not os.path.exists(out_path):
             if os.path.exists(out_path): os.remove(out_path)
-            cmd = f'ncrcat -O -4 -h --no_cll_mth -L {compression} {" ".join(paths_sub)} -o {out_path} 2>/dev/null'
-            subprocess.run(cmd, shell=True)
+            # cmd = f'ncrcat -O -4 -h --no_cll_mth -L {compression} {" ".join(paths_sub)} -o {out_path} 2>/dev/null'
+            # subprocess.run(cmd, shell=True)
+            cmd = [
+                'ncrcat', '-O', '-4', '-h', '--no_cll_mth',
+                '-L', str(compression),
+                *paths_sub,
+                '-o', out_path
+            ]
+
+            subprocess.run(cmd, check=True)
 
     def bigcrunch(self, comp, hstr, input_dirpath, output_dirpath, timespan=None, overwrite=True, nproc=1, compression=1, vns=None):
         output_dirpath = pathlib.Path(output_dirpath)
@@ -200,17 +235,17 @@ class History:
         desc = 'Merging variables'
         if nproc == 1:
             for vn in tqdm(vns, desc=desc):
-                self.merge_vn(vn, input_dirpath=input_dirpath, output_dirpath=output_dirpath, timespan=timespan, overwrite=overwrite, compression=compression)
+                self.merge_vn(hstr, vn, input_dirpath=input_dirpath, output_dirpath=output_dirpath, timespan=timespan, overwrite=overwrite, compression=compression)
         else:
             utils.p_hint(f'>>> nproc: {nproc}')
             with mp.Pool(processes=nproc) as p:
                 arg_list = []
                 for vn in vns:
-                    arg_list.append((vn, input_dirpath, output_dirpath, timespan, overwrite, compression))
+                    arg_list.append((hstr, vn, input_dirpath, output_dirpath, timespan, overwrite, compression))
                 p.starmap(self.merge_vn, tqdm(arg_list, total=len(arg_list), desc=desc))
 
     def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], years_per_file=None, timestep=None, timespan=None,
-               dir_structure='comp/proc/tseries/month_1' , overwrite=True, nproc=1, compression=1):
+               dir_structure='comp/proc/tseries/tres' , overwrite=True, nproc=1, compression=1):
 
         if staging_dirpath is None: staging_dirpath = output_dirpath
         if timespan is None: raise ValueError('Please specify `timespan`.')
@@ -232,6 +267,16 @@ class History:
             # generate timeseries files for each component and each sub-timespan
             utils.p_header(f'>>> Processing component: {comp}')
             for hs in hstr:
+                if hs in ['h0a', 'h0i', 'h1a', 'h4a', 'h', 'h.native', 'h.z', 'h.rho2']:
+                    tres = 'month_1'
+                elif hs in ['h2a', 'h.sfc']:
+                    tres = 'day_1'
+                elif hs in ['h3a']:
+                    tres = 'hour_3'
+                else:
+                    # raise ValueError(f'Unsupported history string: {hs} for time resolution inference.')
+                    continue
+
                 if vns is None:
                     vns_in = self.vns[comp][hs]
                 else:
@@ -245,7 +290,7 @@ class History:
                     if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
                     self.bigbang(comp=comp, hstr=hs, output_dirpath=bigbang_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, vns=vns_in)
 
-                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
+                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp).replace('tres', tres))
                     self.bigcrunch(comp=comp, hstr=hs, input_dirpath=bigbang_dir, output_dirpath=bigcrunch_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, compression=compression, vns=vns_in)
 
         for comp, vns in comps.items():
@@ -574,9 +619,10 @@ class Timeseries:
         timestep (int): the number of years stored in a single timeseries file
     '''
     def __init__(self, root_dir, grid_dict=None, casename=None, cesm_ver=1):
-        self.path_pattern='comp/proc/tseries/month_1/casename.mdl.h_str.vn.timespan.nc'
+        # self.path_pattern='comp/proc/tseries/month_1/casename.mdl.h_str.vn.timespan.nc'
+        self.path_pattern='comp/proc/tseries/tres/casename.hstr.vn.timespan.nc'
         self.root_dir = os.path.abspath(root_dir)
-        self.casename = casename
+        self.casename = os.path.basename(root_dir) if casename is None else casename
         self.cesm_ver = cesm_ver
 
         self.grid_dict = {'atm': 'ne30pg3', 'ocn': 'g16'}
@@ -594,6 +640,8 @@ class Timeseries:
             utils.p_header(f'>>> case.casename: {self.casename}')
 
         self.paths = utils.find_paths(self.root_dir, self.path_pattern)
+        # self.hstr = utils.get_hstr(self.paths, casename=self.casename)
+        self.hstr = list(set('.'.join(s.split('.')[:-1]) for s in utils.get_hstr(self.paths, casename=self.casename)))
 
         self.ds = {}
         self.diags = {}
@@ -610,8 +658,9 @@ class Timeseries:
 
     def get_paths(self, vn, comp=None, timespan=None):
         if comp is None: comp = self.get_vn_comp(vn)
-        comp, mdl, h_str = self.vars_info[(vn, comp)]
-        paths = utils.find_paths(self.root_dir, self.path_pattern, vn=vn, comp=comp, mdl=mdl, h_str=h_str)
+        comp, mdl, hstr = self.vars_info[(vn, comp)]
+        # paths = utils.find_paths(self.root_dir, self.path_pattern, vn=vn, comp=comp, mdl=mdl, h_str=h_str)
+        paths = utils.find_paths(self.root_dir, self.path_pattern, vn=vn, comp=comp, hstr=hstr)
         if timespan is None:
             paths_sub = paths
         else:
