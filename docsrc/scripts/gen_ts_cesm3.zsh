@@ -10,7 +10,6 @@ export step=10
 export task_name=gts
 export nnodes=1
 export ncpus=128
-export compression=1
 export overwrite=True
 export account=P93300324
 export pyenv=x4c-py313
@@ -38,12 +37,8 @@ import time
 start = time.time()
 
 dirpath = '$hist_root/$casename'
-case = x4c.History(
-    dirpath,
-    casename='$casename',
-    comps_info=${comps_info},
-    cesm_ver=$cesm_ver
-)
+case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info})
+syr, eyr = $syr, $eyr
 
 output_dirpath = '$ts_root/$casename'
 staging_dirpath = '$ts_staging/$casename'
@@ -51,11 +46,11 @@ case.gen_ts(
     comps=$comps,
     output_dirpath=output_dirpath,
     staging_dirpath=staging_dirpath,
-    timespan=($syr, $eyr),
+    timespan=(f'{syr:04d}', f'{eyr:04d}'),
     timestep=$step,
+    timestep_unit='year',
     nproc=$((nnodes * ncpus)),
     overwrite=$overwrite,
-    compression=$compression,
 )
 
 end = time.time()
@@ -90,14 +85,14 @@ EOF
 # =====================================================================
 # Define task entries: name|components|comps_info
 task_list=(
-  "o.sfc|['ocn']|{'ocn': ('mom6', ['h.sfc'])}"
-  "o.z|['ocn']|{'ocn': ('mom6', ['h.z'])}"
-  "o.rho2|['ocn']|{'ocn': ('mom6', ['h.rho2'])}"
-  "o.native|['ocn']|{'ocn': ('mom6', ['h.native'])}"
-  "a.h0a|['atm']|{'atm': ('cam', ['h0a'])}"
-  "a.h2a|['atm']|{'atm': ('cam', ['h2a'])}"
-  "a.h3a|['atm']|{'atm': ('cam', ['h3a'])}"
-  "a.h4a|['atm']|{'atm': ('cam', ['h4a'])}"
+  "o.sfc|['ocn']|{'ocn': ['mom6.h.sfc']}"
+  "o.z|['ocn']|{'ocn': ['mom6.h.z']}"
+  "o.rho2|['ocn']|{'ocn': ['mom6.h.rho2']}"
+  "o.native|['ocn']|{'ocn': ['mom6.h.native']}"
+  "a.h0a|['atm']|{'atm': ['cam.h0a']}"
+  "a.h2a|['atm']|{'atm': ['cam.h2a']}"
+  "a.h3a|['atm']|{'atm': ['cam.h3a']}"
+  "a.h4a|['atm']|{'atm': ['cam.h4a']}"
   "lir|['lnd', 'ice', 'rof']|{}"
 )
 
