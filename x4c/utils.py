@@ -403,7 +403,7 @@ def expand_braces(pattern):
 
 #     return sorted(hstr_set)
 
-def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.hstr.vn.timespan.nc', delimiters=['/', '.'],
+def find_paths(root_dir, path_pattern='comp/proc/tseries/*/casename.hstr.vn.timespan.nc', delimiters=['/', '.'],
                avoid_list=None, verbose=False, **kws):
     s = path_pattern
     for d in delimiters:
@@ -418,7 +418,7 @@ def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.hstr.v
                 path_pattern = path_pattern.replace(e, pattern_str)
             else:
                 path_pattern = path_pattern.replace(e, value)
-        elif e in ['proc', 'tseries', 'month_1', 'nc']:
+        elif e in ['proc', 'tseries', 'nc']:
             pass
         elif e in ['timespan', 'date']:
             path_pattern = path_pattern.replace(e, '*[0-9]')
@@ -467,6 +467,138 @@ def get_hstr(paths, casename):
                 hstr_set.add(hstr)
 
     return sorted(hstr_set)
+
+def add_months(dt: datetime.datetime, months: int) -> datetime.datetime:
+    """Add months to a datetime without relativedelta."""
+    month = dt.month - 1 + months
+    year = dt.year + month // 12
+    month = month % 12 + 1
+    day = min(dt.day, [31,
+                       29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28,
+                       31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1])
+    return dt.replace(year=year, month=month, day=day)
+
+def minus_months(dt: datetime.datetime, months: int) -> datetime.datetime:
+    """Minus months to a datetime without relativedelta."""
+    month = dt.month - 1 - months
+    year = dt.year + month // 12
+    month = month % 12 + 1
+    day = min(dt.day, [31,
+                       29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28,
+                       31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1])
+    return dt.replace(year=year, month=month, day=day)
+
+def parse_timespan(timespan: tuple[str, str]):
+    start, end = timespan
+    date_elements, nparts = {}, {}
+    date = {}
+    date['year'], date['month'], date['day'], date['hour'] = {}, {}, {}, {}
+    date_elements['start']= start.split('-')
+    date_elements['end']= end.split('-')
+
+    for tag in ['start', 'end']:
+        nparts[tag] = len(date_elements[tag])
+        if nparts[tag] == 1:
+            date['year'][tag] = int(date_elements[tag][0])
+            date['month'][tag] = 1
+            date['day'][tag] = 1
+            date['hour'][tag] = 0
+            timespan_precision = 'year'
+        elif nparts[tag] == 2:
+            date['year'][tag] = int(date_elements[tag][0])
+            date['month'][tag] = int(date_elements[tag][1])
+            date['day'][tag] = 1
+            date['hour'][tag] = 0
+            timespan_precision = 'month'
+        elif nparts[tag] == 3:
+            date['year'][tag] = int(date_elements[tag][0])
+            date['month'][tag] = int(date_elements[tag][1])
+            date['day'][tag] = int(date_elements[tag][2])
+            date['hour'][tag] = 0
+            timespan_precision = 'day'
+        elif nparts[tag] == 4:
+            date['year'][tag] = int(date_elements[tag][0])
+            date['month'][tag] = int(date_elements[tag][1])
+            date['day'][tag] = int(date_elements[tag][2])
+            date['hour'][tag] = int(date_elements[tag][3])
+            timespan_precision = 'hour'
+        else:
+            raise ValueError(f'Invalid timespan element format. Expected format: YYYY-MM-DD-HH.')
+
+    start_dt = datetime.datetime(date['year']['start'], date['month']['start'], date['day']['start'], date['hour']['start'])
+    end_dt = datetime.datetime(date['year']['end'], date['month']['end'], date['day']['end'], date['hour']['end'])
+    return start_dt, end_dt, timespan_precision
+
+def parse_timestamps(timespan: tuple[str, str], timestep:int, timestep_unit:str='year'):
+    start_dt, end_dt, timespan_precision = parse_timespan(timespan)
+
+    timestamp_list = []
+    current = start_dt
+    while current <= end_dt:
+        if timestep_unit == 'year':
+            next = add_months(current, timestep * 12)
+            current_end = minus_months(next, 1)
+        elif timestep_unit == 'month':
+            next = add_months(current, timestep)
+            current_end = minus_months(next, 1)
+        elif timestep_unit == 'day':
+            next = current + datetime.timedelta(days=timestep)
+            current_end = next - datetime.timedelta(days=1)
+        elif timestep_unit == 'hour':
+            next = current + datetime.timedelta(hours=timestep)
+            current_end = next - datetime.timedelta(hours=1)
+        else:
+            raise ValueError('Unsupported timestep_unit. Choose from year, month, day, hour.')
+
+        if timespan_precision == 'year':
+            current_str = f'{current.year:04d}'
+            current_end_str = f'{current_end.year:04d}'
+        elif timespan_precision == 'month':
+            current_str = f'{current.year:04d}-{current.month:02d}'
+            current_end_str = f'{current_end.year:04d}-{current_end.month:02d}'
+        elif timespan_precision == 'day':
+            current_str = f'{current.year:04d}-{current.month:02d}-{current.day:02d}'
+            current_end_str = f'{current_end.year:04d}-{current_end.month:02d}-{current_end.day:02d}'
+        elif timespan_precision == 'hour':
+            current_str = f'{current.year:04d}-{current.month:02d}-{current.day:02d}-{current.hour*3600:05d}'
+            current_end_str = f'{current_end.year:04d}-{current_end.month:02d}-{current_end.day:02d}-{current_end.hour*3600:05d}'
+
+        timestamp_list.append((current_str, current_end_str))
+        current = next
+
+    return timestamp_list
+
+def cesm_str2datetime(s: str) -> datetime.datetime:
+    """Convert CESM timestamp 'YYYY-MM-DD-SSSSS' to a datetime."""
+    nparts = len(s.split('-'))
+    if nparts == 4:
+        year, month, day, sec_str = s.split('-')
+        seconds = int(sec_str)
+        base = datetime.datetime(int(year), int(month), int(day))
+        res = base + datetime.timedelta(seconds=seconds)
+    elif nparts == 3:
+        year, month, day = s.split('-')
+        res = datetime.datetime(int(year), int(month), int(day))
+    elif nparts == 2:
+        year, month = s.split('-')
+        res = datetime.datetime(int(year), int(month), 1)
+    elif nparts == 1:
+        year = s.split('-')
+        res = datetime.datetime(int(year), 1, 1)
+
+    return res
+
+def datetime_truncate(dt: datetime.datetime, precision: str = 'day') -> datetime.datetime:
+    if precision == 'year':
+        return dt.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    elif precision == 'month':
+        return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    elif precision == 'day':
+        return dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif precision == 'hour':
+        return dt.replace(minute=0, second=0, microsecond=0)
+    else:
+        raise ValueError(f"Unsupported precision '{precision}'. Choose from 'year', 'month', 'day', 'hour'.")
 
 def download(url: str, fname: str, chunk_size=1024, show_bar=True):
     os.makedirs(os.path.dirname(fname), exist_ok=True)

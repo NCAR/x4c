@@ -2,6 +2,7 @@ import os
 import glob
 import pandas as pd
 import gzip
+import datetime
 from tqdm import tqdm
 import xarray as xr
 import multiprocessing as mp
@@ -124,11 +125,15 @@ class History:
         if timespan is None:
             paths_sub = paths
         else:
-            syr, eyr = timespan
+            start_dt, end_dt, timespan_precision = utils.parse_timespan(timespan)
+            start_dt = utils.datetime_truncate(start_dt, timespan_precision)
+            end_dt = utils.datetime_truncate(end_dt, timespan_precision)
             paths_sub = []
             for path in paths:
-                yr_tmp = int(path.split('.')[-2].split('-')[0][:4])
-                if (yr_tmp >= syr and yr_tmp <= eyr) or (yr_tmp >= syr and yr_tmp <= eyr):
+                date = path.split('.')[-2]
+                dt = utils.cesm_str2datetime(date)
+                dt = utils.datetime_truncate(dt, timespan_precision)
+                if start_dt <= dt <= end_dt:
                     paths_sub.append(path)
 
         return paths_sub
@@ -136,11 +141,11 @@ class History:
     def isolate_vn(self, vn, comp, hstr, in_path, output_dirpath, overwrite=True):
         bn_elements = os.path.basename(in_path).split('.')
         bn_elements.insert(-2, vn)
+        # print(bn_elements)
+        date_str = bn_elements[-2]
 
         if self.casename is not None:
-            dot_in_hstr = hstr.count('.')
-            fname = '.'.join(bn_elements[-5-dot_in_hstr:])
-            fname = f'{self.casename}.{fname}'
+            fname = f'{self.casename}.{hstr}.{vn}.{date_str}.nc'
         else:
             fname = '.'.join(bn_elements)
 
@@ -149,15 +154,12 @@ class History:
             if os.path.exists(out_path): os.remove(out_path)
             vns = self.vns[comp][hstr].copy()
             vns.remove(vn)
-            # cmd = f'ncks -h -C -x -v {",".join(vns)} {in_path} -o {out_path}'
-            # subprocess.run(cmd, shell=True)
             cmd = [
                 'ncks', '-h', '-C', '-x',
                 '-v', ','.join(vns),
                 in_path,
                 '-o', out_path
             ]
-
             subprocess.run(cmd, check=True)
 
     def bigbang(self, comp, hstr, output_dirpath, timespan=None, overwrite=True, nproc=1, vns=None):
@@ -172,7 +174,7 @@ class History:
                 for vn in vns:
                     self.isolate_vn(vn, comp, hstr, in_path=path, output_dirpath=output_dirpath, overwrite=overwrite)
         else:
-            utils.p_hint(f'>>> nproc: {nproc}')
+            # utils.p_hint(f'>>> nproc: {nproc}')
             with mp.Pool(processes=nproc) as p:
                 arg_list = []
                 for path in paths:
@@ -187,44 +189,42 @@ class History:
                     return hstr
 
     def merge_vn(self, hstr, vn, input_dirpath, output_dirpath, timespan=None, overwrite=True, compression=1):
-        # DEBUG
         paths = sorted(glob.glob(os.path.join(input_dirpath, f'*.{hstr}.{vn}.*.nc')))
         if timespan is None:
             paths_sub = paths
         else:
-            syr, eyr = timespan
+            start_dt, end_dt, timespan_precision = utils.parse_timespan(timespan)
+            start_dt = utils.datetime_truncate(start_dt, timespan_precision)
+            end_dt = utils.datetime_truncate(end_dt, timespan_precision)
             paths_sub = []
             for path in paths:
-                year = int(path.split('.')[-2].split('-')[0])
-                if (year >= syr and year <= eyr) or (year >= syr and year <= eyr):
+                date = path.split('.')[-2]
+                dt = utils.cesm_str2datetime(date)
+                dt = utils.datetime_truncate(dt, timespan_precision)
+                if start_dt <= dt <= end_dt:
                     paths_sub.append(path)
 
-        date_start = ''.join(paths[0].split('.')[-2].split('-'))
-        date_end = ''.join(paths[-1].split('.')[-2].split('-'))
+        date_start = ''.join(paths_sub[0].split('.')[-2].split('-'))
+        date_end = ''.join(paths_sub[-1].split('.')[-2].split('-'))
 
-        bn_elements = os.path.basename(paths[0]).split('.')
+        bn_elements = os.path.basename(paths_sub[0]).split('.')
         bn_elements[-2] = f'{date_start}-{date_end}'
+        date_str = bn_elements[-2]
 
         if self.casename is not None:
-            hstr = self.get_hstr_based_on_vn(vn)
-            dot_in_hstr = hstr.count('.')
-            fname = '.'.join(bn_elements[-5-dot_in_hstr:])
-            fname = f'{self.casename}.{fname}'
+            fname = f'{self.casename}.{hstr}.{vn}.{date_str}.nc'
         else:
             fname = '.'.join(bn_elements)
         out_path = os.path.join(output_dirpath, fname)
 
         if overwrite or not os.path.exists(out_path):
             if os.path.exists(out_path): os.remove(out_path)
-            # cmd = f'ncrcat -O -4 -h --no_cll_mth -L {compression} {" ".join(paths_sub)} -o {out_path} 2>/dev/null'
-            # subprocess.run(cmd, shell=True)
             cmd = [
                 'ncrcat', '-O', '-4', '-h', '--no_cll_mth',
                 '-L', str(compression),
                 *paths_sub,
                 '-o', out_path
             ]
-
             subprocess.run(cmd, check=True)
 
     def bigcrunch(self, comp, hstr, input_dirpath, output_dirpath, timespan=None, overwrite=True, nproc=1, compression=1, vns=None):
@@ -237,45 +237,41 @@ class History:
             for vn in tqdm(vns, desc=desc):
                 self.merge_vn(hstr, vn, input_dirpath=input_dirpath, output_dirpath=output_dirpath, timespan=timespan, overwrite=overwrite, compression=compression)
         else:
-            utils.p_hint(f'>>> nproc: {nproc}')
+            # utils.p_hint(f'>>> nproc: {nproc}')
             with mp.Pool(processes=nproc) as p:
                 arg_list = []
                 for vn in vns:
                     arg_list.append((hstr, vn, input_dirpath, output_dirpath, timespan, overwrite, compression))
                 p.starmap(self.merge_vn, tqdm(arg_list, total=len(arg_list), desc=desc))
 
-    def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], years_per_file=None, timestep=None, timespan=None,
-               dir_structure='comp/proc/tseries/tres' , overwrite=True, nproc=1, compression=1):
+    def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'],
+               timespan=None, timestep=None, timestep_unit='year',
+               dir_structure='comp/proc/tseries/hstr' , overwrite=True, nproc=1, compression=1):
 
+        utils.p_header(f'>>> nproc: {nproc}')
         if staging_dirpath is None: staging_dirpath = output_dirpath
         if timespan is None: raise ValueError('Please specify `timespan`.')
-        if years_per_file is None and timestep is None: raise ValueError('Please specify `years_per_file` or the equivalent `timestep`.')
-        if years_per_file is not None and timestep is None: timestep = years_per_file
 
-        syr = timespan[0]
-        nt = (timespan[-1] - timespan[0] + 1) // timestep
-        timespan_list = []
-        for i in range(nt):
-            timespan_list.append((syr, syr+timestep-1))
-            syr += timestep 
+        timespan_list = utils.parse_timestamps(timespan, timestep=timestep, timestep_unit=timestep_unit)
 
         if type(comps) is not dict:
             comps = {comp: None for comp in comps}
 
         for comp, vns in comps.items():
-            mdl, hstr = self.comps_info[comp]
+            # mdl, hstr = self.comps_info[comp]
+            hstr = self.comps_info[comp]
             # generate timeseries files for each component and each sub-timespan
             utils.p_header(f'>>> Processing component: {comp}')
             for hs in hstr:
-                if hs in ['h0a', 'h0i', 'h1a', 'h4a', 'h', 'h.native', 'h.z', 'h.rho2']:
-                    tres = 'month_1'
-                elif hs in ['h2a', 'h.sfc']:
-                    tres = 'day_1'
-                elif hs in ['h3a']:
-                    tres = 'hour_3'
-                else:
-                    # raise ValueError(f'Unsupported history string: {hs} for time resolution inference.')
-                    continue
+                # if hs in ['h0a', 'h0i', 'h1a', 'h4a', 'h', 'h.native', 'h.z', 'h.rho2']:
+                #     tres = 'month_1'
+                # elif hs in ['h2a', 'h.sfc']:
+                #     tres = 'day_1'
+                # elif hs in ['h3a']:
+                #     tres = 'hour_3'
+                # else:
+                #     # raise ValueError(f'Unsupported history string: {hs} for time resolution inference.')
+                #     continue
 
                 if vns is None:
                     vns_in = self.vns[comp][hs]
@@ -286,15 +282,31 @@ class History:
                 utils.p_header(f'>>> Processing hstr: {hs}')
                 for timespan_tmp in timespan_list:
                     utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
-                    bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
+                    bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]}-{timespan_tmp[1]}')
                     if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-                    self.bigbang(comp=comp, hstr=hs, output_dirpath=bigbang_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, vns=vns_in)
+                    self.bigbang(
+                        comp=comp, hstr=hs,
+                        output_dirpath=bigbang_dir,
+                        timespan=timespan_tmp,
+                        overwrite=overwrite,
+                        nproc=nproc,
+                        vns=vns_in,
+                    )
 
-                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp).replace('tres', tres))
-                    self.bigcrunch(comp=comp, hstr=hs, input_dirpath=bigbang_dir, output_dirpath=bigcrunch_dir, timespan=timespan_tmp, overwrite=overwrite, nproc=nproc, compression=compression, vns=vns_in)
+                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
+                    self.bigcrunch(
+                        comp=comp, hstr=hs,
+                        input_dirpath=bigbang_dir,
+                        output_dirpath=bigcrunch_dir,
+                        timespan=timespan_tmp,
+                        overwrite=overwrite,
+                        nproc=nproc,
+                        compression=compression,
+                        vns=vns_in,
+                    )
 
         for comp, vns in comps.items():
-            mdl, hstr = self.comps_info[comp]
+            hstr = self.comps_info[comp]
             # delete the temporary files
             utils.p_header(f'>>> Postprocessing component: {comp}')
             for hs in hstr:
@@ -306,7 +318,7 @@ class History:
 
                 for timespan_tmp in timespan_list:
                     utils.p_header(f'>>> Postprocessing timespan: {timespan_tmp}')
-                    bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]:04d}-{timespan_tmp[1]:04d}')
+                    bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]}-{timespan_tmp[1]}')
                     bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
                     if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
                     if staging_dirpath != output_dirpath:
@@ -314,7 +326,10 @@ class History:
                         dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp))
                         dst_dir = pathlib.Path(dst_dir)
                         dst_dir.mkdir(parents=True, exist_ok=True)
-                        src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12.nc'))
+                        date_start = ''.join(timespan_tmp[0].split('-'))
+                        date_end = ''.join(timespan_tmp[1].split('-'))
+                        date_str = f'{date_start}*-{date_end}*'
+                        src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{date_str}.nc'))
                         # [shutil.move(src_path, dst_dir) for src_path in src_paths]
                         # print(f'{src_paths =}')
                         # print(f'{dst_dir =}')
@@ -619,8 +634,7 @@ class Timeseries:
         timestep (int): the number of years stored in a single timeseries file
     '''
     def __init__(self, root_dir, grid_dict=None, casename=None, cesm_ver=1):
-        # self.path_pattern='comp/proc/tseries/month_1/casename.mdl.h_str.vn.timespan.nc'
-        self.path_pattern='comp/proc/tseries/tres/casename.hstr.vn.timespan.nc'
+        self.path_pattern='comp/proc/tseries/*/casename.hstr.vn.timespan.nc'
         self.root_dir = os.path.abspath(root_dir)
         self.casename = os.path.basename(root_dir) if casename is None else casename
         self.cesm_ver = cesm_ver
@@ -648,18 +662,18 @@ class Timeseries:
         self.vars_info = {}
         for path in self.paths:
             comp = path.split('/')[-5]
-            mdl = path.split('.')[-5]
-            h_str = path.split('.')[-4]
-            vn = path.split('.')[-3]
+            fname = os.path.basename(path)
+            vn = fname.split('.')[-3]
+            casename_hstr = fname.split(vn)[0]
+            hstr = casename_hstr.split(self.casename)[-1][1:-1]
             if (vn, comp) not in self.vars_info:
-                self.vars_info[(vn, comp)] = (comp, mdl, h_str)
+                self.vars_info[(vn, comp)] = (comp, hstr)
 
         utils.p_success(f'>>> case.vars_info created')
 
     def get_paths(self, vn, comp=None, timespan=None):
         if comp is None: comp = self.get_vn_comp(vn)
-        comp, mdl, hstr = self.vars_info[(vn, comp)]
-        # paths = utils.find_paths(self.root_dir, self.path_pattern, vn=vn, comp=comp, mdl=mdl, h_str=h_str)
+        comp, hstr = self.vars_info[(vn, comp)]
         paths = utils.find_paths(self.root_dir, self.path_pattern, vn=vn, comp=comp, hstr=hstr)
         if timespan is None:
             paths_sub = paths
@@ -710,7 +724,8 @@ class Timeseries:
                     self.clear_ds(vn)
 
             if vn not in self.ds:
-                comp, mdl, h_str = self.vars_info[(vn, comp)]
+                # comp, mdl, h_str = self.vars_info[(vn, comp)]
+                comp, hstr = self.vars_info[(vn, comp)]
 
                 _kws = {
                    'vn': vn,
@@ -847,7 +862,7 @@ class Timeseries:
         _kws = utils.update_dict(_kws, kws)
 
         if plot_type == 'map':
-            if (ssv, 'ocn') in self.vars_info and recalculate_ssv or ('ssv' not in self.diags):
+            if (ssv, 'ocn') in self.vars_info and (recalculate_ssv or ('ssv' not in self.diags)):
                 self.load(ssv)
                 da_ssv = self.ds[ssv].x.regrid().x.da.mean('time')
                 self.diags['ssv'] = da_ssv
