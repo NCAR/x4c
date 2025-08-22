@@ -3,7 +3,7 @@
 export hist_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
 export ts_root=/glade/derecho/scratch/fengzhu/x4c/gen_ts
 export ts_staging=/glade/derecho/scratch/fengzhu/x4c/gen_ts
-export casename=b.e30_beta02.BLT1850.ne30_t232.104
+export casename=b.e23_alpha17f.BLT1850.ne30_t232.092
 export syr=$1
 export eyr=$2
 export step=10
@@ -89,9 +89,6 @@ task_list=(
   "o.rho2|['ocn']|{'ocn': ['mom6.h.rho2']}"
   "o.native|['ocn']|{'ocn': ['mom6.h.native']}"
   "a.h0a|['atm']|{'atm': ['cam.h0a']}"
-  "a.h2a|['atm']|{'atm': ['cam.h2a']}"
-  "a.h3a|['atm']|{'atm': ['cam.h3a']}"
-  "a.h4a|['atm']|{'atm': ['cam.h4a']}"
   "lir|['lnd', 'ice', 'rof']|{}"
 )
 
