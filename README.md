@@ -1,7 +1,7 @@
 ![SIF](https://img.shields.io/badge/NSF_NCAR-CGD_SIF-blue)
 ![NSF](https://img.shields.io/badge/NSF-220777-blue)
 ![NSF](https://img.shields.io/badge/NSF-2530608-blue)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17028523.svg)](https://doi.org/10.5281/zenodo.17028523)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17028522.svg)](https://doi.org/10.5281/zenodo.17028522)
 [![PyPI version](https://badge.fury.io/py/x4c.svg)](https://badge.fury.io/py/x4c)
 [![PyPI](https://img.shields.io/badge/python-3.12-blue.svg)]()
 [![PyPI](https://img.shields.io/badge/python-3.13-blue.svg)]()
