@@ -77,5 +77,6 @@ x4c: Xarray for CESM
 
    ug-installation
    ug-core
+   ug-post
    ug-diags
    ug-api
