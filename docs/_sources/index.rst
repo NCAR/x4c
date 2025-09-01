@@ -2,7 +2,7 @@
 x4c: Xarray for CESM
 ******************************
 
-x4c (xarray4cesm) is an Xarray extension that aims to support efficient and intuitive CESM output postprocessing, analysis, and visualization:
+:code:`x4c` is an Xarray extension that aims to support efficient and intuitive CESM output postprocessing, analysis, and visualization:
 
 + **Postprocessing** features: time series generation, seasonal cycle climatology generation, etc.
 + **Analysis** features: regrid, various of mean calculation, annualization/seasonalization, etc.
@@ -32,7 +32,7 @@ x4c (xarray4cesm) is an Xarray extension that aims to support efficient and intu
         :link: ug-core
         :link-type: doc
 
-        Examples on core features; `x4c` as an Xarray extension.
+        Examples on core features; :code:`x4c` as an Xarray extension.
 
     .. grid-item-card::  CESM Postprocessing
         :class-title: custom-title
@@ -41,7 +41,7 @@ x4c (xarray4cesm) is an Xarray extension that aims to support efficient and intu
         :link: ug-post
         :link-type: doc
 
-        Examples on CESM postprocessing, including time series and climatology generation.
+        Examples on CESM postprocessing using the :code:`History` class for timeseries generation.
 
     .. grid-item-card::  CESM Diagnostics
         :class-title: custom-title
@@ -50,16 +50,7 @@ x4c (xarray4cesm) is an Xarray extension that aims to support efficient and intu
         :link: ug-diags
         :link-type: doc
 
-        Examples on CESM diagnostics using the `Timeseries` case system and the `spell` magics.
-
-    .. grid-item-card::  Paleoclimate Applications
-        :class-title: custom-title
-        :class-body: custom-body
-        :img-top: _static/paleo.png
-        :link: ug-paleo
-        :link-type: doc
-
-        Examples on paleoclimate applications.
+        Examples on CESM diagnostics using the :code:`Timeseries` class and the :code:`spell` magics.
 
     .. grid-item-card::  API
         :class-title: custom-title
@@ -69,6 +60,15 @@ x4c (xarray4cesm) is an Xarray extension that aims to support efficient and intu
         :link-type: doc
 
         The essential API.
+
+    .. .. grid-item-card::  Paleoclimate Applications
+    ..     :class-title: custom-title
+    ..     :class-body: custom-body
+    ..     :img-top: _static/paleo.png
+    ..     :link: ug-paleo
+    ..     :link-type: doc
+
+    ..     Examples on paleoclimate applications.
 
 .. toctree::
    :maxdepth: 2

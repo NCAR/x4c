@@ -7,3 +7,4 @@ This section illustrates the diagnostics of CESM output using `x4c`.
 
     notebooks/diags-case
     notebooks/diags-spell
+    notebooks/diags-register_new_funcs

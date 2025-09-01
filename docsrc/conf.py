@@ -16,7 +16,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'x4c'
-author = 'NSF NCAR'
+author = 'NSF NCAR (Feng Zhu, Michael Levy, Brian Dobins)'
 copyright = '2025, University Corporation for Atmospheric Research'
 
 

@@ -2,7 +2,24 @@ from . import utils
 import xarray as xr
 import numpy as np
 
-class DiagCalc:
+class Registry:
+    funcs = {}
+
+    @classmethod
+    def get_F(cls, name):
+        """Retrieve a diagnostic function by name."""
+        return cls.funcs.get(name)
+
+def F(func):
+    """Decorator to register a diagnostic function."""
+    name = func.__name__
+    if name.startswith("get_"):
+        key = name[4:]  # strip "get_"
+    else:
+        key = name
+    Registry.funcs[key] = func
+    return func
+
     # General calculations
     # def calc_ts(case, vn, load_idx=-1, adjust_month=True, sm_method='gm', ann_method='ann', long_name=None, units=None):
     #     ''' General timeseries calculation
@@ -284,7 +301,10 @@ class DiagCalc:
 
     #     return da
 
+class DiagCalc:
     # Get specific diagnostic variables
+    @staticmethod
+    @F
     def get_SST(case, **kws):
         if ('SST', 'ocn') not in case.vars_info:
             vn = 'TEMP'
@@ -299,6 +319,8 @@ class DiagCalc:
         sst.name = 'SST'
         return sst
 
+    @staticmethod
+    @F
     def get_SSS(case, **kws):
         if ('SSS', 'ocn') not in case.vars_info:
             vn = 'SALT'
@@ -313,6 +335,8 @@ class DiagCalc:
         sss.name = 'SSS'
         return sss
 
+    @staticmethod
+    @F
     def get_LST(case, **kws):
         vn = 'TS'
         case.load(vn, **kws)
@@ -328,6 +352,8 @@ class DiagCalc:
         lst.name = 'LST'
         return lst
 
+    @staticmethod
+    @F
     def get_MLD(case, **kws):
         vn = 'XMXL'
         case.load(vn, **kws)
@@ -336,6 +362,8 @@ class DiagCalc:
         da.attrs['units'] = 'm'
         return da
 
+    @staticmethod
+    @F
     def get_PRECT(case, **kws):
         case.load('PRECC', **kws)
         case.load('PRECL', **kws)
@@ -344,6 +372,8 @@ class DiagCalc:
         da.attrs['long_name'] = 'Total precipitation rate (convective + large-scale; liq + ice)'
         return da
 
+    @staticmethod
+    @F
     def get_dD(case, **kws):
         case.load('PRECRC_H2Or', **kws)
         case.load('PRECSC_H2Os', **kws)
@@ -368,6 +398,8 @@ class DiagCalc:
 
         return dD
         
+    @staticmethod
+    @F
     def get_d18Op(case, **kws):
         case.load('PRECRC_H216Or', **kws)
         case.load('PRECSC_H216Os', **kws)
@@ -392,6 +424,8 @@ class DiagCalc:
 
         return d18Op
 
+    @staticmethod
+    @F
     def get_d18Osw(case, **kws):
         case.load('R18O', **kws)
         R18O = case.ds['R18O'].x.da
@@ -401,6 +435,8 @@ class DiagCalc:
         d18Osw.attrs['units'] = 'permil'
         return d18Osw
 
+    @staticmethod
+    @F
     def get_d18Oc(case, **kws):
         ''' Calculate d18Oc = f(TEMP, d18Osw)
 
@@ -419,7 +455,8 @@ class DiagCalc:
         d18Oc.attrs['units'] = 'permil'
         return d18Oc
 
-
+    @staticmethod
+    @F
     def get_RESTOM(case, **kws):
         ''' Calculate RESTOM = FSNT - FLNT
         '''
@@ -465,6 +502,8 @@ class DiagCalc:
     #     utils.p_warning('>>> There are two solutions: "d18Oc_s1" and "d18Oc_s2".')
     #     return ds
 
+    @staticmethod
+    @F
     def get_MOC(case, **kws):
         vn = 'MOC'
         case.load(vn, **kws)
@@ -487,6 +526,8 @@ class DiagCalc:
     #     da.attrs['lon_name'] = 'Southern Ocean (90°S-28°S) MOC'
     #     return da
 
+    @staticmethod
+    @F
     def get_ICEFRAC(case, **kws):
         vn = 'aice'
         case.load(vn, **kws)

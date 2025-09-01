@@ -564,7 +564,7 @@ class XDataArray:
 
     def is_latlon(self):
         da = self.da.squeeze()
-        return ('lat' in da.coords and 'lon' in da.coords)
+        return ('lat' in da.dims and 'lon' in da.dims)
 
     def is_cam_se(self):
         da = self.da.squeeze()

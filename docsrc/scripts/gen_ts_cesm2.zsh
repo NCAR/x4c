@@ -4,8 +4,8 @@ export hist_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/
 export ts_root=/glade/derecho/scratch/fengzhu/x4c/gen_ts
 export ts_staging=/glade/derecho/scratch/fengzhu/x4c/gen_ts
 export casename=b.e23_alpha17f.BLT1850.ne30_t232.092
-export syr=$1
-export eyr=$2
+export syr=$1   # e.g., 0001: model year 1 
+export eyr=$2   # e.g., 0100: model year 100
 export step=10
 export task_name=gts
 export nnodes=1
@@ -37,7 +37,6 @@ start = time.time()
 
 dirpath = '$hist_root/$casename'
 case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info})
-syr, eyr = $syr, $eyr
 
 output_dirpath = '$ts_root/$casename'
 staging_dirpath = '$ts_staging/$casename'
@@ -45,7 +44,7 @@ case.gen_ts(
     comps=$comps,
     output_dirpath=output_dirpath,
     staging_dirpath=staging_dirpath,
-    timespan=(f'{syr:04d}', f'{eyr:04d}'),
+    timespan=('$syr', '$eyr'),
     timestep=$step,
     timestep_unit='year',
     nproc=$((nnodes * ncpus)),

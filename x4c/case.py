@@ -697,7 +697,8 @@ class Timeseries:
         if len(comps) == 1:
             return comps[0]
         elif len(comps) == 0:
-            if f'get_{vn}' in diags.DiagCalc.__dict__:
+            # if f'get_{vn}' in diags.DiagCalc.__dict__:
+            if vn in diags.Registry.funcs:
                 utils.p_warning(f'>>> {vn} is a supported derived variable.')
             else:
                 raise ValueError('The input variable name is unknown.')
@@ -767,8 +768,11 @@ class Timeseries:
                 utils.p_warning(f'>>> Variable `{vn}` is already calculated and the calculation is skipped.')
             else:
                 if comp is None: comp = self.get_vn_comp(vn)
-                if f'get_{vn}' in diags.DiagCalc.__dict__:
-                    da = diags.DiagCalc.__dict__[f'get_{vn}'](self, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
+                # if f'get_{vn}' in diags.DiagCalc.__dict__:
+                #     da = diags.DiagCalc.__dict__[f'get_{vn}'](self, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
+                if vn in diags.Registry.funcs:
+                    F = diags.Registry.funcs[vn]
+                    da = F(self, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
                 elif (vn, comp) in self.vars_info:
                     self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
                     da = self.ds[vn].x.da

@@ -41,7 +41,7 @@ x4c: Xarray for CESM
         :link: ug-post
         :link-type: doc
 
-        Examples on CESM postprocessing, including time series and climatology generation.
+        Examples on CESM postprocessing using the :code:`History` class for timeseries generation.
 
     .. grid-item-card::  CESM Diagnostics
         :class-title: custom-title
@@ -50,16 +50,7 @@ x4c: Xarray for CESM
         :link: ug-diags
         :link-type: doc
 
-        Examples on CESM diagnostics using the :code:`Timeseries` case system and the :code:`spell` magics.
-
-    .. grid-item-card::  Paleoclimate Applications
-        :class-title: custom-title
-        :class-body: custom-body
-        :img-top: _static/paleo.png
-        :link: ug-paleo
-        :link-type: doc
-
-        Examples on paleoclimate applications.
+        Examples on CESM diagnostics using the :code:`Timeseries` class and the :code:`spell` magics.
 
     .. grid-item-card::  API
         :class-title: custom-title
@@ -69,6 +60,15 @@ x4c: Xarray for CESM
         :link-type: doc
 
         The essential API.
+
+    .. .. grid-item-card::  Paleoclimate Applications
+    ..     :class-title: custom-title
+    ..     :class-body: custom-body
+    ..     :img-top: _static/paleo.png
+    ..     :link: ug-paleo
+    ..     :link-type: doc
+
+    ..     Examples on paleoclimate applications.
 
 .. toctree::
    :maxdepth: 2

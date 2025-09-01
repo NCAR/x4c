@@ -6,4 +6,3 @@ This section illustrates the postprocessing of CESM output using `x4c`.
     :maxdepth: 1
 
     notebooks/post-gen_ts
-    notebooks/post-gen_climo
