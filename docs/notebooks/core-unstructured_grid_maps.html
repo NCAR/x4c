@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>CAM-SE &#8212; x4c  documentation</title>
+    <title>Visualization of unstructured grid maps &#8212; x4c  documentation</title>
   
   
   
@@ -55,6 +55,8 @@
     <link rel="icon" href="../_static/x4c-logo.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CESM Postprocessing" href="../ug-post.html" />
+    <link rel="prev" title="Overview: x4c as an Xarray extension" href="core-overview.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -117,8 +119,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -167,13 +167,11 @@
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../ug-installation.html">Installation</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="core-regrid.html">Regrid from a CESM grid to a lat/lon grid</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core-geo_mean.html">Calculate the geo-spatial mean</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core-annualize.html">Annualize CESM output with flexible months</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core-visualize.html">Basic visualizations</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../ug-core.html">Core Features</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Visualization of unstructured grid maps</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../ug-post.html">CESM Postprocessing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -182,7 +180,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../ug-diags.html">CESM Diagnostics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="diags-case.html">A “Timeseries Case” system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-load_variables.html">Load Variables in Timeseries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-spell.html">A “spell” system</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-register_new_funcs.html">Registering New Diagnostic Functions</a></li>
 </ul>
@@ -374,7 +372,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>CAM-SE</h1>
+    <h1>Visualization of unstructured grid maps</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -384,24 +382,23 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">CAM-SE</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#With-regridding">With regridding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Without-regridding">Without regridding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CAM-SE">CAM-SE</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#With-regridding">With regridding</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Without-regridding">Without regridding</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#UXarray-vs-x4c-vs-x4c-regrid">UXarray vs x4c vs x4c-regrid</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#POP">POP</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">With regridding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Without regridding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#UXarray-vs-x4c-vs-x4c-regrid">UXarray vs x4c vs x4c-regrid</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#POP">POP</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">With regridding</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Without regridding</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Case">Case</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Air-surface-temperature">Air surface temperature</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Sea-surface-temperature">Sea surface temperature</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Case">Case</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Air-surface-temperature">Air surface temperature</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Sea-surface-temperature">Sea surface temperature</a></li>
 </ul>
 </li>
 </ul>
-
             </nav>
         </div>
     </div>
@@ -412,7 +409,9 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <div class="nbinput docutils container">
+  <section id="Visualization-of-unstructured-grid-maps">
+<h1>Visualization of unstructured grid maps<a class="headerlink" href="#Visualization-of-unstructured-grid-maps" title="Link to this heading">#</a></h1>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -456,7 +455,7 @@ document.write(`
 </pre></div></div>
 </div>
 <section id="CAM-SE">
-<h1>CAM-SE<a class="headerlink" href="#CAM-SE" title="Link to this heading">#</a></h1>
+<h2>CAM-SE<a class="headerlink" href="#CAM-SE" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -1829,7 +1828,7 @@ Attributes:
     units:      centimeters</dd><dt><span>comp :</span></dt><dd>ocn</dd><dt><span>grid :</span></dt><dd>g16</dd></dl></div></li></ul></div></div></div>
 </div>
 <section id="With-regridding">
-<h2>With regridding<a class="headerlink" href="#With-regridding" title="Link to this heading">#</a></h2>
+<h3>With regridding<a class="headerlink" href="#With-regridding" title="Link to this heading">#</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -1859,7 +1858,7 @@ Wall time: 1.08 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_7_1.png" src="../_images/notebooks_core-unstructured_grid_maps_7_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_8_1.png" src="../_images/notebooks_core-unstructured_grid_maps_8_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -1881,12 +1880,12 @@ Wall time: 1.08 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_8_0.png" src="../_images/notebooks_core-unstructured_grid_maps_8_0.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_9_0.png" src="../_images/notebooks_core-unstructured_grid_maps_9_0.png" />
 </div>
 </div>
 </section>
 <section id="Without-regridding">
-<h2>Without regridding<a class="headerlink" href="#Without-regridding" title="Link to this heading">#</a></h2>
+<h3>Without regridding<a class="headerlink" href="#Without-regridding" title="Link to this heading">#</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -1915,7 +1914,7 @@ Wall time: 286 ms
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_10_1.png" src="../_images/notebooks_core-unstructured_grid_maps_10_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_11_1.png" src="../_images/notebooks_core-unstructured_grid_maps_11_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -1937,13 +1936,13 @@ Wall time: 286 ms
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_11_0.png" src="../_images/notebooks_core-unstructured_grid_maps_11_0.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_12_0.png" src="../_images/notebooks_core-unstructured_grid_maps_12_0.png" />
 </div>
 </div>
 </section>
 </section>
 <section id="UXarray-vs-x4c-vs-x4c-regrid">
-<h1>UXarray vs x4c vs x4c-regrid<a class="headerlink" href="#UXarray-vs-x4c-vs-x4c-regrid" title="Link to this heading">#</a></h1>
+<h2>UXarray vs x4c vs x4c-regrid<a class="headerlink" href="#UXarray-vs-x4c-vs-x4c-regrid" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -1974,7 +1973,7 @@ Wall time: 1.17 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_13_1.png" src="../_images/notebooks_core-unstructured_grid_maps_13_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_14_1.png" src="../_images/notebooks_core-unstructured_grid_maps_14_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -2007,7 +2006,7 @@ Wall time: 296 ms
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_14_1.png" src="../_images/notebooks_core-unstructured_grid_maps_14_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_15_1.png" src="../_images/notebooks_core-unstructured_grid_maps_15_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -2039,14 +2038,14 @@ Wall time: 1.08 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_15_1.png" src="../_images/notebooks_core-unstructured_grid_maps_15_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_16_1.png" src="../_images/notebooks_core-unstructured_grid_maps_16_1.png" />
 </div>
 </div>
 </section>
 <section id="POP">
-<h1>POP<a class="headerlink" href="#POP" title="Link to this heading">#</a></h1>
+<h2>POP<a class="headerlink" href="#POP" title="Link to this heading">#</a></h2>
 <section id="id1">
-<h2>With regridding<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<h3>With regridding<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
@@ -2075,12 +2074,12 @@ Wall time: 2.41 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_18_1.png" src="../_images/notebooks_core-unstructured_grid_maps_18_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_19_1.png" src="../_images/notebooks_core-unstructured_grid_maps_19_1.png" />
 </div>
 </div>
 </section>
 <section id="id2">
-<h2>Without regridding<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<h3>Without regridding<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -2109,15 +2108,15 @@ Wall time: 577 ms
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_20_1.png" src="../_images/notebooks_core-unstructured_grid_maps_20_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_21_1.png" src="../_images/notebooks_core-unstructured_grid_maps_21_1.png" />
 </div>
 </div>
 </section>
 </section>
 <section id="Case">
-<h1>Case<a class="headerlink" href="#Case" title="Link to this heading">#</a></h1>
+<h2>Case<a class="headerlink" href="#Case" title="Link to this heading">#</a></h2>
 <section id="Air-surface-temperature">
-<h2>Air surface temperature<a class="headerlink" href="#Air-surface-temperature" title="Link to this heading">#</a></h2>
+<h3>Air surface temperature<a class="headerlink" href="#Air-surface-temperature" title="Link to this heading">#</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
@@ -2142,7 +2141,7 @@ Wall time: 4.29 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_23_1.png" src="../_images/notebooks_core-unstructured_grid_maps_23_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_24_1.png" src="../_images/notebooks_core-unstructured_grid_maps_24_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -2167,7 +2166,7 @@ Wall time: 1.08 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_24_1.png" src="../_images/notebooks_core-unstructured_grid_maps_24_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_25_1.png" src="../_images/notebooks_core-unstructured_grid_maps_25_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -2192,7 +2191,7 @@ Wall time: 288 ms
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_25_1.png" src="../_images/notebooks_core-unstructured_grid_maps_25_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_26_1.png" src="../_images/notebooks_core-unstructured_grid_maps_26_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -2217,12 +2216,12 @@ Wall time: 1.16 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_26_1.png" src="../_images/notebooks_core-unstructured_grid_maps_26_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_27_1.png" src="../_images/notebooks_core-unstructured_grid_maps_27_1.png" />
 </div>
 </div>
 </section>
 <section id="Sea-surface-temperature">
-<h2>Sea surface temperature<a class="headerlink" href="#Sea-surface-temperature" title="Link to this heading">#</a></h2>
+<h3>Sea surface temperature<a class="headerlink" href="#Sea-surface-temperature" title="Link to this heading">#</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -2245,7 +2244,7 @@ Wall time: 2.45 s
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_28_1.png" src="../_images/notebooks_core-unstructured_grid_maps_28_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_29_1.png" src="../_images/notebooks_core-unstructured_grid_maps_29_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -2270,9 +2269,10 @@ Wall time: 593 ms
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_core-unstructured_grid_maps_29_1.png" src="../_images/notebooks_core-unstructured_grid_maps_29_1.png" />
+<img alt="../_images/notebooks_core-unstructured_grid_maps_30_1.png" src="../_images/notebooks_core-unstructured_grid_maps_30_1.png" />
 </div>
 </div>
+</section>
 </section>
 </section>
 
@@ -2287,6 +2287,24 @@ Wall time: 593 ms
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="core-overview.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../ug-post.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">CESM Postprocessing</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -2303,24 +2321,23 @@ Wall time: 593 ms
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">CAM-SE</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#With-regridding">With regridding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Without-regridding">Without regridding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CAM-SE">CAM-SE</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#With-regridding">With regridding</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Without-regridding">Without regridding</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#UXarray-vs-x4c-vs-x4c-regrid">UXarray vs x4c vs x4c-regrid</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#POP">POP</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">With regridding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Without regridding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#UXarray-vs-x4c-vs-x4c-regrid">UXarray vs x4c vs x4c-regrid</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#POP">POP</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">With regridding</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Without regridding</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Case">Case</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Air-surface-temperature">Air surface temperature</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Sea-surface-temperature">Sea surface temperature</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Case">Case</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Air-surface-temperature">Air surface temperature</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Sea-surface-temperature">Sea surface temperature</a></li>
 </ul>
 </li>
 </ul>
-
   </nav></div>
 
 </div></div>

@@ -32,7 +32,7 @@ x4c: Xarray for CESM
         :link: ug-core
         :link-type: doc
 
-        Examples on core features; :code:`x4c` as an Xarray extension.
+        :code:`x4c` as an Xarray extension.
 
     .. grid-item-card::  CESM Postprocessing
         :class-title: custom-title
@@ -41,7 +41,7 @@ x4c: Xarray for CESM
         :link: ug-post
         :link-type: doc
 
-        Examples on CESM postprocessing using the :code:`History` class for timeseries generation.
+        Timeseries generation using the :code:`History` class.
 
     .. grid-item-card::  CESM Diagnostics
         :class-title: custom-title
@@ -50,7 +50,7 @@ x4c: Xarray for CESM
         :link: ug-diags
         :link-type: doc
 
-        Examples on CESM diagnostics using the :code:`Timeseries` class and the :code:`spell` magics.
+        Diagnostics using the :code:`Timeseries` class and the :code:`spell` magics.
 
     .. grid-item-card::  API
         :class-title: custom-title
