@@ -52,6 +52,9 @@ extensions = [
     # 'sphinx_gallery.load_style',
 ]
 nbsphinx_allow_errors = True
+nbsphinx_execute_arguments = [
+    "--no-prompt"
+]
 
 html_logo = 'x4c-logo.png'
 html_favicon = 'x4c-logo.png'
