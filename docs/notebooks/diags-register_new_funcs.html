@@ -399,7 +399,7 @@ document.write(`
   <section id="Registering-New-Diagnostic-Functions">
 <h1>Registering New Diagnostic Functions<a class="headerlink" href="#Registering-New-Diagnostic-Functions" title="Link to this heading">#</a></h1>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>1
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
@@ -421,7 +421,7 @@ print(x4c.__version__)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>23
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>dirpath = &#39;/glade/campaign/univ/ubrn0018/fengzhu/CESM_output/timeseries/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;
@@ -444,7 +444,7 @@ case = x4c.Timeseries(dirpath, grid_dict={&#39;atm&#39;: &#39;ne16np4&#39;})
 <section id="A-1st-order-variable-that-exists-under-the-CESM-Postprocessing-Timeseries-directory">
 <h2>A 1st order variable that exists under the CESM Postprocessing Timeseries directory<a class="headerlink" href="#A-1st-order-variable-that-exists-under-the-CESM-Postprocessing-Timeseries-directory" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>4
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>spell = &#39;TS&#39;
@@ -462,7 +462,7 @@ case.diags[spell]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>4
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -985,7 +985,7 @@ Attributes:
 <section id="A-deduced-variable-based-on-1st-order-variables">
 <h2>A deduced variable based on 1st order variables<a class="headerlink" href="#A-deduced-variable-based-on-1st-order-variables" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>5
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>spell = &#39;SST&#39;
@@ -1004,7 +1004,7 @@ case.diags[spell]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>5
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1664,7 +1664,7 @@ Attributes:
     cell_methods:  z_t: mean</dd><dt><span>comp :</span></dt><dd>ocn</dd><dt><span>grid :</span></dt><dd>g16</dd></dl></div></li></ul></div></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>24
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>spell = &#39;d18Op&#39;
@@ -1691,7 +1691,7 @@ case.diags[spell]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>24
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -2214,7 +2214,7 @@ Attributes:
 <section id="User-defined-derived-variables">
 <h2>User-defined derived variables<a class="headerlink" href="#User-defined-derived-variables" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>25
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>x4c.diags.Registry.funcs
@@ -2222,7 +2222,7 @@ Attributes:
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>25
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -2243,7 +2243,7 @@ Attributes:
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>26
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>@x4c.diags.F
@@ -2264,7 +2264,7 @@ x4c.diags.Registry.funcs
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>26
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -2285,7 +2285,7 @@ x4c.diags.Registry.funcs
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>28
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>spell = &#39;H2O:ann&#39;
@@ -2313,7 +2313,7 @@ case.diags[spell]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>28
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -2951,7 +2951,7 @@ Attributes:
     units:      degrees_east</dd><dt><span>comp :</span></dt><dd>atm</dd><dt><span>grid :</span></dt><dd>ne16np4</dd></dl></div></li></ul></div></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>18
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>fig, ax = case.plot(spell, regrid=True)
@@ -2966,7 +2966,7 @@ Attributes:
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span> 
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>
