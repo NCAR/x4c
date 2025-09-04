@@ -51,6 +51,7 @@ extensions = [
     # 'sphinx_copybutton',
     # 'sphinx_gallery.load_style',
 ]
+nbsphinx_allow_errors = True
 
 html_logo = 'x4c-logo.png'
 html_favicon = 'x4c-logo.png'

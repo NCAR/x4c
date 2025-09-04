@@ -605,6 +605,9 @@ class XDataArray:
 
         '''
         da = self.da.squeeze()
+        if 'regrid' in kws and kws['regrid'] is True:
+            da = da.x.regrid(gs=gs)
+
         ndim = len(da.dims)
         if self.is_map():
             # map

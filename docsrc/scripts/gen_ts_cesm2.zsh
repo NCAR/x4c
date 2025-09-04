@@ -1,12 +1,13 @@
 #!/bin/zsh
 
 export hist_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
-export ts_root=/glade/derecho/scratch/fengzhu/x4c/gen_ts
+export ts_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
 export ts_staging=/glade/derecho/scratch/fengzhu/x4c/gen_ts
 export casename=b.e23_alpha17f.BLT1850.ne30_t232.092
 export syr=$1   # e.g., 0001: model year 1 
 export eyr=$2   # e.g., 0100: model year 100
-export step=10
+export timestep=10
+export timestep_unit=year
 export task_name=gts
 export nnodes=1
 export ncpus=128
@@ -45,8 +46,8 @@ case.gen_ts(
     output_dirpath=output_dirpath,
     staging_dirpath=staging_dirpath,
     timespan=('$syr', '$eyr'),
-    timestep=$step,
-    timestep_unit='year',
+    timestep=$timestep,
+    timestep_unit='$timestep_unit',
     nproc=$((nnodes * ncpus)),
     overwrite=$overwrite,
 )

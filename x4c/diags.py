@@ -303,7 +303,6 @@ def F(func):
 
 class DiagCalc:
     # Get specific diagnostic variables
-    @staticmethod
     @F
     def get_SST(case, **kws):
         if ('SST', 'ocn') not in case.vars_info:
@@ -319,7 +318,6 @@ class DiagCalc:
         sst.name = 'SST'
         return sst
 
-    @staticmethod
     @F
     def get_SSS(case, **kws):
         if ('SSS', 'ocn') not in case.vars_info:
@@ -335,7 +333,6 @@ class DiagCalc:
         sss.name = 'SSS'
         return sss
 
-    @staticmethod
     @F
     def get_LST(case, **kws):
         vn = 'TS'
@@ -352,7 +349,6 @@ class DiagCalc:
         lst.name = 'LST'
         return lst
 
-    @staticmethod
     @F
     def get_MLD(case, **kws):
         vn = 'XMXL'
@@ -362,7 +358,6 @@ class DiagCalc:
         da.attrs['units'] = 'm'
         return da
 
-    @staticmethod
     @F
     def get_PRECT(case, **kws):
         case.load('PRECC', **kws)
@@ -372,7 +367,6 @@ class DiagCalc:
         da.attrs['long_name'] = 'Total precipitation rate (convective + large-scale; liq + ice)'
         return da
 
-    @staticmethod
     @F
     def get_dD(case, **kws):
         case.load('PRECRC_H2Or', **kws)
@@ -398,7 +392,6 @@ class DiagCalc:
 
         return dD
         
-    @staticmethod
     @F
     def get_d18Op(case, **kws):
         case.load('PRECRC_H216Or', **kws)
@@ -424,7 +417,6 @@ class DiagCalc:
 
         return d18Op
 
-    @staticmethod
     @F
     def get_d18Osw(case, **kws):
         case.load('R18O', **kws)
@@ -435,7 +427,6 @@ class DiagCalc:
         d18Osw.attrs['units'] = 'permil'
         return d18Osw
 
-    @staticmethod
     @F
     def get_d18Oc(case, **kws):
         ''' Calculate d18Oc = f(TEMP, d18Osw)
@@ -455,7 +446,6 @@ class DiagCalc:
         d18Oc.attrs['units'] = 'permil'
         return d18Oc
 
-    @staticmethod
     @F
     def get_RESTOM(case, **kws):
         ''' Calculate RESTOM = FSNT - FLNT
@@ -502,7 +492,6 @@ class DiagCalc:
     #     utils.p_warning('>>> There are two solutions: "d18Oc_s1" and "d18Oc_s2".')
     #     return ds
 
-    @staticmethod
     @F
     def get_MOC(case, **kws):
         vn = 'MOC'
@@ -526,7 +515,6 @@ class DiagCalc:
     #     da.attrs['lon_name'] = 'Southern Ocean (90°S-28°S) MOC'
     #     return da
 
-    @staticmethod
     @F
     def get_ICEFRAC(case, **kws):
         vn = 'aice'

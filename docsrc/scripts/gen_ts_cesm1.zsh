@@ -1,12 +1,12 @@
 #!/bin/zsh
 
-export hist_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
+export hist_root=/glade/derecho/scratch/jiangzhu/archive
 export ts_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
 export ts_staging=/glade/derecho/scratch/fengzhu/x4c/gen_ts
-export casename=b.e30_beta02.BLT1850.ne30_t232.104
+export casename=b.e13.B1850.f19_g16.icesm131_icam6_paleo.PI.010
 export syr=$1   # e.g., 0001: model year 1 
 export eyr=$2   # e.g., 0100: model year 100
-export timestep=10
+export timestep=100
 export timestep_unit=year
 export task_name=gts
 export nnodes=1
@@ -84,15 +84,9 @@ EOF
 # =====================================================================
 # Define task entries: name|components|comps_info
 task_list=(
-  "o.sfc|['ocn']|{'ocn': ['mom6.h.sfc']}"
-  "o.z|['ocn']|{'ocn': ['mom6.h.z']}"
-  "o.rho2|['ocn']|{'ocn': ['mom6.h.rho2']}"
-  "o.native|['ocn']|{'ocn': ['mom6.h.native']}"
-  "a.h0a|['atm']|{'atm': ['cam.h0a']}"
-  "a.h2a|['atm']|{'atm': ['cam.h2a']}"
-  "a.h3a|['atm']|{'atm': ['cam.h3a']}"
-  "a.h4a|['atm']|{'atm': ['cam.h4a']}"
-  "lir|['lnd', 'ice', 'rof']|{}"
+  "o|['ocn']|{}"
+  "ai|['atm', 'ice']|{}"
+  "lr|['lnd', 'rof']|{}"
 )
 
 for entry in "${task_list[@]}"; do

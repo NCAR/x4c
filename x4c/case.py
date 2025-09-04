@@ -319,11 +319,11 @@ class History:
                 for timespan_tmp in timespan_list:
                     utils.p_header(f'>>> Postprocessing timespan: {timespan_tmp}')
                     bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]}-{timespan_tmp[1]}')
-                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp))
+                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
                     if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
                     if staging_dirpath != output_dirpath:
                         # move files from staging to destination
-                        dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp))
+                        dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
                         dst_dir = pathlib.Path(dst_dir)
                         dst_dir.mkdir(parents=True, exist_ok=True)
                         date_start = ''.join(timespan_tmp[0].split('-'))
