@@ -401,12 +401,12 @@ document.write(`
 <ul class="simple">
 <li><p>Annualization</p></li>
 <li><p>Geospatial Averaging</p></li>
-<li><p>Visualization</p></li>
+<li><p>Publication-ready Visualization</p></li>
 </ul>
 <p>More detailed explainations of each feature can be found in later sections.</p>
 </div><div style="border-left: 5px solid #787878ff; padding: 0.5em; background: #ebebebff;"><p><strong>Example Datasets:</strong> Zhu, F. &amp; Zhu, J. Long simulations of the Miocene Climatic Optimum, DOI: 10.5065/3QFN-GN70 (2025). <a class="reference external" href="https://rda.ucar.edu/datasets/d010026/">https://rda.ucar.edu/datasets/d010026/</a>.</p>
 </div><div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>1
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
@@ -432,7 +432,7 @@ document.write(`
 <h2>Loading a netCDF file as an <code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code><a class="headerlink" href="#Loading-a-netCDF-file-as-an-xarray.Dataset" title="Link to this heading">#</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">x4c.load_dataset()</span></code> function is an enhanced version of <code class="docutils literal notranslate"><span class="pre">xarray.load_dataset()</span></code> for CESM output. The users may specify the component (<code class="docutils literal notranslate"><span class="pre">comp</span></code>) and grid (<code class="docutils literal notranslate"><span class="pre">grid</span></code>) information while loading the file.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span> 
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
@@ -1525,7 +1525,7 @@ Attributes:
     units:      degrees_east</dd></dl></div></li></ul></div></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>10
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;comp&#39;</span><span class="p">])</span>
@@ -1547,7 +1547,7 @@ ne16np4
 <p>The loaded dataset has add-on attributions such as <code class="docutils literal notranslate"><span class="pre">comp</span></code> and <code class="docutils literal notranslate"><span class="pre">grid</span></code> that are useful for later analysis and visualization. The add-on attribution <code class="docutils literal notranslate"><span class="pre">path</span></code> is good for file tracking.</p>
 <p>Note that the time axis is offset by one month in the raw iCESM1 output, and <code class="docutils literal notranslate"><span class="pre">x4c.load_dataset()</span></code> provides the option <code class="docutils literal notranslate"><span class="pre">adjust_month=True</span></code> to fix this issue. This won’t be an issue for CESM2 &amp; 3 outputs.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>6
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
@@ -1563,7 +1563,7 @@ ne16np4
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>6
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -2646,7 +2646,7 @@ Attributes:
 <h2>Annualization<a class="headerlink" href="#Annualization" title="Link to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">x4c</span></code> provides a handy function <code class="docutils literal notranslate"><span class="pre">x4c.annualize()</span></code> for annualization of the dataset.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>11
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds_ann</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">annualize</span><span class="p">()</span>
@@ -2655,7 +2655,7 @@ Attributes:
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>11
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -3458,7 +3458,7 @@ Attributes:
     units:      degrees_east</dd></dl></div></li></ul></div></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span> 
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
