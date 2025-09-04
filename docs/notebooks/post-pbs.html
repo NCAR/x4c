@@ -33,7 +33,6 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=db61ab07" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
-    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=fca5bd30" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -400,379 +399,334 @@ document.write(`
                   
   <section id="PBS-Scripts">
 <h1>PBS Scripts<a class="headerlink" href="#PBS-Scripts" title="Link to this heading">#</a></h1>
+<p>In production mode, we usually submit a PBS (Portable Batch System) job to the HPC for a high-performance timeseries generation for the all available CESM output components and variables. Below we show three Zsh scripts that work for CESM1, 2, and 3, respectively. Each script follows the same workflow:</p>
+<ol class="arabic simple">
+<li><p>Python scripts generation</p></li>
+<li><p>PBS job scripts generation</p></li>
+<li><p>PBS jobs submission</p></li>
+</ol>
 <section id="CESM1-Example">
 <h2>CESM1 Example<a class="headerlink" href="#CESM1-Example" title="Link to this heading">#</a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
 
-<span class="n">export</span> <span class="n">hist_root</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">derecho</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">jiangzhu</span><span class="o">/</span><span class="n">archive</span>
-<span class="n">export</span> <span class="n">ts_root</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">campaign</span><span class="o">/</span><span class="n">cesm</span><span class="o">/</span><span class="n">development</span><span class="o">/</span><span class="n">cross</span><span class="o">-</span><span class="n">wg</span><span class="o">/</span><span class="n">diagnostic_framework</span><span class="o">/</span><span class="n">x4c</span><span class="o">/</span><span class="n">timeseries</span>
-<span class="n">export</span> <span class="n">ts_staging</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">derecho</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">fengzhu</span><span class="o">/</span><span class="n">x4c</span><span class="o">/</span><span class="n">gen_ts</span>
-<span class="n">export</span> <span class="n">casename</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">e13</span><span class="o">.</span><span class="n">B1850</span><span class="o">.</span><span class="n">f19_g16</span><span class="o">.</span><span class="n">icesm131_icam6_paleo</span><span class="o">.</span><span class="n">PI</span><span class="mf">.010</span>
-<span class="n">export</span> <span class="n">syr</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>   <span class="c1"># e.g., 0001: model year 1</span>
-<span class="n">export</span> <span class="n">eyr</span><span class="o">=</span><span class="err">$</span><span class="mi">2</span>   <span class="c1"># e.g., 0100: model year 100</span>
-<span class="n">export</span> <span class="n">timestep</span><span class="o">=</span><span class="mi">100</span>
-<span class="n">export</span> <span class="n">timestep_unit</span><span class="o">=</span><span class="n">year</span>
-<span class="n">export</span> <span class="n">task_name</span><span class="o">=</span><span class="n">gts</span>
-<span class="n">export</span> <span class="n">nnodes</span><span class="o">=</span><span class="mi">1</span>
-<span class="n">export</span> <span class="n">ncpus</span><span class="o">=</span><span class="mi">128</span>
-<span class="n">export</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span>
-<span class="n">export</span> <span class="n">account</span><span class="o">=</span><span class="n">P93300324</span>
-<span class="n">export</span> <span class="n">pyenv</span><span class="o">=</span><span class="n">x4c</span><span class="o">-</span><span class="n">py313</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">hist_root</span><span class="o">=</span>/glade/derecho/scratch/jiangzhu/archive
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_staging</span><span class="o">=</span>/glade/derecho/scratch/fengzhu/x4c/gen_ts
+<span class="nb">export</span><span class="w"> </span><span class="nv">casename</span><span class="o">=</span>b.e13.B1850.f19_g16.icesm131_icam6_paleo.PI.010
+<span class="nb">export</span><span class="w"> </span><span class="nv">syr</span><span class="o">=</span><span class="nv">$1</span><span class="w">   </span><span class="c1"># e.g., 0001: model year 1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">eyr</span><span class="o">=</span><span class="nv">$2</span><span class="w">   </span><span class="c1"># e.g., 0100: model year 100</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep</span><span class="o">=</span><span class="m">100</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep_unit</span><span class="o">=</span>year
+<span class="nb">export</span><span class="w"> </span><span class="nv">task_name</span><span class="o">=</span>gts
+<span class="nb">export</span><span class="w"> </span><span class="nv">nnodes</span><span class="o">=</span><span class="m">1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="m">128</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">overwrite</span><span class="o">=</span>True
+<span class="nb">export</span><span class="w"> </span><span class="nv">account</span><span class="o">=</span>P93300324
+<span class="nb">export</span><span class="w"> </span><span class="nv">pyenv</span><span class="o">=</span>x4c-py313
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># create d case directory</span>
 <span class="c1"># =====================================================================</span>
-<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="err">$</span><span class="p">{</span><span class="n">casename</span><span class="p">}</span>
-<span class="n">cd</span> <span class="err">$</span><span class="p">{</span><span class="n">casename</span><span class="p">}</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># define functions</span>
 <span class="c1"># =====================================================================</span>
-<span class="n">gen_py_script</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">local</span> <span class="n">name</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
-  <span class="n">local</span> <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="mi">2</span>
-  <span class="n">local</span> <span class="n">comps_info</span><span class="o">=</span><span class="err">$</span><span class="mi">3</span>
+gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps_info</span><span class="o">=</span><span class="nv">$3</span>
 
-  <span class="n">cat</span> <span class="o">&gt;!</span><span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span>&lt;&lt;<span class="w"> </span>EOF
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">x4c</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">import os</span>
+<span class="s">import x4c</span>
+<span class="s">import time</span>
 
-<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="s">start = time.time()</span>
 
-<span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;$hist_root/$casename&#39;</span>
-<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">History</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="n">comps</span><span class="p">,</span> <span class="n">comps_info</span><span class="o">=</span><span class="err">$</span><span class="p">{</span><span class="n">comps_info</span><span class="p">})</span>
+<span class="s">dirpath = &#39;$hist_root/$casename&#39;</span>
+<span class="s">case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info})</span>
 
-<span class="n">output_dirpath</span> <span class="o">=</span> <span class="s1">&#39;$ts_root/$casename&#39;</span>
-<span class="n">staging_dirpath</span> <span class="o">=</span> <span class="s1">&#39;$ts_staging/$casename&#39;</span>
-<span class="k">case</span><span class="o">.</span><span class="n">gen_ts</span><span class="p">(</span>
-    <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="n">comps</span><span class="p">,</span>
-    <span class="n">output_dirpath</span><span class="o">=</span><span class="n">output_dirpath</span><span class="p">,</span>
-    <span class="n">staging_dirpath</span><span class="o">=</span><span class="n">staging_dirpath</span><span class="p">,</span>
-    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;$syr&#39;</span><span class="p">,</span> <span class="s1">&#39;$eyr&#39;</span><span class="p">),</span>
-    <span class="n">timestep</span><span class="o">=</span><span class="err">$</span><span class="n">timestep</span><span class="p">,</span>
-    <span class="n">timestep_unit</span><span class="o">=</span><span class="s1">&#39;$timestep_unit&#39;</span><span class="p">,</span>
-    <span class="n">nproc</span><span class="o">=</span><span class="err">$</span><span class="p">((</span><span class="n">nnodes</span> <span class="o">*</span> <span class="n">ncpus</span><span class="p">)),</span>
-    <span class="n">overwrite</span><span class="o">=</span><span class="err">$</span><span class="n">overwrite</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="s">output_dirpath = &#39;$ts_root/$casename&#39;</span>
+<span class="s">staging_dirpath = &#39;$ts_staging/$casename&#39;</span>
+<span class="s">case.gen_ts(</span>
+<span class="s">    comps=$comps,</span>
+<span class="s">    output_dirpath=output_dirpath,</span>
+<span class="s">    staging_dirpath=staging_dirpath,</span>
+<span class="s">    timespan=(&#39;$syr&#39;, &#39;$eyr&#39;),</span>
+<span class="s">    timestep=$timestep,</span>
+<span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
+<span class="s">    nproc=$((nnodes * ncpus)),</span>
+<span class="s">    overwrite=$overwrite,</span>
+<span class="s">)</span>
 
-<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Elapsed wall-clock time: </span><span class="si">{</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">/</span><span class="mi">60</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> mins&#39;</span><span class="p">)</span>
-<span class="n">EOF</span>
-<span class="p">}</span>
+<span class="s">end = time.time()</span>
+<span class="s">print(f&#39;Elapsed wall-clock time: {(end-start)/60:.1f} mins&#39;)</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
 
-<span class="n">gen_pbs_script</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">local</span> <span class="n">name</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
+gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
 
-  <span class="n">cat</span> <span class="o">&gt;!</span><span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span>&lt;&lt;<span class="w"> </span>EOF
-<span class="c1">#!/bin/bash</span>
-<span class="c1">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
-<span class="c1">#PBS -q main</span>
-<span class="c1">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
-<span class="c1">#PBS -l walltime=12:00:00</span>
-<span class="c1">#PBS -A ${account}</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
+<span class="s">#PBS -q main</span>
+<span class="s">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
+<span class="s">#PBS -l walltime=12:00:00</span>
+<span class="s">#PBS -A ${account}</span>
 
-<span class="n">source</span> \<span class="err">$</span><span class="n">LMOD_ROOT</span><span class="o">/</span><span class="n">lmod</span><span class="o">/</span><span class="n">init</span><span class="o">/</span><span class="n">zsh</span>
+<span class="s">source \$LMOD_ROOT/lmod/init/zsh</span>
 
-<span class="n">module</span> <span class="n">load</span> <span class="n">ncarenv</span><span class="o">/</span><span class="mf">23.09</span>
-<span class="n">module</span> <span class="n">load</span> <span class="n">nco</span>
-<span class="n">module</span> <span class="n">load</span> <span class="n">conda</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="err">$</span><span class="p">{</span><span class="n">pyenv</span><span class="p">}</span>
+<span class="s">module load ncarenv/23.09</span>
+<span class="s">module load nco</span>
+<span class="s">module load conda</span>
+<span class="s">conda activate ${pyenv}</span>
 
-<span class="n">python</span> <span class="err">$</span><span class="p">{</span><span class="n">task_name</span><span class="p">}</span><span class="n">_</span><span class="err">$</span><span class="p">{</span><span class="n">name</span><span class="p">}</span><span class="n">_</span><span class="err">$</span><span class="p">{</span><span class="n">syr</span><span class="p">}</span><span class="o">-</span><span class="err">$</span><span class="p">{</span><span class="n">eyr</span><span class="p">}</span><span class="o">.</span><span class="n">py</span>
-<span class="n">EOF</span>
-<span class="p">}</span>
+<span class="s">python ${task_name}_${name}_${syr}-${eyr}.py</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># call functions</span>
 <span class="c1"># =====================================================================</span>
 <span class="c1"># Define task entries: name|components|comps_info</span>
-<span class="n">task_list</span><span class="o">=</span><span class="p">(</span>
-  <span class="s2">&quot;o|[&#39;ocn&#39;]|</span><span class="si">{}</span><span class="s2">&quot;</span>
-  <span class="s2">&quot;ai|[&#39;atm&#39;, &#39;ice&#39;]|</span><span class="si">{}</span><span class="s2">&quot;</span>
-  <span class="s2">&quot;lr|[&#39;lnd&#39;, &#39;rof&#39;]|</span><span class="si">{}</span><span class="s2">&quot;</span>
-<span class="p">)</span>
+<span class="nv">task_list</span><span class="o">=(</span>
+<span class="w">  </span><span class="s2">&quot;o|[&#39;ocn&#39;]|{}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;ai|[&#39;atm&#39;, &#39;ice&#39;]|{}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;lr|[&#39;lnd&#39;, &#39;rof&#39;]|{}&quot;</span>
+<span class="o">)</span>
 
-<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="s2">&quot;$</span><span class="si">{task_list[@]}</span><span class="s2">&quot;</span><span class="p">;</span> <span class="n">do</span>
-  <span class="n">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span> <span class="n">read</span> <span class="o">-</span><span class="n">r</span> <span class="n">name</span> <span class="n">comps</span> <span class="n">comps_info</span> <span class="o">&lt;&lt;&lt;</span> <span class="s2">&quot;$entry&quot;</span>
+<span class="k">for</span><span class="w"> </span>entry<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_list</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
 
-  <span class="n">gen_py_script</span> <span class="s2">&quot;$name&quot;</span> <span class="s2">&quot;$comps&quot;</span> <span class="s2">&quot;$</span><span class="si">{comps_info}</span><span class="s2">&quot;</span>
-  <span class="n">gen_pbs_script</span> <span class="s2">&quot;$name&quot;</span>
-  <span class="n">qsub</span> <span class="s2">&quot;$</span><span class="si">{task_name}</span><span class="s2">_$</span><span class="si">{name}</span><span class="s2">_$</span><span class="si">{syr}</span><span class="s2">-$</span><span class="si">{eyr}</span><span class="s2">.pbs&quot;</span>
-<span class="n">done</span>
+<span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span>
+<span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
+<span class="k">done</span>
 
-<span class="n">exit</span>
+<span class="nb">exit</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[1]</span><span class="ansi-green-fg">, line 3</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">export hist_root=/glade/derecho/scratch/jiangzhu/archive</span>
-           ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> invalid syntax
-
-</pre></div></div>
 </div>
 </section>
 <section id="CESM2-Example">
 <h2>CESM2 Example<a class="headerlink" href="#CESM2-Example" title="Link to this heading">#</a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
 
-<span class="n">export</span> <span class="n">hist_root</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">campaign</span><span class="o">/</span><span class="n">cesm</span><span class="o">/</span><span class="n">development</span><span class="o">/</span><span class="n">cross</span><span class="o">-</span><span class="n">wg</span><span class="o">/</span><span class="n">diagnostic_framework</span><span class="o">/</span><span class="n">CESM_output_for_testing</span>
-<span class="n">export</span> <span class="n">ts_root</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">campaign</span><span class="o">/</span><span class="n">cesm</span><span class="o">/</span><span class="n">development</span><span class="o">/</span><span class="n">cross</span><span class="o">-</span><span class="n">wg</span><span class="o">/</span><span class="n">diagnostic_framework</span><span class="o">/</span><span class="n">x4c</span><span class="o">/</span><span class="n">timeseries</span>
-<span class="n">export</span> <span class="n">ts_staging</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">derecho</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">fengzhu</span><span class="o">/</span><span class="n">x4c</span><span class="o">/</span><span class="n">gen_ts</span>
-<span class="n">export</span> <span class="n">casename</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">e23_alpha17f</span><span class="o">.</span><span class="n">BLT1850</span><span class="o">.</span><span class="n">ne30_t232</span><span class="mf">.092</span>
-<span class="n">export</span> <span class="n">syr</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>   <span class="c1"># e.g., 0001: model year 1</span>
-<span class="n">export</span> <span class="n">eyr</span><span class="o">=</span><span class="err">$</span><span class="mi">2</span>   <span class="c1"># e.g., 0100: model year 100</span>
-<span class="n">export</span> <span class="n">timestep</span><span class="o">=</span><span class="mi">10</span>
-<span class="n">export</span> <span class="n">timestep_unit</span><span class="o">=</span><span class="n">year</span>
-<span class="n">export</span> <span class="n">task_name</span><span class="o">=</span><span class="n">gts</span>
-<span class="n">export</span> <span class="n">nnodes</span><span class="o">=</span><span class="mi">1</span>
-<span class="n">export</span> <span class="n">ncpus</span><span class="o">=</span><span class="mi">128</span>
-<span class="n">export</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span>
-<span class="n">export</span> <span class="n">account</span><span class="o">=</span><span class="n">P93300324</span>
-<span class="n">export</span> <span class="n">pyenv</span><span class="o">=</span><span class="n">x4c</span><span class="o">-</span><span class="n">py313</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">hist_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_staging</span><span class="o">=</span>/glade/derecho/scratch/fengzhu/x4c/gen_ts
+<span class="nb">export</span><span class="w"> </span><span class="nv">casename</span><span class="o">=</span>b.e23_alpha17f.BLT1850.ne30_t232.092
+<span class="nb">export</span><span class="w"> </span><span class="nv">syr</span><span class="o">=</span><span class="nv">$1</span><span class="w">   </span><span class="c1"># e.g., 0001: model year 1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">eyr</span><span class="o">=</span><span class="nv">$2</span><span class="w">   </span><span class="c1"># e.g., 0100: model year 100</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep</span><span class="o">=</span><span class="m">10</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep_unit</span><span class="o">=</span>year
+<span class="nb">export</span><span class="w"> </span><span class="nv">task_name</span><span class="o">=</span>gts
+<span class="nb">export</span><span class="w"> </span><span class="nv">nnodes</span><span class="o">=</span><span class="m">1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="m">128</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">overwrite</span><span class="o">=</span>True
+<span class="nb">export</span><span class="w"> </span><span class="nv">account</span><span class="o">=</span>P93300324
+<span class="nb">export</span><span class="w"> </span><span class="nv">pyenv</span><span class="o">=</span>x4c-py313
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># create d case directory</span>
 <span class="c1"># =====================================================================</span>
-<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="err">$</span><span class="p">{</span><span class="n">casename</span><span class="p">}</span>
-<span class="n">cd</span> <span class="err">$</span><span class="p">{</span><span class="n">casename</span><span class="p">}</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># define functions</span>
 <span class="c1"># =====================================================================</span>
-<span class="n">gen_py_script</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">local</span> <span class="n">name</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
-  <span class="n">local</span> <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="mi">2</span>
-  <span class="n">local</span> <span class="n">comps_info</span><span class="o">=</span><span class="err">$</span><span class="mi">3</span>
+gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps_info</span><span class="o">=</span><span class="nv">$3</span>
 
-  <span class="n">cat</span> <span class="o">&gt;!</span><span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span>&lt;&lt;<span class="w"> </span>EOF
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">x4c</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">import os</span>
+<span class="s">import x4c</span>
+<span class="s">import time</span>
 
-<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="s">start = time.time()</span>
 
-<span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;$hist_root/$casename&#39;</span>
-<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">History</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="n">comps</span><span class="p">,</span> <span class="n">comps_info</span><span class="o">=</span><span class="err">$</span><span class="p">{</span><span class="n">comps_info</span><span class="p">})</span>
+<span class="s">dirpath = &#39;$hist_root/$casename&#39;</span>
+<span class="s">case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info})</span>
 
-<span class="n">output_dirpath</span> <span class="o">=</span> <span class="s1">&#39;$ts_root/$casename&#39;</span>
-<span class="n">staging_dirpath</span> <span class="o">=</span> <span class="s1">&#39;$ts_staging/$casename&#39;</span>
-<span class="k">case</span><span class="o">.</span><span class="n">gen_ts</span><span class="p">(</span>
-    <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="n">comps</span><span class="p">,</span>
-    <span class="n">output_dirpath</span><span class="o">=</span><span class="n">output_dirpath</span><span class="p">,</span>
-    <span class="n">staging_dirpath</span><span class="o">=</span><span class="n">staging_dirpath</span><span class="p">,</span>
-    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;$syr&#39;</span><span class="p">,</span> <span class="s1">&#39;$eyr&#39;</span><span class="p">),</span>
-    <span class="n">timestep</span><span class="o">=</span><span class="err">$</span><span class="n">timestep</span><span class="p">,</span>
-    <span class="n">timestep_unit</span><span class="o">=</span><span class="s1">&#39;$timestep_unit&#39;</span><span class="p">,</span>
-    <span class="n">nproc</span><span class="o">=</span><span class="err">$</span><span class="p">((</span><span class="n">nnodes</span> <span class="o">*</span> <span class="n">ncpus</span><span class="p">)),</span>
-    <span class="n">overwrite</span><span class="o">=</span><span class="err">$</span><span class="n">overwrite</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="s">output_dirpath = &#39;$ts_root/$casename&#39;</span>
+<span class="s">staging_dirpath = &#39;$ts_staging/$casename&#39;</span>
+<span class="s">case.gen_ts(</span>
+<span class="s">    comps=$comps,</span>
+<span class="s">    output_dirpath=output_dirpath,</span>
+<span class="s">    staging_dirpath=staging_dirpath,</span>
+<span class="s">    timespan=(&#39;$syr&#39;, &#39;$eyr&#39;),</span>
+<span class="s">    timestep=$timestep,</span>
+<span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
+<span class="s">    nproc=$((nnodes * ncpus)),</span>
+<span class="s">    overwrite=$overwrite,</span>
+<span class="s">)</span>
 
-<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Elapsed wall-clock time: </span><span class="si">{</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">/</span><span class="mi">60</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> mins&#39;</span><span class="p">)</span>
-<span class="n">EOF</span>
-<span class="p">}</span>
+<span class="s">end = time.time()</span>
+<span class="s">print(f&#39;Elapsed wall-clock time: {(end-start)/60:.1f} mins&#39;)</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
 
-<span class="n">gen_pbs_script</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">local</span> <span class="n">name</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
+gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
 
-  <span class="n">cat</span> <span class="o">&gt;!</span><span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span>&lt;&lt;<span class="w"> </span>EOF
-<span class="c1">#!/bin/bash</span>
-<span class="c1">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
-<span class="c1">#PBS -q main</span>
-<span class="c1">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
-<span class="c1">#PBS -l walltime=12:00:00</span>
-<span class="c1">#PBS -A ${account}</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
+<span class="s">#PBS -q main</span>
+<span class="s">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
+<span class="s">#PBS -l walltime=12:00:00</span>
+<span class="s">#PBS -A ${account}</span>
 
-<span class="n">source</span> \<span class="err">$</span><span class="n">LMOD_ROOT</span><span class="o">/</span><span class="n">lmod</span><span class="o">/</span><span class="n">init</span><span class="o">/</span><span class="n">zsh</span>
+<span class="s">source \$LMOD_ROOT/lmod/init/zsh</span>
 
-<span class="n">module</span> <span class="n">load</span> <span class="n">ncarenv</span><span class="o">/</span><span class="mf">23.09</span>
-<span class="n">module</span> <span class="n">load</span> <span class="n">nco</span>
-<span class="n">module</span> <span class="n">load</span> <span class="n">conda</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="err">$</span><span class="p">{</span><span class="n">pyenv</span><span class="p">}</span>
+<span class="s">module load ncarenv/23.09</span>
+<span class="s">module load nco</span>
+<span class="s">module load conda</span>
+<span class="s">conda activate ${pyenv}</span>
 
-<span class="n">python</span> <span class="err">$</span><span class="p">{</span><span class="n">task_name</span><span class="p">}</span><span class="n">_</span><span class="err">$</span><span class="p">{</span><span class="n">name</span><span class="p">}</span><span class="n">_</span><span class="err">$</span><span class="p">{</span><span class="n">syr</span><span class="p">}</span><span class="o">-</span><span class="err">$</span><span class="p">{</span><span class="n">eyr</span><span class="p">}</span><span class="o">.</span><span class="n">py</span>
-<span class="n">EOF</span>
-<span class="p">}</span>
+<span class="s">python ${task_name}_${name}_${syr}-${eyr}.py</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># call functions</span>
 <span class="c1"># =====================================================================</span>
 <span class="c1"># Define task entries: name|components|comps_info</span>
-<span class="n">task_list</span><span class="o">=</span><span class="p">(</span>
-  <span class="s2">&quot;o.sfc|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.sfc&#39;]}&quot;</span>
-  <span class="s2">&quot;o.z|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.z&#39;]}&quot;</span>
-  <span class="s2">&quot;o.rho2|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.rho2&#39;]}&quot;</span>
-  <span class="s2">&quot;o.native|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.native&#39;]}&quot;</span>
-  <span class="s2">&quot;a.h0a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h0a&#39;]}&quot;</span>
-  <span class="s2">&quot;lir|[&#39;lnd&#39;, &#39;ice&#39;, &#39;rof&#39;]|</span><span class="si">{}</span><span class="s2">&quot;</span>
-<span class="p">)</span>
+<span class="nv">task_list</span><span class="o">=(</span>
+<span class="w">  </span><span class="s2">&quot;o.sfc|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.sfc&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.z|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.z&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.rho2|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.rho2&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.native|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.native&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h0a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h0a&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;lir|[&#39;lnd&#39;, &#39;ice&#39;, &#39;rof&#39;]|{}&quot;</span>
+<span class="o">)</span>
 
-<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="s2">&quot;$</span><span class="si">{task_list[@]}</span><span class="s2">&quot;</span><span class="p">;</span> <span class="n">do</span>
-  <span class="n">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span> <span class="n">read</span> <span class="o">-</span><span class="n">r</span> <span class="n">name</span> <span class="n">comps</span> <span class="n">comps_info</span> <span class="o">&lt;&lt;&lt;</span> <span class="s2">&quot;$entry&quot;</span>
+<span class="k">for</span><span class="w"> </span>entry<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_list</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
 
-  <span class="n">gen_py_script</span> <span class="s2">&quot;$name&quot;</span> <span class="s2">&quot;$comps&quot;</span> <span class="s2">&quot;$</span><span class="si">{comps_info}</span><span class="s2">&quot;</span>
-  <span class="n">gen_pbs_script</span> <span class="s2">&quot;$name&quot;</span>
-  <span class="n">qsub</span> <span class="s2">&quot;$</span><span class="si">{task_name}</span><span class="s2">_$</span><span class="si">{name}</span><span class="s2">_$</span><span class="si">{syr}</span><span class="s2">-$</span><span class="si">{eyr}</span><span class="s2">.pbs&quot;</span>
-<span class="n">done</span>
+<span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span>
+<span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
+<span class="k">done</span>
 
-<span class="n">exit</span>
+<span class="nb">exit</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[2]</span><span class="ansi-green-fg">, line 3</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">export hist_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing</span>
-           ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> invalid syntax
-
-</pre></div></div>
 </div>
 </section>
 <section id="CESM3-Example">
 <h2>CESM3 Example<a class="headerlink" href="#CESM3-Example" title="Link to this heading">#</a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
 
-<span class="n">export</span> <span class="n">hist_root</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">campaign</span><span class="o">/</span><span class="n">cesm</span><span class="o">/</span><span class="n">development</span><span class="o">/</span><span class="n">cross</span><span class="o">-</span><span class="n">wg</span><span class="o">/</span><span class="n">diagnostic_framework</span><span class="o">/</span><span class="n">CESM_output_for_testing</span>
-<span class="n">export</span> <span class="n">ts_root</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">campaign</span><span class="o">/</span><span class="n">cesm</span><span class="o">/</span><span class="n">development</span><span class="o">/</span><span class="n">cross</span><span class="o">-</span><span class="n">wg</span><span class="o">/</span><span class="n">diagnostic_framework</span><span class="o">/</span><span class="n">x4c</span><span class="o">/</span><span class="n">timeseries</span>
-<span class="n">export</span> <span class="n">ts_staging</span><span class="o">=/</span><span class="n">glade</span><span class="o">/</span><span class="n">derecho</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">fengzhu</span><span class="o">/</span><span class="n">x4c</span><span class="o">/</span><span class="n">gen_ts</span>
-<span class="n">export</span> <span class="n">casename</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">e30_beta02</span><span class="o">.</span><span class="n">BLT1850</span><span class="o">.</span><span class="n">ne30_t232</span><span class="mf">.104</span>
-<span class="n">export</span> <span class="n">syr</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>   <span class="c1"># e.g., 0001: model year 1</span>
-<span class="n">export</span> <span class="n">eyr</span><span class="o">=</span><span class="err">$</span><span class="mi">2</span>   <span class="c1"># e.g., 0100: model year 100</span>
-<span class="n">export</span> <span class="n">timestep</span><span class="o">=</span><span class="mi">10</span>
-<span class="n">export</span> <span class="n">timestep_unit</span><span class="o">=</span><span class="n">year</span>
-<span class="n">export</span> <span class="n">task_name</span><span class="o">=</span><span class="n">gts</span>
-<span class="n">export</span> <span class="n">nnodes</span><span class="o">=</span><span class="mi">1</span>
-<span class="n">export</span> <span class="n">ncpus</span><span class="o">=</span><span class="mi">128</span>
-<span class="n">export</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span>
-<span class="n">export</span> <span class="n">account</span><span class="o">=</span><span class="n">P93300324</span>
-<span class="n">export</span> <span class="n">pyenv</span><span class="o">=</span><span class="n">x4c</span><span class="o">-</span><span class="n">py313</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">hist_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_staging</span><span class="o">=</span>/glade/derecho/scratch/fengzhu/x4c/gen_ts
+<span class="nb">export</span><span class="w"> </span><span class="nv">casename</span><span class="o">=</span>b.e30_beta02.BLT1850.ne30_t232.104
+<span class="nb">export</span><span class="w"> </span><span class="nv">syr</span><span class="o">=</span><span class="nv">$1</span><span class="w">   </span><span class="c1"># e.g., 0001: model year 1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">eyr</span><span class="o">=</span><span class="nv">$2</span><span class="w">   </span><span class="c1"># e.g., 0100: model year 100</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep</span><span class="o">=</span><span class="m">10</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep_unit</span><span class="o">=</span>year
+<span class="nb">export</span><span class="w"> </span><span class="nv">task_name</span><span class="o">=</span>gts
+<span class="nb">export</span><span class="w"> </span><span class="nv">nnodes</span><span class="o">=</span><span class="m">1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="m">128</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">overwrite</span><span class="o">=</span>True
+<span class="nb">export</span><span class="w"> </span><span class="nv">account</span><span class="o">=</span>P93300324
+<span class="nb">export</span><span class="w"> </span><span class="nv">pyenv</span><span class="o">=</span>x4c-py313
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># create d case directory</span>
 <span class="c1"># =====================================================================</span>
-<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="err">$</span><span class="p">{</span><span class="n">casename</span><span class="p">}</span>
-<span class="n">cd</span> <span class="err">$</span><span class="p">{</span><span class="n">casename</span><span class="p">}</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># define functions</span>
 <span class="c1"># =====================================================================</span>
-<span class="n">gen_py_script</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">local</span> <span class="n">name</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
-  <span class="n">local</span> <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="mi">2</span>
-  <span class="n">local</span> <span class="n">comps_info</span><span class="o">=</span><span class="err">$</span><span class="mi">3</span>
+gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps_info</span><span class="o">=</span><span class="nv">$3</span>
 
-  <span class="n">cat</span> <span class="o">&gt;!</span><span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span>&lt;&lt;<span class="w"> </span>EOF
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">x4c</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">import os</span>
+<span class="s">import x4c</span>
+<span class="s">import time</span>
 
-<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="s">start = time.time()</span>
 
-<span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;$hist_root/$casename&#39;</span>
-<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">History</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="n">comps</span><span class="p">,</span> <span class="n">comps_info</span><span class="o">=</span><span class="err">$</span><span class="p">{</span><span class="n">comps_info</span><span class="p">})</span>
+<span class="s">dirpath = &#39;$hist_root/$casename&#39;</span>
+<span class="s">case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info})</span>
 
-<span class="n">output_dirpath</span> <span class="o">=</span> <span class="s1">&#39;$ts_root/$casename&#39;</span>
-<span class="n">staging_dirpath</span> <span class="o">=</span> <span class="s1">&#39;$ts_staging/$casename&#39;</span>
-<span class="k">case</span><span class="o">.</span><span class="n">gen_ts</span><span class="p">(</span>
-    <span class="n">comps</span><span class="o">=</span><span class="err">$</span><span class="n">comps</span><span class="p">,</span>
-    <span class="n">output_dirpath</span><span class="o">=</span><span class="n">output_dirpath</span><span class="p">,</span>
-    <span class="n">staging_dirpath</span><span class="o">=</span><span class="n">staging_dirpath</span><span class="p">,</span>
-    <span class="n">timespan</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;$syr&#39;</span><span class="p">,</span> <span class="s1">&#39;$eyr&#39;</span><span class="p">),</span>
-    <span class="n">timestep</span><span class="o">=</span><span class="err">$</span><span class="n">timestep</span><span class="p">,</span>
-    <span class="n">timestep_unit</span><span class="o">=</span><span class="s1">&#39;$timestep_unit&#39;</span><span class="p">,</span>
-    <span class="n">nproc</span><span class="o">=</span><span class="err">$</span><span class="p">((</span><span class="n">nnodes</span> <span class="o">*</span> <span class="n">ncpus</span><span class="p">)),</span>
-    <span class="n">overwrite</span><span class="o">=</span><span class="err">$</span><span class="n">overwrite</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="s">output_dirpath = &#39;$ts_root/$casename&#39;</span>
+<span class="s">staging_dirpath = &#39;$ts_staging/$casename&#39;</span>
+<span class="s">case.gen_ts(</span>
+<span class="s">    comps=$comps,</span>
+<span class="s">    output_dirpath=output_dirpath,</span>
+<span class="s">    staging_dirpath=staging_dirpath,</span>
+<span class="s">    timespan=(&#39;$syr&#39;, &#39;$eyr&#39;),</span>
+<span class="s">    timestep=$timestep,</span>
+<span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
+<span class="s">    nproc=$((nnodes * ncpus)),</span>
+<span class="s">    overwrite=$overwrite,</span>
+<span class="s">)</span>
 
-<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Elapsed wall-clock time: </span><span class="si">{</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">/</span><span class="mi">60</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> mins&#39;</span><span class="p">)</span>
-<span class="n">EOF</span>
-<span class="p">}</span>
+<span class="s">end = time.time()</span>
+<span class="s">print(f&#39;Elapsed wall-clock time: {(end-start)/60:.1f} mins&#39;)</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
 
-<span class="n">gen_pbs_script</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">local</span> <span class="n">name</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
+gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
 
-  <span class="n">cat</span> <span class="o">&gt;!</span><span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span>&lt;&lt;<span class="w"> </span>EOF
-<span class="c1">#!/bin/bash</span>
-<span class="c1">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
-<span class="c1">#PBS -q main</span>
-<span class="c1">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
-<span class="c1">#PBS -l walltime=12:00:00</span>
-<span class="c1">#PBS -A ${account}</span>
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
+<span class="s">#PBS -q main</span>
+<span class="s">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
+<span class="s">#PBS -l walltime=12:00:00</span>
+<span class="s">#PBS -A ${account}</span>
 
-<span class="n">source</span> \<span class="err">$</span><span class="n">LMOD_ROOT</span><span class="o">/</span><span class="n">lmod</span><span class="o">/</span><span class="n">init</span><span class="o">/</span><span class="n">zsh</span>
+<span class="s">source \$LMOD_ROOT/lmod/init/zsh</span>
 
-<span class="n">module</span> <span class="n">load</span> <span class="n">ncarenv</span><span class="o">/</span><span class="mf">23.09</span>
-<span class="n">module</span> <span class="n">load</span> <span class="n">nco</span>
-<span class="n">module</span> <span class="n">load</span> <span class="n">conda</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="err">$</span><span class="p">{</span><span class="n">pyenv</span><span class="p">}</span>
+<span class="s">module load ncarenv/23.09</span>
+<span class="s">module load nco</span>
+<span class="s">module load conda</span>
+<span class="s">conda activate ${pyenv}</span>
 
-<span class="n">python</span> <span class="err">$</span><span class="p">{</span><span class="n">task_name</span><span class="p">}</span><span class="n">_</span><span class="err">$</span><span class="p">{</span><span class="n">name</span><span class="p">}</span><span class="n">_</span><span class="err">$</span><span class="p">{</span><span class="n">syr</span><span class="p">}</span><span class="o">-</span><span class="err">$</span><span class="p">{</span><span class="n">eyr</span><span class="p">}</span><span class="o">.</span><span class="n">py</span>
-<span class="n">EOF</span>
-<span class="p">}</span>
+<span class="s">python ${task_name}_${name}_${syr}-${eyr}.py</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
 
 <span class="c1"># =====================================================================</span>
 <span class="c1"># call functions</span>
 <span class="c1"># =====================================================================</span>
 <span class="c1"># Define task entries: name|components|comps_info</span>
-<span class="n">task_list</span><span class="o">=</span><span class="p">(</span>
-  <span class="s2">&quot;o.sfc|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.sfc&#39;]}&quot;</span>
-  <span class="s2">&quot;o.z|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.z&#39;]}&quot;</span>
-  <span class="s2">&quot;o.rho2|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.rho2&#39;]}&quot;</span>
-  <span class="s2">&quot;o.native|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.native&#39;]}&quot;</span>
-  <span class="s2">&quot;a.h0a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h0a&#39;]}&quot;</span>
-  <span class="s2">&quot;a.h2a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h2a&#39;]}&quot;</span>
-  <span class="s2">&quot;a.h3a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h3a&#39;]}&quot;</span>
-  <span class="s2">&quot;a.h4a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h4a&#39;]}&quot;</span>
-  <span class="s2">&quot;lir|[&#39;lnd&#39;, &#39;ice&#39;, &#39;rof&#39;]|</span><span class="si">{}</span><span class="s2">&quot;</span>
-<span class="p">)</span>
+<span class="nv">task_list</span><span class="o">=(</span>
+<span class="w">  </span><span class="s2">&quot;o.sfc|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.sfc&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.z|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.z&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.rho2|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.rho2&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.native|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.native&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h0a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h0a&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h2a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h2a&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h3a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h3a&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h4a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h4a&#39;]}&quot;</span>
+<span class="w">  </span><span class="s2">&quot;lir|[&#39;lnd&#39;, &#39;ice&#39;, &#39;rof&#39;]|{}&quot;</span>
+<span class="o">)</span>
 
-<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="s2">&quot;$</span><span class="si">{task_list[@]}</span><span class="s2">&quot;</span><span class="p">;</span> <span class="n">do</span>
-  <span class="n">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span> <span class="n">read</span> <span class="o">-</span><span class="n">r</span> <span class="n">name</span> <span class="n">comps</span> <span class="n">comps_info</span> <span class="o">&lt;&lt;&lt;</span> <span class="s2">&quot;$entry&quot;</span>
+<span class="k">for</span><span class="w"> </span>entry<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_list</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
 
-  <span class="n">gen_py_script</span> <span class="s2">&quot;$name&quot;</span> <span class="s2">&quot;$comps&quot;</span> <span class="s2">&quot;$</span><span class="si">{comps_info}</span><span class="s2">&quot;</span>
-  <span class="n">gen_pbs_script</span> <span class="s2">&quot;$name&quot;</span>
-  <span class="n">qsub</span> <span class="s2">&quot;$</span><span class="si">{task_name}</span><span class="s2">_$</span><span class="si">{name}</span><span class="s2">_$</span><span class="si">{syr}</span><span class="s2">-$</span><span class="si">{eyr}</span><span class="s2">.pbs&quot;</span>
-<span class="n">done</span>
+<span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span>
+<span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
+<span class="k">done</span>
 
-<span class="n">exit</span>
+<span class="nb">exit</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[3]</span><span class="ansi-green-fg">, line 3</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">export hist_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing</span>
-           ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> invalid syntax
-
-</pre></div></div>
 </div>
 </section>
 </section>
