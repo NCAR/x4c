@@ -184,7 +184,7 @@ def update_attrs(da, da_src):
 
     return da
 
-def update_ds(ds, path, vn=None, comp=None, grid=None, adjust_month=False,
+def update_ds(ds, path, vn=None, comp=None, hstr=None, grid=None, adjust_month=False,
               gw_name=None, lat_name=None, lon_name=None):
     if adjust_month:
         ds['time'] = ds['time'].get_index('time') - datetime.timedelta(days=1)
@@ -196,6 +196,7 @@ def update_ds(ds, path, vn=None, comp=None, grid=None, adjust_month=False,
 
     if vn is not None: ds.attrs['vn'] = vn
     if comp is not None: ds.attrs['comp'] = comp
+    if hstr is not None: ds.attrs['hstr'] = hstr
     if grid is not None: ds.attrs['grid'] = grid
 
     if 'comp' in ds.attrs:
@@ -686,3 +687,9 @@ def find_nearest2d(da:xr.DataArray, lat, lon, lat_name='lat', lon_name='lon', ne
         da_res = xr.concat(da_res_list, dim=new_dim).squeeze()
 
     return da_res
+
+def move_and_overwrite(src_path, dst_dir):
+    fname = os.path.basename(src_path)
+    dst_path = os.path.join(dst_dir, fname)
+    if os.path.exists(dst_path): os.remove(dst_path)
+    shutil.move(src_path, dst_dir)

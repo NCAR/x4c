@@ -15,7 +15,7 @@ from . import utils, visual
 import os
 dirpath = os.path.dirname(__file__)
 
-def load_dataset(path, adjust_month=False, comp=None, grid=None, vn=None, **kws):
+def load_dataset(path, adjust_month=False, comp=None, hstr=None, grid=None, vn=None, **kws):
     ''' Load a netCDF file and form a `xarray.Dataset`
 
     Args:
@@ -29,10 +29,10 @@ def load_dataset(path, adjust_month=False, comp=None, grid=None, vn=None, **kws)
     _kws = {'use_cftime': True, 'decode_timedelta': True}
     _kws.update(kws)
     ds = xr.load_dataset(path, **_kws)
-    ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, grid=grid, adjust_month=adjust_month)
+    ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, hstr=hstr, grid=grid, adjust_month=adjust_month)
     return ds
 
-def open_dataset(path, adjust_month=False, comp=None, grid=None, vn=None, **kws):
+def open_dataset(path, adjust_month=False, comp=None, hstr=None, grid=None, vn=None, **kws):
     ''' Open a netCDF file and form a `xarray.Dataset` with a lazy load mode
 
     Args:
@@ -46,10 +46,10 @@ def open_dataset(path, adjust_month=False, comp=None, grid=None, vn=None, **kws)
     _kws = {'use_cftime': True, 'decode_timedelta': True}
     _kws.update(kws)
     ds = xr.open_dataset(path, **_kws)
-    ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, grid=grid, adjust_month=adjust_month)
+    ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, hstr=hstr, grid=grid, adjust_month=adjust_month)
     return ds
 
-def open_mfdataset(paths, adjust_month=False, comp=None, grid=None, vn=None, **kws):
+def open_mfdataset(paths, adjust_month=False, comp=None, hstr=None, grid=None, vn=None, **kws):
     ''' Open multiple netCDF files and form a `xarray.Dataset` in a lazy load mode
 
     Args:
@@ -80,7 +80,7 @@ def open_mfdataset(paths, adjust_month=False, comp=None, grid=None, vn=None, **k
     }
     _kws.update(kws)
     ds = xr.open_mfdataset(paths, **_kws)
-    ds = utils.update_ds(ds, vn=vn, path=paths, comp=comp, grid=grid, adjust_month=adjust_month)
+    ds = utils.update_ds(ds, vn=vn, path=paths, comp=comp, hstr=hstr, grid=grid, adjust_month=adjust_month)
     return ds
 
 @xr.register_dataset_accessor('x')

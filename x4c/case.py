@@ -31,25 +31,6 @@ class History:
         utils.p_header(f'>>> case.root_dir: {self.root_dir}')
         utils.p_header(f'>>> case.casename: {self.casename}')
 
-        # if cesm_ver in [1, 2]:
-        #     _comps_info = {
-        #         'atm': ('cam', '*'),
-        #         'ocn': ('pop', '*'),
-        #         'lnd': ('clm2', '*'),
-        #         'ice': ('cice', '*'),
-        #         'rof': ('rtm', '*'),
-        #     }
-        # elif cesm_ver == 3:
-        #     _comps_info = {
-        #         'atm': ('cam', '*'),
-        #         'ocn': ('mom6', '*'),
-        #         'lnd': ('clm2', '*'),
-        #         'ice': ('cice', '*'),
-        #         'rof': ('mosart', '*'),
-        #     }
-        # else:
-        #     raise ValueError(f'Unsupported CESM version: {cesm_ver}. Please specify `cesm_ver` as 1, 2, or 3.')
-
         _comps_info = {
             'atm': '*',
             'ocn': '*',
@@ -59,9 +40,6 @@ class History:
         }
         if comps_info is not None:
             _comps_info.update(comps_info)
-
-        # self.comps_info = _comps_info
-        # utils.p_header(f'>>> case.comps_info: {self.comps_info}')
 
         self.comps_info = {}
         self.paths = {}
@@ -73,22 +51,17 @@ class History:
             if hstr == '*':
                 paths = utils.find_paths(
                     self.root_dir, self.path_pattern,
-                    # comp=comp, mdl=mdl, hstr=hstr,
                     comp=comp, hstr=hstr,
                     avoid_list=avoid_list,
                 )
                 hstr = utils.get_hstr(paths, casename=self.casename)
-                # self.comps_info[comp] = (mdl, hstr)
                 self.comps_info[comp] = hstr
             else:
-                # self.comps_info[comp] = (mdl, hstr)
                 self.comps_info[comp] = hstr
-
 
             for hs in hstr:
                 self.paths[comp][hs] = utils.find_paths(
                     self.root_dir, self.path_pattern,
-                    # comp=comp, mdl=mdl, hstr=hs,
                     comp=comp, hstr=hs,
                     avoid_list=avoid_list,
                 )
@@ -107,7 +80,7 @@ class History:
         vns_ts = []
         ds0 = core.open_dataset(self.paths[comp][hstr][0])
         vns = list(ds0.variables)
-        exclude_vars = ['time', 'time_bnds', 'time_written', 'date', 'datesec', 'date_written']
+        exclude_vars = ['time', 'time_bnds', 'time_bounds', 'time_written', 'date', 'datesec', 'date_written']
 
         for v in vns:
             # if len(ds0[v].dims) >= 2 and 'time' in ds0[v].dims and 'time' not in v and v not in exclude_vars:
@@ -340,7 +313,8 @@ class History:
 
                         with mp.Pool(processes=nproc) as p:
                             arg_list = [(src_path, dst_dir) for src_path in src_paths]
-                            p.starmap(shutil.move, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
+                            # p.starmap(shutil.move, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
+                            p.starmap(utils.move_and_overwrite, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
 
                         # utils.p_header(f'>>> Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n ')
                         # # utils.rsync_move(src_paths, dst_dir)
@@ -633,7 +607,7 @@ class Timeseries:
         grid_dict (dict): the grid dictionary for different components
         timestep (int): the number of years stored in a single timeseries file
     '''
-    def __init__(self, root_dir, grid_dict=None, casename=None, cesm_ver=1):
+    def __init__(self, root_dir, grid_dict=None, casename=None, cesm_ver=3):
         self.path_pattern='comp/proc/tseries/*/casename.hstr.vn.timespan.nc'
         self.root_dir = os.path.abspath(root_dir)
         self.casename = os.path.basename(root_dir) if casename is None else casename
@@ -653,85 +627,133 @@ class Timeseries:
         if self.casename is not None:
             utils.p_header(f'>>> case.casename: {self.casename}')
 
-        self.paths = utils.find_paths(self.root_dir, self.path_pattern)
-        # self.hstr = utils.get_hstr(self.paths, casename=self.casename)
-        self.hstr = list(set('.'.join(s.split('.')[:-1]) for s in utils.get_hstr(self.paths, casename=self.casename)))
+        self.paths_all = utils.find_paths(self.root_dir, self.path_pattern)
+        self.hstr_all = list(set('.'.join(s.split('.')[:-1]) for s in utils.get_hstr(self.paths_all, casename=self.casename)))
 
         self.ds = {}
         self.diags = {}
-        self.vars_info = {}
-        for path in self.paths:
+
+        self.paths = {}
+        self.vns = {}
+        for path in self.paths_all:
             comp = path.split('/')[-5]
             fname = os.path.basename(path)
             vn = fname.split('.')[-3]
             casename_hstr = fname.split(vn)[0]
             hstr = casename_hstr.split(self.casename)[-1][1:-1]
-            if (vn, comp) not in self.vars_info:
-                self.vars_info[(vn, comp)] = (comp, hstr)
+            if comp not in self.paths:
+                self.paths[comp] = {}
+            if hstr not in self.paths[comp]:
+                self.paths[comp][hstr] = {}
+            if vn not in self.paths[comp][hstr]:
+                self.paths[comp][hstr][vn] = []
 
-        utils.p_success(f'>>> case.vars_info created')
+            if comp not in self.vns:
+                self.vns[comp] = {}
+            if hstr not in self.vns[comp]:
+                self.vns[comp][hstr] = []
 
-    def get_paths(self, vn, comp=None, timespan=None):
-        if comp is None: comp = self.get_vn_comp(vn)
-        comp, hstr = self.vars_info[(vn, comp)]
-        paths = utils.find_paths(self.root_dir, self.path_pattern, vn=vn, comp=comp, hstr=hstr)
-        if timespan is None:
-            paths_sub = paths
-        else:
-            syr, eyr = timespan
-            paths_sub = []
-            for path in paths:
-                syr_tmp = int(path.split('.')[-2].split('-')[0][:4])
-                eyr_tmp = int(path.split('.')[-2].split('-')[1][:4])
-                if (syr_tmp >= syr and syr_tmp <= eyr) or (eyr_tmp >= syr and eyr_tmp <= eyr):
-                    paths_sub.append(path)
+        for path in self.paths_all:
+            comp = path.split('/')[-5]
+            fname = os.path.basename(path)
+            vn = fname.split('.')[-3]
+            casename_hstr = fname.split(vn)[0]
+            hstr = casename_hstr.split(self.casename)[-1][1:-1]
+            self.paths[comp][hstr][vn].append(path)
+            self.vns[comp][hstr].append(vn)
 
-        return paths_sub
+        for comp in self.paths:
+            for hstr in self.paths[comp]:
+                utils.p_success(f'>>> case.paths["{comp}"]["{hstr}"] created')
 
-    def get_vn_comp(self, vn):
-        comps = []
-        for (v, comp) in self.vars_info:
-            if v == vn:
-                comps.append(comp)
-        
-        if len(comps) == 1:
-            return comps[0]
-        elif len(comps) == 0:
-            # if f'get_{vn}' in diags.DiagCalc.__dict__:
-            if vn in diags.Registry.funcs:
-                utils.p_warning(f'>>> {vn} is a supported derived variable.')
+        for comp in self.vns:
+            for hstr in self.vns[comp]:
+                utils.p_success(f'>>> case.vns["{comp}"]["{hstr}"] created')
+
+    # def get_paths(self, comp, hstr, vn, timespan=None):
+    #     paths = self.paths[comp][hstr][vn]
+    #     if timespan is None:
+    #         paths_sub = paths
+    #     else:
+    #         syr, eyr = timespan
+    #         paths_sub = []
+    #         for path in paths:
+    #             syr_tmp = int(path.split('.')[-2].split('-')[0][:4])
+    #             eyr_tmp = int(path.split('.')[-2].split('-')[1][:4])
+    #             if (syr_tmp >= syr and syr_tmp <= eyr) or (eyr_tmp >= syr and eyr_tmp <= eyr):
+    #                 paths_sub.append(path)
+
+    #     return paths_sub
+
+    def get_paths(self, comp, hstr, vn, timespan=None):
+        if vn in self.paths[comp][hstr]:
+            paths = self.paths[comp][hstr][vn]
+            if timespan is None:
+                paths_sub = paths
             else:
-                raise ValueError('The input variable name is unknown.')
+                start_dt, end_dt, timespan_precision = utils.parse_timespan(timespan)
+                start_dt = utils.datetime_truncate(start_dt, timespan_precision)
+                end_dt = utils.datetime_truncate(end_dt, timespan_precision)
+                paths_sub = []
+                for path in paths:
+                    date = path.split('.')[-2]
+                    dt = utils.cesm_str2datetime(date)
+                    dt = utils.datetime_truncate(dt, timespan_precision)
+                    if start_dt <= dt <= end_dt:
+                        paths_sub.append(path)
+
+            return paths_sub
         else:
-            utils.p_warning(f'{vn} belongs to components: {comps}')
-            raise ValueError('The input variable name belongs to multiple components. Please specify via the argument `comp`.')
+            return None
+
+    def get_comp_hstr(self, vn):
+        found_comp_hstr = []
+        for k, v in self.vns.items():
+            comp = k
+            for hstr, vns in v.items():
+                if vn in vns:
+                    found_comp_hstr.append((comp, hstr))
+
+        return found_comp_hstr
 
     
-    def load(self, vn, comp=None, timespan=None, load_idx=-1, verbose=True, **kws):
+    def load(self, vn, comp=None, hstr=None, timespan=None, load_idx=-1, verbose=True, reload=False, **kws):
         adjust_month = True if self.cesm_ver == 1 else False
 
-        if comp is None:
-            comp = self.get_vn_comp(vn)
-
-        if (vn, comp) in self.vars_info:
-            if timespan is None:
-                paths = self.get_paths(vn, comp=comp)[load_idx]
+        found_comp_hstr = self.get_comp_hstr(vn)
+        if len(found_comp_hstr) == 0:
+            if vn in diags.Registry.funcs:
+                vtype = 'derived'
             else:
-                paths = self.get_paths(vn, comp=comp, timespan=timespan)
+                raise ValueError('The input variable name is unknown.')
+        elif len(found_comp_hstr) == 1:
+            vtype = 'raw'
+            comp, hstr = found_comp_hstr[0]
+        else:
+            if (comp, hstr) in found_comp_hstr:
+                vtype = 'raw'
+            else:
+                raise ValueError(f'The input variable name belongs to multiple (comp, hstr) pairs: {found_comp_hstr}. Please specify via the argument `comp` and `hstr`.')
+
+        if reload: self.clear_ds(vn)
+
+        if vtype == 'raw':
+            paths = self.get_paths(comp, hstr, vn, timespan=timespan)
+            if timespan is None: paths = paths[load_idx]
 
             if vn in self.ds:
                 if self.ds[vn].path != paths:
                     if verbose: utils.p_warning(f'>>> case.ds["{vn}"] will be reloaded due to different paths.')
                     self.clear_ds(vn)
+                else:
+                    if verbose: utils.p_warning(f'>>> case.ds["{vn}"] already loaded; to reload, run case.load("{vn}", ..., reload=True).')
 
-            if vn not in self.ds:
-                # comp, mdl, h_str = self.vars_info[(vn, comp)]
-                comp, hstr = self.vars_info[(vn, comp)]
-
+            else:
                 _kws = {
                    'vn': vn,
                    'adjust_month': adjust_month, 
                    'comp': comp,
+                   'hstr': hstr,
                    'grid': self.grid_dict[comp],
                 }
                 _kws.update(kws)
@@ -743,17 +765,18 @@ class Timeseries:
                 self.ds[vn] = ds
                 self.ds[vn].attrs['vn'] = vn
                 if verbose: utils.p_success(f'>>> case.ds["{vn}"] created')
-            # else:
-            #     if verbose: utils.p_warning(f'>>> case.ds["{vn}"] already loaded; to reload, run case.clear_ds("{vn}") before case.load("{vn}")')
 
+        elif vtype == 'derived':
+            if verbose: utils.p_warning(f'>>> {vn} is a supported derived variable.')
+            self.ds[vn] = diags.Registry.funcs[vn](self, comp=comp, hstr=hstr, timespan=timespan, load_idx=load_idx, verbose=verbose, reload=reload, **kws)
+            self.ds[vn].attrs['vn'] = vn
+            if verbose: utils.p_success(f'>>> case.ds["{vn}"] created')
         else:
-            if verbose: utils.p_warning(f'>>> Variable {vn} not existing')
+            raise ValueError('The input variable name is unknown.')
 
-    def calc(self, spell:str, comp=None, timespan=None, load_idx=-1, recalculate=False, verbose=True):
+    def calc(self, spell:str, comp=None, timespan=None, load_idx=-1, recalculate=False, verbose=True, **kws):
         ''' Calculate a diagnostic spell
         '''
-        adjust_month = True if self.cesm_ver == 1 else False
-
         if spell in self.diags and not recalculate:
             utils.p_warning(f'>>> Spell `{spell}` is already calculated and the calculation is skipped.')
         else:
@@ -763,21 +786,21 @@ class Timeseries:
             else:
                 vn = S.vn.split('.')[0]
 
-            if vn in self.diags:
-                da = self.diags[vn]
-                utils.p_warning(f'>>> Variable `{vn}` is already calculated and the calculation is skipped.')
-            else:
-                if comp is None: comp = self.get_vn_comp(vn)
-                # if f'get_{vn}' in diags.DiagCalc.__dict__:
-                #     da = diags.DiagCalc.__dict__[f'get_{vn}'](self, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
-                if vn in diags.Registry.funcs:
-                    F = diags.Registry.funcs[vn]
-                    da = F(self, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
-                elif (vn, comp) in self.vars_info:
-                    self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
-                    da = self.ds[vn].x.da
-                else:
-                    raise ValueError(f'Unknown diagnostic variable: {vn}')
+            # if vn in self.diags:
+            #     da = self.diags[vn]
+            #     utils.p_warning(f'>>> Variable `{vn}` is already calculated and the calculation is skipped.')
+            # else:
+            #     if comp is None: comp = self.get_vn_comp(vn)
+            #     if vn in diags.Registry.funcs:
+            #         F = diags.Registry.funcs[vn]
+            #         da = F(self, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
+            #     elif (vn, comp) in self.vars_info:
+            #         self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
+            #         da = self.ds[vn].x.da
+            #     else:
+            #         raise ValueError(f'Unknown diagnostic variable: {vn}')
+            self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, verbose=verbose, **kws)
+            da = self.ds[vn].x.da
 
             if S.regrid is not None:
                 da = eval(f'da.x.{S.regrid}')
@@ -866,7 +889,8 @@ class Timeseries:
         _kws = utils.update_dict(_kws, kws)
 
         if plot_type == 'map':
-            if (ssv, 'ocn') in self.vars_info and (recalculate_ssv or ('ssv' not in self.diags)):
+            # if (ssv, 'ocn') in self.vars_info and (recalculate_ssv or ('ssv' not in self.diags)):
+            if len(self.get_comp_hstr(ssv))==1 and (recalculate_ssv or ('ssv' not in self.diags)):
                 self.load(ssv)
                 da_ssv = self.ds[ssv].x.regrid().x.da.mean('time')
                 self.diags['ssv'] = da_ssv
@@ -1059,34 +1083,34 @@ class Timeseries:
             climo.to_netcdf(out_path)
             climo.close()
 
-    def gen_climo(self, output_dirpath, comp=None, timespan=None, vns=None, nproc=1, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
-        adjust_month = True if self.cesm_ver == 1 else False
+    # def gen_climo(self, output_dirpath, comp=None, timespan=None, vns=None, nproc=1, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+    #     adjust_month = True if self.cesm_ver == 1 else False
 
-        if comp is None:
-            raise ValueError('Please specify component via the argument `comp`.')
+    #     if comp is None:
+    #         raise ValueError('Please specify component via the argument `comp`.')
 
-        if vns is None:
-            vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
+    #     if vns is None:
+    #         vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
 
-        utils.p_header(f'>>> Generating climo for {len(vns)} variables:')
-        for i in range(len(vns)//10+1):
-            print(vns[10*i:10*i+10])
+    #     utils.p_header(f'>>> Generating climo for {len(vns)} variables:')
+    #     for i in range(len(vns)//10+1):
+    #         print(vns[10*i:10*i+10])
 
-        if nproc == 1:
-            for v in tqdm(vns, total=len(vns), desc=f'Generating climo files'):
-                self.save_climo(
-                    output_dirpath, v, comp=comp, timespan=timespan,
-                    adjust_month=adjust_month, slicing=slicing,
-                    regrid=regrid, dlat=dlat, dlon=dlon,
-                    overwrite=overwrite,
-                )
-        else:
-            utils.p_hint(f'>>> nproc: {nproc}')
-            with mp.Pool(processes=nproc) as p:
-                arg_list = [(output_dirpath, v, comp, timespan, adjust_month, slicing, regrid, dlat, dlon, overwrite) for v in vns]
-                p.starmap(self.save_climo, tqdm(arg_list, total=len(vns), desc=f'Generating climo files'))
+    #     if nproc == 1:
+    #         for v in tqdm(vns, total=len(vns), desc=f'Generating climo files'):
+    #             self.save_climo(
+    #                 output_dirpath, v, comp=comp, timespan=timespan,
+    #                 adjust_month=adjust_month, slicing=slicing,
+    #                 regrid=regrid, dlat=dlat, dlon=dlon,
+    #                 overwrite=overwrite,
+    #             )
+    #     else:
+    #         utils.p_hint(f'>>> nproc: {nproc}')
+    #         with mp.Pool(processes=nproc) as p:
+    #             arg_list = [(output_dirpath, v, comp, timespan, adjust_month, slicing, regrid, dlat, dlon, overwrite) for v in vns]
+    #             p.starmap(self.save_climo, tqdm(arg_list, total=len(vns), desc=f'Generating climo files'))
 
-        utils.p_success(f'>>> {len(vns)} climo files created in: {output_dirpath}')
+    #     utils.p_success(f'>>> {len(vns)} climo files created in: {output_dirpath}')
 
     # def save_combined_ts(self, output_dirpath, comp, vns=None, timespan=None, adjust_month=True, overwrite=False, chunk_nt=None):
     #     output_dirpath = pathlib.Path(output_dirpath)
@@ -1186,80 +1210,80 @@ class Timeseries:
                 ds_ann.to_netcdf(out_path)
                 ds_ann.close()
 
-    def gen_means(self, output_dirpath, comp=None, vns=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False, nproc=1):
-        adjust_month = True if self.cesm_ver == 1 else False
+    # def gen_means(self, output_dirpath, comp=None, vns=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False, nproc=1):
+    #     adjust_month = True if self.cesm_ver == 1 else False
 
-        if comp is None:
-            raise ValueError('Please specify component via the argument `comp`.')
+    #     if comp is None:
+    #         raise ValueError('Please specify component via the argument `comp`.')
 
-        if vns is None:
-            vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
+    #     if vns is None:
+    #         vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
 
-        utils.p_header(f'>>> Generating seaonal means for {len(vns)} variables:')
-        for i in range(len(vns)//10+1):
-            print(vns[10*i:10*i+10])
+    #     utils.p_header(f'>>> Generating seaonal means for {len(vns)} variables:')
+    #     for i in range(len(vns)//10+1):
+    #         print(vns[10*i:10*i+10])
 
-        if nproc == 1:
-            for vn in vns:
-                self.save_means(
-                    vn, comp, output_dirpath, timespan, adjust_month=adjust_month, slicing=slicing,
-                    regrid=regrid, dlat=dlat, dlon=dlon, overwrite=overwrite, 
-                )
-        else:
-            utils.p_hint(f'>>> nproc: {nproc}')
-            with mp.Pool(processes=nproc) as p:
-                arg_list = [(vn, comp, output_dirpath, timespan, adjust_month, slicing, regrid, dlat, dlon, overwrite) for vn in vns]
-                p.starmap(self.save_means, tqdm(arg_list, total=len(vns), desc=f'Generating seasonal mean files'))
+    #     if nproc == 1:
+    #         for vn in vns:
+    #             self.save_means(
+    #                 vn, comp, output_dirpath, timespan, adjust_month=adjust_month, slicing=slicing,
+    #                 regrid=regrid, dlat=dlat, dlon=dlon, overwrite=overwrite, 
+    #             )
+    #     else:
+    #         utils.p_hint(f'>>> nproc: {nproc}')
+    #         with mp.Pool(processes=nproc) as p:
+    #             arg_list = [(vn, comp, output_dirpath, timespan, adjust_month, slicing, regrid, dlat, dlon, overwrite) for vn in vns]
+    #             p.starmap(self.save_means, tqdm(arg_list, total=len(vns), desc=f'Generating seasonal mean files'))
 
-    def check_timespan(self, comp, vns=None, timespan=None):
-        if vns is None:
-            vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
-        elif type(vns) is str:
-            vns = [vns]
+    # def check_timespan(self, comp, vns=None, timespan=None):
+    #     if vns is None:
+    #         vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
+    #     elif type(vns) is str:
+    #         vns = [vns]
 
-        paths = self.get_paths(vns[0], comp=comp, timespan=timespan)
-        if timespan is None:
-            syr = int(paths[0].split('.')[-2].split('-')[0][:4])
-            eyr = int(paths[-1].split('.')[-2].split('-')[1][:4])
-        else:
-            syr, eyr = timespan
+    #     paths = self.get_paths(vns[0], comp=comp, timespan=timespan)
+    #     if timespan is None:
+    #         syr = int(paths[0].split('.')[-2].split('-')[0][:4])
+    #         eyr = int(paths[-1].split('.')[-2].split('-')[1][:4])
+    #     else:
+    #         syr, eyr = timespan
 
-        step_s = int(paths[0].split('.')[-2].split('-')[0][:4])
-        step_e = int(paths[0].split('.')[-2].split('-')[1][:4])
-        step = step_e - step_s + 1
+    #     step_s = int(paths[0].split('.')[-2].split('-')[0][:4])
+    #     step_e = int(paths[0].split('.')[-2].split('-')[1][:4])
+    #     step = step_e - step_s + 1
 
-        full_list = []
-        for y in range(syr, eyr, step):
-            full_list.append(f'{y:04d}01-{y+step-1:04d}12')
+    #     full_list = []
+    #     for y in range(syr, eyr, step):
+    #         full_list.append(f'{y:04d}01-{y+step-1:04d}12')
 
-        df = pd.DataFrame(index=vns, columns=range(1, len(full_list)+1))
+    #     df = pd.DataFrame(index=vns, columns=range(1, len(full_list)+1))
 
-        for irow, vn in enumerate(vns):
-            paths = self.get_paths(vn, comp=comp, timespan=timespan)
-            # print(vn, paths)
+    #     for irow, vn in enumerate(vns):
+    #         paths = self.get_paths(vn, comp=comp, timespan=timespan)
+    #         # print(vn, paths)
 
-            for icol, timestamp in enumerate(full_list):
-                path_elements = paths[icol].split('.')
-                path_elements[-2] = timestamp
-                path = '.'.join(path_elements)
-                if os.path.exists(path):
-                    df.iloc[irow, icol] = timestamp
-                else:
-                    print(path)
-                    df.iloc[irow, icol] = f'{timestamp}!'
+    #         for icol, timestamp in enumerate(full_list):
+    #             path_elements = paths[icol].split('.')
+    #             path_elements[-2] = timestamp
+    #             path = '.'.join(path_elements)
+    #             if os.path.exists(path):
+    #                 df.iloc[irow, icol] = timestamp
+    #             else:
+    #                 print(path)
+    #                 df.iloc[irow, icol] = f'{timestamp}!'
 
-        df = df.fillna('!')
+    #     df = df.fillna('!')
         
-        def style_missing(v, props=''):
-            return props if '!' in v else None
+    #     def style_missing(v, props=''):
+    #         return props if '!' in v else None
         
-        def remove_mark(v):
-            if '!' in v:
-                v = v.split('!')[0]
-            return v
+    #     def remove_mark(v):
+    #         if '!' in v:
+    #             v = v.split('!')[0]
+    #         return v
 
-        df = df.style.map(style_missing, props='background-color:red;color:white').format(remove_mark)
-        return df
+    #     df = df.style.map(style_missing, props='background-color:red;color:white').format(remove_mark)
+    #     return df
 
     def clear_ds(self, vn=None):
         ''' Clear the existing `.ds` property

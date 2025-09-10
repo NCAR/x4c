@@ -305,7 +305,8 @@ class DiagCalc:
     # Get specific diagnostic variables
     @F
     def get_SST(case, **kws):
-        if ('SST', 'ocn') not in case.vars_info:
+        # if ('SST', 'ocn') not in case.vars_info:
+        if len(case.get_comp_hstr('SST')) == 0:
             vn = 'TEMP'
             case.load(vn, **kws)
             sst = case.ds[vn].x.da.isel(z_t=0)
@@ -320,7 +321,8 @@ class DiagCalc:
 
     @F
     def get_SSS(case, **kws):
-        if ('SSS', 'ocn') not in case.vars_info:
+        # if ('SSS', 'ocn') not in case.vars_info:
+        if len(case.get_comp_hstr('SSS')) == 0:
             vn = 'SALT'
             case.load(vn, **kws)
             sss = case.ds[vn].x.da.isel(z_t=0)
