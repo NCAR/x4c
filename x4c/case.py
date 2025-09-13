@@ -231,20 +231,10 @@ class History:
             comps = {comp: None for comp in comps}
 
         for comp, vns in comps.items():
-            # mdl, hstr = self.comps_info[comp]
             hstr = self.comps_info[comp]
             # generate timeseries files for each component and each sub-timespan
             utils.p_header(f'>>> Processing component: {comp}')
             for hs in hstr:
-                # if hs in ['h0a', 'h0i', 'h1a', 'h4a', 'h', 'h.native', 'h.z', 'h.rho2']:
-                #     tres = 'month_1'
-                # elif hs in ['h2a', 'h.sfc']:
-                #     tres = 'day_1'
-                # elif hs in ['h3a']:
-                #     tres = 'hour_3'
-                # else:
-                #     # raise ValueError(f'Unsupported history string: {hs} for time resolution inference.')
-                #     continue
 
                 if vns is None:
                     vns_in = self.vns[comp][hs]
@@ -303,25 +293,10 @@ class History:
                         date_end = ''.join(timespan_tmp[1].split('-'))
                         date_str = f'{date_start}*-{date_end}*'
                         src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{date_str}.nc'))
-                        # [shutil.move(src_path, dst_dir) for src_path in src_paths]
-                        # print(f'{src_paths =}')
-                        # print(f'{dst_dir =}')
-                        # for src_path in src_paths:
-                        #     dst_path = os.path.join(dst_dir, os.path.basename(src_path))
-                        #     if os.path.exists(dst_path):
-                        #         os.remove(dst_path)
 
                         with mp.Pool(processes=nproc) as p:
                             arg_list = [(src_path, dst_dir) for src_path in src_paths]
-                            # p.starmap(shutil.move, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
                             p.starmap(utils.move_and_overwrite, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
-
-                        # utils.p_header(f'>>> Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n ')
-                        # # utils.rsync_move(src_paths, dst_dir)
-                        # src_paths =  f'{bigcrunch_dir}/*.{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12.nc'
-                        # cmd = f'rsync -a --remove-source-files {src_paths} {str(dst_dir)}'
-                        # print('>>> {cmd}')
-                        # subprocess.run(cmd, check=True, shell=True)
 
 
     # def split_ds(self, comp, in_path, output_dirpath, overwrite=False, nco=True):
