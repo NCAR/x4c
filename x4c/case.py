@@ -138,22 +138,16 @@ class History:
     def bigbang(self, comp, hstr, output_dirpath, timespan=None, overwrite=True, nproc=1, vns=None):
         output_dirpath = pathlib.Path(output_dirpath)
         output_dirpath.mkdir(parents=True, exist_ok=True)
-
         paths = self.get_paths(comp, hstr, timespan=timespan)
-
         if vns is None: vns = self.vns[comp][hstr]
-        if nproc == 1:
-            for path in tqdm(paths, desc=f'Spliting {len(paths)} history files'):
-                for vn in vns:
-                    self.isolate_vn(vn, comp, hstr, in_path=path, output_dirpath=output_dirpath, overwrite=overwrite)
+        arg_list = [(vn, comp, hstr, path, output_dirpath, overwrite) for path in paths for vn in vns]
+        desc = f'Spliting {len(paths)} history files for {len(vns)} variables'
+        if nproc <= 1:
+            for arg in tqdm(arg_list, total=len(arg_list), desc=desc):
+                self.isolate_vn(*arg)
         else:
-            # utils.p_hint(f'>>> nproc: {nproc}')
             with mp.Pool(processes=nproc) as p:
-                arg_list = []
-                for path in paths:
-                    for vn in vns:
-                        arg_list.append((vn, comp, hstr, path, output_dirpath, overwrite))
-                p.starmap(self.isolate_vn, tqdm(arg_list, total=len(arg_list), desc=f'Spliting {len(paths)} history files for {len(vns)} variables'))
+                p.starmap(self.isolate_vn, tqdm(arg_list, total=len(arg_list), desc=desc))
     
     def get_hstr_based_on_vn(self, vn):
         for comp, hstrs in self.vns.items():
@@ -205,16 +199,14 @@ class History:
         output_dirpath.mkdir(parents=True, exist_ok=True)
 
         if vns is None: vns = self.vns[comp][hstr]
+        arg_list = [(hstr, vn, input_dirpath, output_dirpath, timespan, overwrite, compression) for vn in vns]
         desc = 'Merging variables'
-        if nproc == 1:
-            for vn in tqdm(vns, desc=desc):
-                self.merge_vn(hstr, vn, input_dirpath=input_dirpath, output_dirpath=output_dirpath, timespan=timespan, overwrite=overwrite, compression=compression)
+        if nproc <= 1:
+            for arg in tqdm(arg_list, total=len(arg_list), desc=desc):
+                self.merge_vn(*arg)
         else:
             # utils.p_hint(f'>>> nproc: {nproc}')
             with mp.Pool(processes=nproc) as p:
-                arg_list = []
-                for vn in vns:
-                    arg_list.append((hstr, vn, input_dirpath, output_dirpath, timespan, overwrite, compression))
                 p.starmap(self.merge_vn, tqdm(arg_list, total=len(arg_list), desc=desc))
 
     def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'],

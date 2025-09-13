@@ -10,10 +10,8 @@ export eyr=$2   # e.g., 0100: model year 100
 export timestep=10
 export timestep_unit=year
 export task_name=gts
-# export nnodes=1
-# export ncpus=128
-export nnodes=16
-export ncpus=64
+export nnodes=1
+export ncpus=128
 export overwrite=True
 export account=P93300324
 export pyenv=x4c-py313
@@ -78,7 +76,7 @@ module load nco
 module load conda
 conda activate ${pyenv}
 
-mpiexec -n $nnodes python ${task_name}_${name}_${syr}-${eyr}.py
+python ${task_name}_${name}_${syr}-${eyr}.py
 EOF
 }
 
@@ -100,12 +98,12 @@ EOF
 #   "r.h0|['rof']|{'rof': ['mosart.h0']}"
 # )
 task_list=(
-#   "i.h1|['ice']|{'ice': ['cice.h1']}"
+  "i.h1|['ice']|{'ice': ['cice.h1']}"
 #   "aolir|['atm', 'ocn', 'lnd', 'ice', 'rof']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a'], 'lnd': ['clm2.h0'], 'ice': ['cice.h'], 'rof': ['mosart.h0']}"
 )
-task_list=(
-  "aolir|['atm', 'ocn', 'lnd', 'ice', 'rof']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a']}"
-)
+# task_list=(
+#   "aolir|['atm', 'ocn', 'lnd', 'ice', 'rof']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a']}"
+# )
 
 for entry in "${task_list[@]}"; do
   IFS='|' read -r name comps comps_info <<< "$entry"
