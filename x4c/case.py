@@ -6,6 +6,7 @@ import datetime
 from tqdm import tqdm
 import xarray as xr
 import multiprocessing as mp
+from mpi4py import MPI
 import pathlib
 import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -136,18 +137,26 @@ class History:
             subprocess.run(cmd, check=True)
 
     def bigbang(self, comp, hstr, output_dirpath, timespan=None, overwrite=True, nproc=1, vns=None):
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        size = comm.Get_size()
+
         output_dirpath = pathlib.Path(output_dirpath)
-        output_dirpath.mkdir(parents=True, exist_ok=True)
+        if rank == 0: output_dirpath.mkdir(parents=True, exist_ok=True)
+        comm.Barrier()
+
         paths = self.get_paths(comp, hstr, timespan=timespan)
         if vns is None: vns = self.vns[comp][hstr]
         arg_list = [(vn, comp, hstr, path, output_dirpath, overwrite) for path in paths for vn in vns]
-        desc = f'Spliting {len(paths)} history files for {len(vns)} variables'
+        tasks = arg_list[rank::size]
+
+        desc = f'[Rank {rank}] Spliting {len(paths)} history files for {len(vns)} variables'
         if nproc <= 1:
-            for arg in tqdm(arg_list, total=len(arg_list), desc=desc):
+            for arg in tqdm(tasks, total=len(tasks), desc=desc):
                 self.isolate_vn(*arg)
         else:
             with mp.Pool(processes=nproc) as p:
-                p.starmap(self.isolate_vn, tqdm(arg_list, total=len(arg_list), desc=desc))
+                p.starmap(self.isolate_vn, tqdm(tasks, total=len(tasks), desc=desc))
     
     def get_hstr_based_on_vn(self, vn):
         for comp, hstrs in self.vns.items():
@@ -195,23 +204,33 @@ class History:
             subprocess.run(cmd, check=True)
 
     def bigcrunch(self, comp, hstr, input_dirpath, output_dirpath, timespan=None, overwrite=True, nproc=1, compression=1, vns=None):
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        size = comm.Get_size()
+
         output_dirpath = pathlib.Path(output_dirpath)
-        output_dirpath.mkdir(parents=True, exist_ok=True)
+        if rank == 0: output_dirpath.mkdir(parents=True, exist_ok=True)
+        comm.Barrier()
 
         if vns is None: vns = self.vns[comp][hstr]
         arg_list = [(hstr, vn, input_dirpath, output_dirpath, timespan, overwrite, compression) for vn in vns]
-        desc = 'Merging variables'
+        tasks = arg_list[rank::size]
+
+        desc = f'[Rank {rank}] Merging variables'
         if nproc <= 1:
-            for arg in tqdm(arg_list, total=len(arg_list), desc=desc):
+            for arg in tqdm(tasks, total=len(tasks), desc=desc):
                 self.merge_vn(*arg)
         else:
-            # utils.p_hint(f'>>> nproc: {nproc}')
             with mp.Pool(processes=nproc) as p:
-                p.starmap(self.merge_vn, tqdm(arg_list, total=len(arg_list), desc=desc))
+                p.starmap(self.merge_vn, tqdm(tasks, total=len(tasks), desc=desc))
 
     def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'],
                timespan=None, timestep=None, timestep_unit='year',
                dir_structure='comp/proc/tseries/hstr' , overwrite=True, nproc=1, compression=1):
+
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        size = comm.Get_size()
 
         utils.p_header(f'>>> nproc: {nproc}')
         if staging_dirpath is None: staging_dirpath = output_dirpath
@@ -227,7 +246,6 @@ class History:
             # generate timeseries files for each component and each sub-timespan
             utils.p_header(f'>>> Processing component: {comp}')
             for hs in hstr:
-
                 if vns is None:
                     vns_in = self.vns[comp][hs]
                 else:
@@ -238,7 +256,9 @@ class History:
                 for timespan_tmp in timespan_list:
                     utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
                     bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]}-{timespan_tmp[1]}')
-                    if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
+                    if rank == 0 and os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
+                    comm.Barrier()
+
                     self.bigbang(
                         comp=comp, hstr=hs,
                         output_dirpath=bigbang_dir,
@@ -247,6 +267,7 @@ class History:
                         nproc=nproc,
                         vns=vns_in,
                     )
+                    comm.Barrier()
 
                     bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
                     self.bigcrunch(
@@ -259,36 +280,50 @@ class History:
                         compression=compression,
                         vns=vns_in,
                     )
+                    comm.Barrier()
 
-        for comp, vns in comps.items():
-            hstr = self.comps_info[comp]
-            # delete the temporary files
-            utils.p_header(f'>>> Postprocessing component: {comp}')
-            for hs in hstr:
-                if vns is None:
-                    vns_in = self.vns[comp][hs]
-                else:
-                    vns_in = list(set(self.vns[comp][hs]) & set(vns))
-                if len(vns_in) == 0: continue
-
-                for timespan_tmp in timespan_list:
-                    utils.p_header(f'>>> Postprocessing timespan: {timespan_tmp}')
-                    bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]}-{timespan_tmp[1]}')
-                    bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
-                    if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-                    if staging_dirpath != output_dirpath:
-                        # move files from staging to destination
+                    if rank == 0 and staging_dirpath != output_dirpath:
                         dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
-                        dst_dir = pathlib.Path(dst_dir)
-                        dst_dir.mkdir(parents=True, exist_ok=True)
+                        pathlib.Path(dst_dir).mkdir(parents=True, exist_ok=True)
                         date_start = ''.join(timespan_tmp[0].split('-'))
                         date_end = ''.join(timespan_tmp[1].split('-'))
                         date_str = f'{date_start}*-{date_end}*'
                         src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{date_str}.nc'))
+                        if src_paths:
+                            with mp.Pool(processes=nproc) as pool:
+                                arg_list = [(src_path, dst_dir) for src_path in src_paths]
+                                pool.starmap(utils.move_and_overwrite, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
+                    comm.Barrier()
 
-                        with mp.Pool(processes=nproc) as p:
-                            arg_list = [(src_path, dst_dir) for src_path in src_paths]
-                            p.starmap(utils.move_and_overwrite, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
+        # for comp, vns in comps.items():
+        #     hstr = self.comps_info[comp]
+        #     # delete the temporary files
+        #     utils.p_header(f'>>> Postprocessing component: {comp}')
+        #     for hs in hstr:
+        #         if vns is None:
+        #             vns_in = self.vns[comp][hs]
+        #         else:
+        #             vns_in = list(set(self.vns[comp][hs]) & set(vns))
+        #         if len(vns_in) == 0: continue
+
+        #         for timespan_tmp in timespan_list:
+        #             utils.p_header(f'>>> Postprocessing timespan: {timespan_tmp}')
+        #             bigbang_dir = os.path.join(staging_dirpath, f'.bigbang_{comp}.{hs}.{timespan_tmp[0]}-{timespan_tmp[1]}')
+        #             bigcrunch_dir = os.path.join(staging_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
+        #             if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
+        #             if staging_dirpath != output_dirpath:
+        #                 # move files from staging to destination
+        #                 dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
+        #                 dst_dir = pathlib.Path(dst_dir)
+        #                 dst_dir.mkdir(parents=True, exist_ok=True)
+        #                 date_start = ''.join(timespan_tmp[0].split('-'))
+        #                 date_end = ''.join(timespan_tmp[1].split('-'))
+        #                 date_str = f'{date_start}*-{date_end}*'
+        #                 src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{date_str}.nc'))
+
+        #                 with mp.Pool(processes=nproc) as p:
+        #                     arg_list = [(src_path, dst_dir) for src_path in src_paths]
+        #                     p.starmap(utils.move_and_overwrite, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
 
 
     # def split_ds(self, comp, in_path, output_dirpath, overwrite=False, nco=True):

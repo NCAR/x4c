@@ -29,5 +29,6 @@ setup(
         'nc-time-axis',
         'colorama',
         'tqdm',
+        'mpi4py',
     ],
 )
