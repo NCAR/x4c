@@ -11,9 +11,11 @@ module swap ncarenv ncarenv/23.09
 module use /glade/work/bdobbins/Software/Modules
 module load cesm_postprocessing_derecho
 
-set case = b.e30_beta02.BLT1850.ne30_t232.104
-set tslices_dir = /glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
-set tseries_dir = /glade/derecho/scratch/fengzhu/CESM_postprocess/timeseries
+# set case = b.e30_beta02.BLT1850.ne30_t232.104
+# set tslices_dir = /glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
+set case = b.e30_beta06.B1850C_LTso.ne30_t232_wgx3.192.wrkflw.1_32
+set tslices_dir = /glade/derecho/scratch/cmip7/archive/
+set tseries_dir = /glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/old_postprocessing
 
 # =====================================================================
 # create case and change xml settings 
