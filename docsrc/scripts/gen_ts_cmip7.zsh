@@ -10,10 +10,6 @@ export eyr=$2   # e.g., 0100: model year 100
 export timestep=10
 export timestep_unit=year
 export task_name=gts
-# export nnodes=1
-# export ncpus=128
-export nnodes=16
-export ncpus=64
 export overwrite=True
 export account=P93300324
 export pyenv=x4c-py313
@@ -31,6 +27,7 @@ gen_py_script() {
   local name=$1
   local comps=$2
   local comps_info=$3
+  local ncpus=$4
 
   cat >! ${task_name}_${name}_${syr}-${eyr}.py << EOF
 import os
@@ -62,6 +59,8 @@ EOF
 
 gen_pbs_script() {
   local name=$1
+  local nnodes=$2
+  local ncpus=$3
 
   cat >! ${task_name}_${name}_${syr}-${eyr}.pbs << EOF
 #!/bin/bash
@@ -85,33 +84,20 @@ EOF
 # =====================================================================
 # call functions
 # =====================================================================
-# Define task entries: name|components|comps_info
-# task_list=(
-#   "o.sfc|['ocn']|{'ocn': ['mom6.h.sfc']}"
-#   "o.z|['ocn']|{'ocn': ['mom6.h.z']}"
-#   "o.rho2|['ocn']|{'ocn': ['mom6.h.rho2']}"
-#   "o.native|['ocn']|{'ocn': ['mom6.h.native']}"
-#   "a.h0a|['atm']|{'atm': ['cam.h0a']}"
-#   "a.h1a|['atm']|{'atm': ['cam.h1a']}"
-#   "a.h2a|['atm']|{'atm': ['cam.h2a']}"
-#   "l.h0|['lnd']|{'lnd': ['clm2.h0']}"
-#   "i.h|['ice']|{'ice': ['cice.h']}"
-#   "i.h1|['ice']|{'ice': ['cice.h1']}"
-#   "r.h0|['rof']|{'rof': ['mosart.h0']}"
-# )
-# task_list=(
-#   "i.h1|['ice']|{'ice': ['cice.h1']}"
-#   "aolir|['atm', 'ocn', 'lnd', 'ice', 'rof']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a'], 'lnd': ['clm2.h0'], 'ice': ['cice.h'], 'rof': ['mosart.h0']}"
-# )
+# Define task entries: name|components|comps_info|nnodes|ncpus
 task_list=(
-  "aolir|['atm', 'ocn', 'lnd', 'ice', 'rof']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a']}"
+#   "o.sfc|['ocn']|{'ocn': ['mom6.h.sfc']}|1|64"
+#   "o.native|['ocn']|{'ocn': ['mom6.h.native']}|1|64"
+#   "o.zrho2|['ocn']|{'ocn': ['mom6.h.z', 'mom6.h.rho2']}|1|64"
+#   "ailr|['atm', 'ice', 'lnd', 'rof']|{'ice': ['cice.h']}|1|64"
+  "i.h1|['ice']|{'ice': ['cice.h1']}|10|128"
 )
 
 for entry in "${task_list[@]}"; do
-  IFS='|' read -r name comps comps_info <<< "$entry"
+  IFS='|' read -r name comps comps_info nnodes ncpus <<< "$entry"
 
-  gen_py_script "$name" "$comps" "${comps_info}"
-  gen_pbs_script "$name"
+  gen_py_script "$name" "$comps" "${comps_info}" "$ncpus"
+  gen_pbs_script "$name" "$nnodes" "$ncpus" 
   qsub "${task_name}_${name}_${syr}-${eyr}.pbs"
 done
 
