@@ -570,23 +570,48 @@ def parse_timestamps(timespan: tuple[str, str], timestep:int, timestep_unit:str=
     return timestamp_list
 
 def cesm_str2datetime(s: str) -> datetime.datetime:
-    """Convert CESM timestamp 'YYYY-MM-DD-SSSSS' to a datetime."""
-    nparts = len(s.split('-'))
-    if nparts == 4:
-        year, month, day, sec_str = s.split('-')
-        seconds = int(sec_str)
-        base = datetime.datetime(int(year), int(month), int(day))
-        res = base + datetime.timedelta(seconds=seconds)
-    elif nparts == 3:
-        year, month, day = s.split('-')
-        res = datetime.datetime(int(year), int(month), int(day))
-    elif nparts == 2:
-        year, month = s.split('-')
-        res = datetime.datetime(int(year), int(month), 1)
-    elif nparts == 1:
-        year = s.split('-')
-        res = datetime.datetime(int(year), 1, 1)
+    """Convert CESM timestamp 'YYYY-MM-DD-SSSSS' or 'YYYYMMDDSSSSSS' to a datetime."""
 
+    if "-" in s:  # dash-separated formats
+        nparts = len(s.split('-'))
+        if nparts == 4:
+            year, month, day, sec_str = s.split('-')
+            seconds = int(sec_str)
+            base = datetime.datetime(int(year), int(month), int(day))
+            res = base + datetime.timedelta(seconds=seconds)
+        elif nparts == 3:
+            year, month, day = s.split('-')
+            res = datetime.datetime(int(year), int(month), int(day))
+        elif nparts == 2:
+            year, month = s.split('-')
+            res = datetime.datetime(int(year), int(month), 1)
+        elif nparts == 1:
+            year = s.split('-')
+            res = datetime.datetime(int(year), 1, 1)
+    else:  # compact format, e.g. "YYYYMMDDSSSSSS"
+        year   = int(s[0:4])
+        month  = int(s[4:6])
+        day    = int(s[6:8])
+        seconds = int(s[8:]) if len(s) > 8 else 0
+        base = datetime.datetime(year, month, day)
+        res = base + datetime.timedelta(seconds=seconds)
+
+    return res
+
+def add_dash_to_timestamp(timestamp:str):
+    if len(timestamp) == 4:
+        # year
+        res = timestamp
+    if len(timestamp) == 6:
+        # month
+        res = f'{timestamp[0:4]}-{timestamp[4:6]}'
+    elif len(timestamp) == 8:
+        # day
+        res = f'{timestamp[0:4]}-{timestamp[4:6]}-{timestamp[6:8]}'
+    elif len(timestamp) == 14:
+        res = f'{timestamp[0:4]}-{timestamp[4:6]}-{timestamp[6:8]}-{timestamp[8:14]}'
+    else:
+        raise ValueError('Invalid timestamp format. Supported formats: YYYY, YYYYMM, YYYYMMDD, YYYYMMDDSSSSSS')
     return res
 
 def datetime_truncate(dt: datetime.datetime, precision: str = 'day') -> datetime.datetime:

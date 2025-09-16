@@ -280,43 +280,28 @@ class History:
                     )
                     comm.Barrier()
 
-                    if rank == 0:
-                        clean_tasks.append(bigbang_dir)
-                        if staging_dirpath != output_dirpath:
-                            dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
-                            move_tasks.append((bigcrunch_dir, dst_dir, timespan_tmp))
+                    if rank == 0 and staging_dirpath != output_dirpath:
+                        dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
+                        move_tasks.append((bigcrunch_dir, dst_dir, timespan_tmp))
 
-                        # if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-                        # if staging_dirpath != output_dirpath:
-                        #     dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
-                        #     pathlib.Path(dst_dir).mkdir(parents=True, exist_ok=True)
-                        #     date_start = ''.join(timespan_tmp[0].split('-'))
-                        #     date_end = ''.join(timespan_tmp[1].split('-'))
-                        #     date_str = f'{date_start}*-{date_end}*'
-                        #     src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{date_str}.nc'))
-                        #     if src_paths:
-                        #         with mp.Pool(processes=nproc) as pool:
-                        #             arg_list = [(src_path, dst_dir) for src_path in src_paths]
-                        #             pool.starmap(utils.move_and_overwrite, tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n'))
-
-        if rank == 0:
-            for bigcrunch_dir, dst_dir, timespan_tmp in move_tasks:
-                pathlib.Path(dst_dir).mkdir(parents=True, exist_ok=True)
-                date_start = ''.join(timespan_tmp[0].split('-'))
-                date_end = ''.join(timespan_tmp[1].split('-'))
-                date_str = f'{date_start}*-{date_end}*'
-                src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{date_str}.nc'))
-                if src_paths:
-                    with mp.Pool(processes=nproc) as pool:
-                        arg_list = [(src_path, dst_dir) for src_path in src_paths]
-                        pool.starmap(
-                            utils.move_and_overwrite,
-                            tqdm(arg_list, total=len(arg_list), desc=f'Moving generated files\nfrom: {staging_dirpath}\nto: {output_dirpath}\n')
+        move_tasks = comm.bcast(move_tasks if rank == 0 else None, root=0)
+        for i, (bigcrunch_dir, dst_dir, timespan_tmp) in enumerate(move_tasks):
+            if i % size != rank: continue
+            pathlib.Path(dst_dir).mkdir(parents=True, exist_ok=True)
+            date_start = ''.join(timespan_tmp[0].split('-'))
+            date_end = ''.join(timespan_tmp[1].split('-'))
+            date_str = f'{date_start}*-{date_end}*'
+            src_paths = glob.glob(os.path.join(bigcrunch_dir, f'*.{date_str}.nc'))
+            if src_paths:
+                with mp.Pool(processes=nproc) as pool:
+                    arg_list = [(src_path, dst_dir) for src_path in src_paths]
+                    pool.starmap(
+                        utils.move_and_overwrite,
+                        tqdm(
+                            arg_list, total=len(arg_list),
+                            desc=f'[Rank {rank}] Moving files from {bigcrunch_dir} to {dst_dir}',
                         )
-            comm.Barrier()
-            for bigbang_dir in clean_tasks:
-                if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-            comm.Barrier()
+                    )
 
 
     # def split_ds(self, comp, in_path, output_dirpath, overwrite=False, nco=True):
@@ -687,14 +672,16 @@ class Timeseries:
                 paths_sub = paths
             else:
                 start_dt, end_dt, timespan_precision = utils.parse_timespan(timespan)
-                start_dt = utils.datetime_truncate(start_dt, timespan_precision)
-                end_dt = utils.datetime_truncate(end_dt, timespan_precision)
                 paths_sub = []
                 for path in paths:
-                    date = path.split('.')[-2]
-                    dt = utils.cesm_str2datetime(date)
-                    dt = utils.datetime_truncate(dt, timespan_precision)
-                    if start_dt <= dt <= end_dt:
+                    start_str, end_str = path.split('.')[-2].split('-')
+                    start_str = utils.add_dash_to_timestamp(start_str)
+                    end_str = utils.add_dash_to_timestamp(end_str)
+                    timespan_tmp = (start_str, end_str)
+                    start, end, _ = utils.parse_timespan(timespan_tmp)
+                    start = utils.datetime_truncate(start, timespan_precision)
+                    end = utils.datetime_truncate(end, timespan_precision)
+                    if start_dt <= start and end <= end_dt:
                         paths_sub.append(path)
 
             return paths_sub
@@ -734,12 +721,14 @@ class Timeseries:
 
         if vtype == 'raw':
             paths = self.get_paths(comp, hstr, vn, timespan=timespan)
+            if len(paths) == 0: raise ValueError(f'No timeseries files found for variable `{vn}` in component `{comp}` with hstr `{hstr}` within the timespan `{timespan}`.')
             if timespan is None: paths = paths[load_idx]
 
             if vn in self.ds:
                 if self.ds[vn].path != paths:
                     if verbose: utils.p_warning(f'>>> case.ds["{vn}"] will be reloaded due to different paths.')
                     self.clear_ds(vn)
+                    self.load(vn, comp=comp, hstr=hstr, timespan=timespan, load_idx=load_idx, verbose=verbose, reload=False, **kws)
                 else:
                     if verbose: utils.p_warning(f'>>> case.ds["{vn}"] already loaded; to reload, run case.load("{vn}", ..., reload=True).')
 

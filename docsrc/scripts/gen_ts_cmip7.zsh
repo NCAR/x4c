@@ -85,12 +85,18 @@ EOF
 # call functions
 # =====================================================================
 # Define task entries: name|components|comps_info|nnodes|ncpus
+# task_list=(
+#   "o.sz|['ocn']|{'ocn': ['mom6.h.sfc', 'mom6.h.z']}|1|128"
+#   "o.nr+r|['ocn', 'rof']|{'ocn': ['mom6.h.native', 'mom6.h.rho2']}|1|128"
+#   "ail|['atm', 'ice', 'lnd']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a'],'ice': ['cice.h']}|1|128"
+#   "i.h1|['ice']|{'ice': ['cice.h1']}|13|128"
+# )
+
 task_list=(
-#   "o.sfc|['ocn']|{'ocn': ['mom6.h.sfc']}|1|64"
-#   "o.native|['ocn']|{'ocn': ['mom6.h.native']}|1|64"
-#   "o.zrho2|['ocn']|{'ocn': ['mom6.h.z', 'mom6.h.rho2']}|1|64"
-#   "ailr|['atm', 'ice', 'lnd', 'rof']|{'ice': ['cice.h']}|1|64"
-  "i.h1|['ice']|{'ice': ['cice.h1']}|10|128"
+  "o.sz|['ocn']|{'ocn': ['mom6.h.sfc', 'mom6.h.z']}|1|64"
+  "o.nr+r|['ocn', 'rof']|{'ocn': ['mom6.h.native', 'mom6.h.rho2']}|1|64"
+  "ail|['atm', 'ice', 'lnd']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a'],'ice': ['cice.h']}|1|64"
+  "i.h1|['ice']|{'ice': ['cice.h1']}|13|64"
 )
 
 for entry in "${task_list[@]}"; do
