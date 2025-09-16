@@ -720,6 +720,12 @@ class Timeseries:
         if reload: self.clear_ds(vn)
 
         if vtype == 'raw':
+            if timespan is not None and not isinstance(timespan[0], str) and not isinstance(timespan[-1], str):
+                start, end = timespan
+                start_str = utils.int_to_timestamp(start)
+                end_str = utils.int_to_timestamp(end)
+                timespan = (start_str, end_str)
+
             paths = self.get_paths(comp, hstr, vn, timespan=timespan)
             if len(paths) == 0: raise ValueError(f'No timeseries files found for variable `{vn}` in component `{comp}` with hstr `{hstr}` within the timespan `{timespan}`.')
             if timespan is None: paths = paths[load_idx]

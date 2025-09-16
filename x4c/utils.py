@@ -602,7 +602,7 @@ def add_dash_to_timestamp(timestamp:str):
     if len(timestamp) == 4:
         # year
         res = timestamp
-    if len(timestamp) == 6:
+    elif len(timestamp) == 6:
         # month
         res = f'{timestamp[0:4]}-{timestamp[4:6]}'
     elif len(timestamp) == 8:
@@ -611,8 +611,27 @@ def add_dash_to_timestamp(timestamp:str):
     elif len(timestamp) == 14:
         res = f'{timestamp[0:4]}-{timestamp[4:6]}-{timestamp[6:8]}-{timestamp[8:14]}'
     else:
-        raise ValueError('Invalid timestamp format. Supported formats: YYYY, YYYYMM, YYYYMMDD, YYYYMMDDSSSSSS')
+        raise ValueError(f'Invalid timestamp format: {timestamp}. Supported formats: YYYY, YYYYMM, YYYYMMDD, YYYYMMDDSSSSSS')
     return res
+
+def int_to_timestamp(t: int) -> str:
+    t_str = str(t)
+    if len(t_str) <= 4:
+        # year
+        t_str = t_str.zfill(4)
+    elif len(t_str) <= 6:
+        # month
+        t_str = t_str.zfill(6)
+    elif len(t_str) <= 8:
+        # day
+        t_str = t_str.zfill(8)
+    elif len(t_str) <= 14:
+        # second
+        t_str = t_str.zfill(14)
+    else:
+        raise ValueError('Invalid integer timestamp format. Supported formats: YYYY, YYYYMM, YYYYMMDD, YYYYMMDDSSSSSS')
+
+    return add_dash_to_timestamp(t_str)
 
 def datetime_truncate(dt: datetime.datetime, precision: str = 'day') -> datetime.datetime:
     if precision == 'year':
