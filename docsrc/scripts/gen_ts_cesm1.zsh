@@ -4,13 +4,11 @@ export hist_root=/glade/derecho/scratch/jiangzhu/archive
 export ts_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
 export ts_staging=/glade/derecho/scratch/fengzhu/x4c/gen_ts
 export casename=b.e13.B1850.f19_g16.icesm131_icam6_paleo.PI.010
-export syr=$1   # e.g., 0001: model year 1 
-export eyr=$2   # e.g., 0100: model year 100
+export syr=$1
+export eyr=$2
 export timestep=100
 export timestep_unit=year
 export task_name=gts
-export nnodes=1
-export ncpus=128
 export overwrite=True
 export account=P93300324
 export pyenv=x4c-py313
@@ -28,6 +26,7 @@ gen_py_script() {
   local name=$1
   local comps=$2
   local comps_info=$3
+  local ncpus=$4
 
   cat >! ${task_name}_${name}_${syr}-${eyr}.py << EOF
 import os
@@ -48,7 +47,7 @@ case.gen_ts(
     timespan=('$syr', '$eyr'),
     timestep=$timestep,
     timestep_unit='$timestep_unit',
-    nproc=$((nnodes * ncpus)),
+    nproc=$ncpus,
     overwrite=$overwrite,
 )
 
@@ -59,6 +58,8 @@ EOF
 
 gen_pbs_script() {
   local name=$1
+  local nnodes=$2
+  local ncpus=$3
 
   cat >! ${task_name}_${name}_${syr}-${eyr}.pbs << EOF
 #!/bin/bash
@@ -75,24 +76,24 @@ module load nco
 module load conda
 conda activate ${pyenv}
 
-python ${task_name}_${name}_${syr}-${eyr}.py
+mpiexec -n $nnodes python ${task_name}_${name}_${syr}-${eyr}.py
 EOF
 }
 
 # =====================================================================
 # call functions
 # =====================================================================
-# Define task entries: name|components|comps_info
+# Define task entries: name|components|comps_info|nndoes|ncpus
 task_list=(
-  "o|['ocn']|{}"
-  "ai|['atm', 'ice']|{}"
-  "lr|['lnd', 'rof']|{}"
+  "o|['ocn']|{}|1|128"
+  "ai|['atm', 'ice']|{}|1|128"
+  "lr|['lnd', 'rof']|{}|1|128"
 )
 
 for entry in "${task_list[@]}"; do
-  IFS='|' read -r name comps comps_info <<< "$entry"
+  IFS='|' read -r name comps comps_info nnodes ncpus <<< "$entry"
 
-  gen_py_script "$name" "$comps" "${comps_info}"
+  gen_py_script "$name" "$comps" "${comps_info}" "$ncpus"
   gen_pbs_script "$name"
   qsub "${task_name}_${name}_${syr}-${eyr}.pbs"
 done

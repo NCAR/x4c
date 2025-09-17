@@ -54,7 +54,7 @@
     <link rel="icon" href="_static/x4c-logo.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Load Variables in Timeseries" href="notebooks/diags-load_variables.html" />
+    <link rel="next" title="Overview: x4c as a CESM Diagnostic System" href="notebooks/diags-overview.html" />
     <link rel="prev" title="PBS Scripts" href="notebooks/post-pbs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -170,7 +170,10 @@
 <li class="toctree-l1"><a class="reference internal" href="ug-installation.html">Installation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/core-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/core-unstructured_grid_maps.html">Visualization of unstructured grid maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-annualization.html">Annualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-geo_mean.html">Geospatial Averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-regridding.html">Regridding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-visualization.html">Visualization</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-post.html">CESM Postprocessing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -179,9 +182,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">CESM Diagnostics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-load_variables.html">Load Variables in Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/diags-spell.html">A “spell” system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-register_new_funcs.html">Registering New Diagnostic Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-new_vars.html">Adding New Diagnostic Variables</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="ug-api.html">API Reference</a></li>
@@ -388,9 +393,11 @@ document.write(`
 <p>This section illustrates the diagnostics of CESM output using <cite>x4c</cite>.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/diags-load_variables.html">Load Variables in Timeseries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/diags-spell.html">A “spell” system</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notebooks/diags-register_new_funcs.html">Registering New Diagnostic Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/diags-new_vars.html">Adding New Diagnostic Variables</a></li>
 </ul>
 </div>
 </section>
@@ -416,11 +423,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="notebooks/diags-load_variables.html"
+       href="notebooks/diags-overview.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Load Variables in Timeseries</p>
+        <p class="prev-next-title">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

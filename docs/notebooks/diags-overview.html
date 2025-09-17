@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Timeseries case system &#8212; x4c  documentation</title>
+    <title>Overview: x4c as a CESM Diagnostic System &#8212; x4c  documentation</title>
   
   
   
@@ -51,12 +51,12 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/diags-case';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/diags-overview';</script>
     <link rel="icon" href="../_static/x4c-logo.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Loading Variables" href="diags-load_variables.html" />
-    <link rel="prev" title="Overview: x4c as a CESM Diagnostic System" href="diags-overview.html" />
+    <link rel="next" title="The Timeseries case system" href="diags-case.html" />
+    <link rel="prev" title="CESM Diagnostics" href="../ug-diags.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -183,8 +183,8 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../ug-diags.html">CESM Diagnostics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-spell.html">A “spell” system</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-new_vars.html">Adding New Diagnostic Variables</a></li>
@@ -262,7 +262,7 @@
       
       
       
-      <li><a href="https://github.com/NCAR/x4c/edit/main/notebooks/diags-case.ipynb" target="_blank"
+      <li><a href="https://github.com/NCAR/x4c/edit/main/notebooks/diags-overview.ipynb" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -279,7 +279,7 @@
       
       
       
-      <li><a href="https://github.com/NCAR/x4c/issues/new?title=Issue%20on%20page%20%2Fnotebooks/diags-case.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/NCAR/x4c/issues/new?title=Issue%20on%20page%20%2Fnotebooks/diags-overview.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -309,7 +309,7 @@
       
       
       
-      <li><a href="../_sources/notebooks/diags-case.ipynb" target="_blank"
+      <li><a href="../_sources/notebooks/diags-overview.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -375,7 +375,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>The Timeseries case system</h1>
+    <h1>Overview: x4c as a CESM Diagnostic System</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -389,12 +389,13 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="The-Timeseries-case-system">
-<h1>The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system<a class="headerlink" href="#The-Timeseries-case-system" title="Link to this heading">#</a></h1>
+  <section id="Overview:-x4c-as-a-CESM-Diagnostic-System">
+<h1>Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System<a class="headerlink" href="#Overview:-x4c-as-a-CESM-Diagnostic-System" title="Link to this heading">#</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">x4c</span></code> provides a high-level diagnositc system for CESM output analysis and visualization. In this tutorial, we show some simple examples to give a quick glance of the major features, including:</p>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">spell</span></code> magics</p></li>
+<li><p>Adding new diagnostic variables</p></li>
 </ul>
 <p>More detailed explainations of each feature can be found in later sections.</p>
 <div style="border-left: 5px solid #787878ff; padding: 0.5em; background: #ebebebff;"><p><strong>Example Datasets:</strong> Zhu, F. &amp; Zhu, J. Long simulations of the Miocene Climatic Optimum, DOI: 10.5065/3QFN-GN70 (2025). <a class="reference external" href="https://rda.ucar.edu/datasets/d010026/">https://rda.ucar.edu/datasets/d010026/</a>.</p>
@@ -3246,20 +3247,20 @@ Attributes:
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="diags-overview.html"
+       href="../ug-diags.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</p>
+        <p class="prev-next-title">CESM Diagnostics</p>
       </div>
     </a>
     <a class="right-next"
-       href="diags-load_variables.html"
+       href="diags-case.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Loading Variables</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

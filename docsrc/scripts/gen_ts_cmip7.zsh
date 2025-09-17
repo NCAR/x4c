@@ -5,8 +5,8 @@ export ts_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4
 export ts_staging=/glade/derecho/scratch/fengzhu/x4c/gen_ts
 export casename=b.e30_beta06.B1850C_LTso.ne30_t232_wgx3.192.wrkflw.1
 export casefolder=b.e30_beta06.B1850C_LTso.ne30_t232_wgx3.192.wrkflw.1_32
-export syr=$1   # e.g., 0001: model year 1 
-export eyr=$2   # e.g., 0100: model year 100
+export syr=$1
+export eyr=$2
 export timestep=10
 export timestep_unit=year
 export task_name=gts
@@ -85,18 +85,11 @@ EOF
 # call functions
 # =====================================================================
 # Define task entries: name|components|comps_info|nnodes|ncpus
-# task_list=(
-#   "o.sz|['ocn']|{'ocn': ['mom6.h.sfc', 'mom6.h.z']}|1|128"
-#   "o.nr+r|['ocn', 'rof']|{'ocn': ['mom6.h.native', 'mom6.h.rho2']}|1|128"
-#   "ail|['atm', 'ice', 'lnd']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a'],'ice': ['cice.h']}|1|128"
-#   "i.h1|['ice']|{'ice': ['cice.h1']}|13|128"
-# )
-
 task_list=(
-  "o.sz|['ocn']|{'ocn': ['mom6.h.sfc', 'mom6.h.z']}|1|64"
-  "o.nr+r|['ocn', 'rof']|{'ocn': ['mom6.h.native', 'mom6.h.rho2']}|1|64"
-  "ail|['atm', 'ice', 'lnd']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a'],'ice': ['cice.h']}|1|64"
-  "i.h1|['ice']|{'ice': ['cice.h1']}|13|64"
+  "o.sz|['ocn']|{'ocn': ['mom6.h.sfc', 'mom6.h.z']}|1|128"
+  "o.nr+r|['ocn', 'rof']|{'ocn': ['mom6.h.native', 'mom6.h.rho2']}|1|128"
+  "ail|['atm', 'ice', 'lnd']|{'atm': ['cam.h0a', 'cam.h1a', 'cam.h2a'],'ice': ['cice.h']}|1|128"
+  "i.h1|['ice']|{'ice': ['cice.h1']}|13|128"
 )
 
 for entry in "${task_list[@]}"; do

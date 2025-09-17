@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Load Variables in Timeseries &#8212; x4c  documentation</title>
+    <title>Loading Variables &#8212; x4c  documentation</title>
   
   
   
@@ -56,7 +56,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="A “spell” system" href="diags-spell.html" />
-    <link rel="prev" title="CESM Diagnostics" href="../ug-diags.html" />
+    <link rel="prev" title="The Timeseries case system" href="diags-case.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -171,7 +171,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../ug-installation.html">Installation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="core-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core-unstructured_grid_maps.html">Visualization of unstructured grid maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-annualization.html">Annualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-geo_mean.html">Geospatial Averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-regridding.html">Regridding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-visualization.html">Visualization</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../ug-post.html">CESM Postprocessing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -180,9 +183,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../ug-diags.html">CESM Diagnostics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Load Variables in Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-spell.html">A “spell” system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diags-register_new_funcs.html">Registering New Diagnostic Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-new_vars.html">Adding New Diagnostic Variables</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../ug-api.html">API Reference</a></li>
@@ -370,7 +375,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Load Variables in Timeseries</h1>
+    <h1>Loading Variables</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -384,19 +389,19 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="Load-Variables-in-Timeseries">
-<h1>Load Variables in Timeseries<a class="headerlink" href="#Load-Variables-in-Timeseries" title="Link to this heading">#</a></h1>
+  <section id="Loading-Variables">
+<h1>Loading Variables<a class="headerlink" href="#Loading-Variables" title="Link to this heading">#</a></h1>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;/glade/u/home/fengzhu/Github/x4c/docsrc/notebooks&#39;</span><span class="p">)</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">x4c</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x4c</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+import os
+os.chdir(&#39;/glade/u/home/fengzhu/Github/x4c/docsrc/notebooks&#39;)
+import x4c
+print(x4c.__version__)
 </pre></div>
 </div>
 </div>
@@ -412,8 +417,8 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
-<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">Timeseries</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">grid_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;atm&#39;</span><span class="p">:</span> <span class="s1">&#39;ne16np4&#39;</span><span class="p">})</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>dirpath = &#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;
+case = x4c.Timeseries(dirpath, grid_dict={&#39;atm&#39;: &#39;ne16np4&#39;})
 </pre></div>
 </div>
 </div>
@@ -433,7 +438,7 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -451,12 +456,12 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../ug-diags.html"
+       href="diags-case.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">CESM Diagnostics</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</p>
       </div>
     </a>
     <a class="right-next"

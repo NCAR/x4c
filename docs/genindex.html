@@ -167,7 +167,10 @@
 <li class="toctree-l1"><a class="reference internal" href="ug-installation.html">Installation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/core-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/core-unstructured_grid_maps.html">Visualization of unstructured grid maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-annualization.html">Annualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-geo_mean.html">Geospatial Averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-regridding.html">Regridding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-visualization.html">Visualization</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-post.html">CESM Postprocessing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -176,9 +179,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-diags.html">CESM Diagnostics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-load_variables.html">Load Variables in Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/diags-spell.html">A “spell” system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-register_new_funcs.html">Registering New Diagnostic Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-new_vars.html">Adding New Diagnostic Variables</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="ug-api.html">API Reference</a></li>
@@ -323,6 +328,7 @@ document.write(`
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -389,6 +395,14 @@ document.write(`
   </ul></td>
 </tr></table>
 
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ug-api.html#x4c.case.History">History (class in x4c.case)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -444,6 +458,10 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ug-api.html#x4c.core.XDataset.regrid">regrid() (x4c.core.XDataset method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ug-api.html#x4c.case.History.rm_timespan">rm_timespan() (x4c.case.History method)</a>
 </li>
   </ul></td>
 </tr></table>

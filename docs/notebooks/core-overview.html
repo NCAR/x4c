@@ -55,7 +55,7 @@
     <link rel="icon" href="../_static/x4c-logo.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Visualization of unstructured grid maps" href="core-unstructured_grid_maps.html" />
+    <link rel="next" title="Annualization" href="core-annualization.html" />
     <link rel="prev" title="Core Features" href="../ug-core.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -171,7 +171,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../ug-installation.html">Installation</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../ug-core.html">Core Features</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core-unstructured_grid_maps.html">Visualization of unstructured grid maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-annualization.html">Annualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-geo_mean.html">Geospatial Averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-regridding.html">Regridding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-visualization.html">Visualization</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../ug-post.html">CESM Postprocessing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -180,9 +183,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../ug-diags.html">CESM Diagnostics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="diags-load_variables.html">Load Variables in Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-spell.html">A “spell” system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="diags-register_new_funcs.html">Registering New Diagnostic Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-new_vars.html">Adding New Diagnostic Variables</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../ug-api.html">API Reference</a></li>
@@ -413,14 +418,14 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;/glade/u/home/fengzhu/Github/x4c/docsrc/notebooks&#39;</span><span class="p">)</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">x4c</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x4c</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+import os
+import numpy as np
+os.chdir(&#39;/glade/u/home/fengzhu/Github/x4c/docsrc/notebooks&#39;)
+import x4c
+print(x4c.__version__)
 </pre></div>
 </div>
 </div>
@@ -439,14 +444,14 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
-<span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005.cam.h0.TS.895101-900012.nc&#39;</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="s1">&#39;atm/proc/tseries/month_1&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span>
-    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
-    <span class="n">grid</span><span class="o">=</span><span class="s1">&#39;ne16np4&#39;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">ds</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>dirpath = &#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;
+fname = &#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005.cam.h0.TS.895101-900012.nc&#39;
+ds = x4c.load_dataset(
+    os.path.join(dirpath, &#39;atm/proc/tseries/month_1&#39;, fname),
+    comp=&#39;atm&#39;,
+    grid=&#39;ne16np4&#39;,
+)
+ds
 </pre></div>
 </div>
 </div>
@@ -1532,9 +1537,9 @@ Attributes:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;comp&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;grid&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>print(ds.attrs[&#39;comp&#39;])
+print(ds.attrs[&#39;grid&#39;])
+print(ds.attrs[&#39;path&#39;])
 </pre></div>
 </div>
 </div>
@@ -1554,15 +1559,15 @@ ne16np4
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
-<span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005.cam.h0.TS.895101-900012.nc&#39;</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="s1">&#39;atm/proc/tseries/month_1&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span>
-    <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;atm&#39;</span><span class="p">,</span>
-    <span class="n">grid</span><span class="o">=</span><span class="s1">&#39;ne16np4&#39;</span><span class="p">,</span>
-    <span class="n">adjust_month</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">ds</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>dirpath = &#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;
+fname = &#39;b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005.cam.h0.TS.895101-900012.nc&#39;
+ds = x4c.load_dataset(
+    os.path.join(dirpath, &#39;atm/proc/tseries/month_1&#39;, fname),
+    comp=&#39;atm&#39;,
+    grid=&#39;ne16np4&#39;,
+    adjust_month=True,
+)
+ds
 </pre></div>
 </div>
 </div>
@@ -2650,8 +2655,8 @@ Attributes:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">da</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;TS&#39;</span><span class="p">]</span>
-<span class="n">da</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>da = ds.x[&#39;TS&#39;]
+da
 </pre></div>
 </div>
 </div>
@@ -3186,8 +3191,8 @@ Attributes:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds_ann</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">annualize</span><span class="p">()</span>
-<span class="n">ds_ann</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>ds_ann = ds.x.annualize()
+ds_ann
 </pre></div>
 </div>
 </div>
@@ -3998,8 +4003,8 @@ Attributes:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">da_ann</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">annualize</span><span class="p">()</span>
-<span class="n">da_ann</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>da_ann = da.x.annualize()
+da_ann
 </pre></div>
 </div>
 </div>
@@ -4585,7 +4590,7 @@ Attributes:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">da</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">geo_mean</span><span class="p">(</span><span class="n">latlon_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">))</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>da.x.geo_mean(latlon_range=(-90, 90, 0, 360))
 </pre></div>
 </div>
 </div>
@@ -5170,8 +5175,8 @@ Attributes:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds_rgd</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">regrid</span><span class="p">()</span>
-<span class="n">ds_rgd</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>ds_rgd = ds.x.regrid()
+ds_rgd
 </pre></div>
 </div>
 </div>
@@ -6322,8 +6327,8 @@ Dimensions without coordinates: ncol</dd></dl></div></li></ul></div></div></div>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">da_rgd</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">regrid</span><span class="p">()</span>
-<span class="n">da_rgd</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>da_rgd = da.x.regrid()
+da_rgd
 </pre></div>
 </div>
 </div>
@@ -6919,8 +6924,8 @@ Dimensions without coordinates: ncol</dd><dt><span>comp :</span></dt><dd>atm</dd
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">da_clim</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">regrid</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
-<span class="n">da_clim</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>da_clim = da.x.regrid().mean(&#39;time&#39;)
+da_clim
 </pre></div>
 </div>
 </div>
@@ -7441,7 +7446,7 @@ Dimensions without coordinates: ncol</dd><dt><span>comp :</span></dt><dd>atm</dd
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">da_clim</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>da_clim.plot()
 </pre></div>
 </div>
 </div>
@@ -7466,10 +7471,10 @@ Dimensions without coordinates: ncol</dd><dt><span>comp :</span></dt><dd>atm</dd
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">da_clim</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">levels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">220</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
-    <span class="n">cbar_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ticks&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">220</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="mi">11</span><span class="p">)},</span>
-<span class="p">)</span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>fig, ax = da_clim.x.plot(
+    levels=np.linspace(220, 320, 21),
+    cbar_kwargs={&#39;ticks&#39;: np.linspace(220, 320, 11)},
+)
 </pre></div>
 </div>
 </div>
@@ -7484,7 +7489,7 @@ Dimensions without coordinates: ncol</dd><dt><span>comp :</span></dt><dd>atm</dd
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -7512,11 +7517,11 @@ Dimensions without coordinates: ncol</dd><dt><span>comp :</span></dt><dd>atm</dd
       </div>
     </a>
     <a class="right-next"
-       href="core-unstructured_grid_maps.html"
+       href="core-annualization.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Visualization of unstructured grid maps</p>
+        <p class="prev-next-title">Annualization</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

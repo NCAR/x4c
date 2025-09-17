@@ -52,7 +52,7 @@
     <link rel="icon" href="_static/x4c-logo.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Registering New Diagnostic Functions" href="notebooks/diags-register_new_funcs.html" />
+    <link rel="prev" title="Adding New Diagnostic Variables" href="notebooks/diags-new_vars.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -167,7 +167,10 @@
 <li class="toctree-l1"><a class="reference internal" href="ug-installation.html">Installation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/core-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/core-unstructured_grid_maps.html">Visualization of unstructured grid maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-annualization.html">Annualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-geo_mean.html">Geospatial Averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-regridding.html">Regridding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/core-visualization.html">Visualization</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-post.html">CESM Postprocessing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -176,9 +179,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="ug-diags.html">CESM Diagnostics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-load_variables.html">Load Variables in Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/diags-spell.html">A “spell” system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-register_new_funcs.html">Registering New Diagnostic Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-new_vars.html">Adding New Diagnostic Variables</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">API Reference</a></li>
@@ -406,6 +411,13 @@ document.write(`
 </li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cesm-postprocessing">CESM Postprocessing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.History"><code class="docutils literal notranslate"><span class="pre">History</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.History.rm_timespan"><code class="docutils literal notranslate"><span class="pre">History.rm_timespan()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cesm-diagnostics">CESM Diagnostics</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.Timeseries.calc"><code class="docutils literal notranslate"><span class="pre">Timeseries.calc()</span></code></a></li>
@@ -432,7 +444,7 @@ document.write(`
 <span id="core-features"></span><h2>Core Features<a class="headerlink" href="#module-x4c.core" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="x4c.core.load_dataset">
-<span class="sig-prename descclassname"><span class="pre">x4c.core.</span></span><span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.load_dataset" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">x4c.core.</span></span><span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hstr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.load_dataset" title="Link to this definition">#</a></dt>
 <dd><p>Load a netCDF file and form a <cite>xarray.Dataset</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -449,7 +461,7 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="x4c.core.open_mfdataset">
-<span class="sig-prename descclassname"><span class="pre">x4c.core.</span></span><span class="sig-name descname"><span class="pre">open_mfdataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.open_mfdataset" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">x4c.core.</span></span><span class="sig-name descname"><span class="pre">open_mfdataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hstr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.core.open_mfdataset" title="Link to this definition">#</a></dt>
 <dd><p>Open multiple netCDF files and form a <cite>xarray.Dataset</cite> in a lazy load mode</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -663,11 +675,30 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
 </dd></dl>
 
 </section>
+<section id="cesm-postprocessing">
+<h2>CESM Postprocessing<a class="headerlink" href="#cesm-postprocessing" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="x4c.case.History">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">x4c.case.</span></span><span class="sig-name descname"><span class="pre">History</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['atm',</span> <span class="pre">'ocn',</span> <span class="pre">'lnd',</span> <span class="pre">'ice',</span> <span class="pre">'rof']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comps_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">casename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comp/hist/casename.hstr.date.nc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['nday1',</span> <span class="pre">'once']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.History" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="x4c.case.History.rm_timespan">
+<span class="sig-name descname"><span class="pre">rm_timespan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timespan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['atm',</span> <span class="pre">'ice',</span> <span class="pre">'ocn',</span> <span class="pre">'rof',</span> <span class="pre">'lnd']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nworkers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rehearsal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.History.rm_timespan" title="Link to this definition">#</a></dt>
+<dd><p>Rename the archive files within a timespan</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timespan</strong> (<em>tuple</em><em> or </em><em>list</em>) – [start_year, end_year] with elements being integers</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="cesm-diagnostics">
 <h2>CESM Diagnostics<a class="headerlink" href="#cesm-diagnostics" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="x4c.case.Timeseries">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">x4c.case.</span></span><span class="sig-name descname"><span class="pre">Timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">casename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cesm_ver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">x4c.case.</span></span><span class="sig-name descname"><span class="pre">Timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">casename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cesm_ver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries" title="Link to this definition">#</a></dt>
 <dd><p>Initialize a CESM Timeseries case generated by CESM Postprocessing</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -680,7 +711,7 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="x4c.case.Timeseries.calc">
-<span class="sig-name descname"><span class="pre">calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recalculate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries.calc" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recalculate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.Timeseries.calc" title="Link to this definition">#</a></dt>
 <dd><p>Calculate a diagnostic spell</p>
 </dd></dl>
 
@@ -718,12 +749,12 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="notebooks/diags-register_new_funcs.html"
+       href="notebooks/diags-new_vars.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Registering New Diagnostic Functions</p>
+        <p class="prev-next-title">Adding New Diagnostic Variables</p>
       </div>
     </a>
 </div>
@@ -766,6 +797,13 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.shs"><code class="docutils literal notranslate"><span class="pre">XDataArray.shs</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.somin"><code class="docutils literal notranslate"><span class="pre">XDataArray.somin</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.core.XDataArray.zm"><code class="docutils literal notranslate"><span class="pre">XDataArray.zm</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cesm-postprocessing">CESM Postprocessing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.History"><code class="docutils literal notranslate"><span class="pre">History</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#x4c.case.History.rm_timespan"><code class="docutils literal notranslate"><span class="pre">History.rm_timespan()</span></code></a></li>
 </ul>
 </li>
 </ul>

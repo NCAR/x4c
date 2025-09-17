@@ -7,4 +7,7 @@ This section illustrates the core features of `x4c` as an Xarray extension.
     :maxdepth: 1
 
     notebooks/core-overview
-    notebooks/core-unstructured_grid_maps
+    notebooks/core-annualization
+    notebooks/core-geo_mean
+    notebooks/core-regridding
+    notebooks/core-visualization

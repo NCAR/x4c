@@ -4,13 +4,11 @@ export hist_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/
 export ts_root=/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
 export ts_staging=/glade/derecho/scratch/fengzhu/x4c/gen_ts
 export casename=b.e23_alpha17f.BLT1850.ne30_t232.092
-export syr=$1   # e.g., 0001: model year 1 
-export eyr=$2   # e.g., 0100: model year 100
+export syr=$1
+export eyr=$2
 export timestep=10
 export timestep_unit=year
 export task_name=gts
-export nnodes=1
-export ncpus=128
 export overwrite=True
 export account=P93300324
 export pyenv=x4c-py313
@@ -28,6 +26,7 @@ gen_py_script() {
   local name=$1
   local comps=$2
   local comps_info=$3
+  local ncpus=$4
 
   cat >! ${task_name}_${name}_${syr}-${eyr}.py << EOF
 import os
@@ -59,6 +58,8 @@ EOF
 
 gen_pbs_script() {
   local name=$1
+  local nnodes=$2
+  local ncpus=$3
 
   cat >! ${task_name}_${name}_${syr}-${eyr}.pbs << EOF
 #!/bin/bash
@@ -75,27 +76,27 @@ module load nco
 module load conda
 conda activate ${pyenv}
 
-python ${task_name}_${name}_${syr}-${eyr}.py
+mpiexec -n $nnodes python ${task_name}_${name}_${syr}-${eyr}.py
 EOF
 }
 
 # =====================================================================
 # call functions
 # =====================================================================
-# Define task entries: name|components|comps_info
+# Define task entries: name|components|comps_info|nnodes|ncpus
 task_list=(
-  "o.sfc|['ocn']|{'ocn': ['mom6.h.sfc']}"
-  "o.z|['ocn']|{'ocn': ['mom6.h.z']}"
-  "o.rho2|['ocn']|{'ocn': ['mom6.h.rho2']}"
-  "o.native|['ocn']|{'ocn': ['mom6.h.native']}"
-  "a.h0a|['atm']|{'atm': ['cam.h0a']}"
-  "lir|['lnd', 'ice', 'rof']|{}"
+  "o.sfc|['ocn']|{'ocn': ['mom6.h.sfc']}|1|128"
+  "o.z|['ocn']|{'ocn': ['mom6.h.z']}|1|128"
+  "o.rho2|['ocn']|{'ocn': ['mom6.h.rho2']}|1|128"
+  "o.native|['ocn']|{'ocn': ['mom6.h.native']}|1|128"
+  "a.h0a|['atm']|{'atm': ['cam.h0a']}|1|128"
+  "lir|['lnd', 'ice', 'rof']|{}|1|128"
 )
 
 for entry in "${task_list[@]}"; do
-  IFS='|' read -r name comps comps_info <<< "$entry"
+  IFS='|' read -r name comps comps_info nnodes ncpus <<< "$entry"
 
-  gen_py_script "$name" "$comps" "${comps_info}"
+  gen_py_script "$name" "$comps" "${comps_info}" "$ncpus"
   gen_pbs_script "$name"
   qsub "${task_name}_${name}_${syr}-${eyr}.pbs"
 done

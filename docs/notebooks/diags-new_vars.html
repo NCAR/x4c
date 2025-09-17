@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Registering New Diagnostic Functions &#8212; x4c  documentation</title>
+    <title>Adding New Diagnostic Variables &#8212; x4c  documentation</title>
   
   
   
@@ -51,7 +51,7 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/diags-register_new_funcs';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/diags-new_vars';</script>
     <link rel="icon" href="../_static/x4c-logo.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -171,7 +171,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../ug-installation.html">Installation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="core-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core-unstructured_grid_maps.html">Visualization of unstructured grid maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-annualization.html">Annualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-geo_mean.html">Geospatial Averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-regridding.html">Regridding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-visualization.html">Visualization</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../ug-post.html">CESM Postprocessing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -180,9 +183,11 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../ug-diags.html">CESM Diagnostics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="diags-load_variables.html">Load Variables in Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-spell.html">A “spell” system</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Registering New Diagnostic Functions</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Adding New Diagnostic Variables</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../ug-api.html">API Reference</a></li>
@@ -257,7 +262,7 @@
       
       
       
-      <li><a href="https://github.com/NCAR/x4c/edit/main/notebooks/diags-register_new_funcs.ipynb" target="_blank"
+      <li><a href="https://github.com/NCAR/x4c/edit/main/notebooks/diags-new_vars.ipynb" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -274,7 +279,7 @@
       
       
       
-      <li><a href="https://github.com/NCAR/x4c/issues/new?title=Issue%20on%20page%20%2Fnotebooks/diags-register_new_funcs.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/NCAR/x4c/issues/new?title=Issue%20on%20page%20%2Fnotebooks/diags-new_vars.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -304,7 +309,7 @@
       
       
       
-      <li><a href="../_sources/notebooks/diags-register_new_funcs.ipynb" target="_blank"
+      <li><a href="../_sources/notebooks/diags-new_vars.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -372,7 +377,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Registering New Diagnostic Functions</h1>
+    <h1>Adding New Diagnostic Variables</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -396,8 +401,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="Registering-New-Diagnostic-Functions">
-<h1>Registering New Diagnostic Functions<a class="headerlink" href="#Registering-New-Diagnostic-Functions" title="Link to this heading">#</a></h1>
+  <section id="Adding-New-Diagnostic-Variables">
+<h1>Adding New Diagnostic Variables<a class="headerlink" href="#Adding-New-Diagnostic-Variables" title="Link to this heading">#</a></h1>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -2962,7 +2967,7 @@ Attributes:
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_diags-register_new_funcs_12_0.png" src="../_images/notebooks_diags-register_new_funcs_12_0.png" />
+<img alt="../_images/notebooks_diags-new_vars_12_0.png" src="../_images/notebooks_diags-new_vars_12_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">

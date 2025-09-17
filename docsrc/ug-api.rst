@@ -14,6 +14,13 @@ Core Features
 .. autoclass:: x4c.core.XDataArray
    :members:
 
+CESM Postprocessing
+-------------------
+
+.. autoclass:: x4c.case.History
+    :members:
+
+
 
 CESM Diagnostics
 ----------------
