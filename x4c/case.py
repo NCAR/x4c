@@ -24,7 +24,6 @@ from .spell import Spell
 
 class History:
     def __init__(self, root_dir, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], comps_info=None, casename=None,
-                #  path_pattern='comp/hist/casename.mdl.hstr.date.nc',
                  path_pattern='comp/hist/casename.hstr.date.nc', avoid_list=['nday1', 'once']):
         self.path_pattern = path_pattern
         self.root_dir = root_dir
@@ -619,8 +618,8 @@ class Timeseries:
             comp = path.split('/')[-5]
             fname = os.path.basename(path)
             vn = fname.split('.')[-3]
-            casename_hstr = fname.split(vn)[0]
-            hstr = casename_hstr.split(self.casename)[-1][1:-1]
+            casename_hstr = fname.split(f'.{vn}.')[0]
+            hstr = casename_hstr.split(self.casename)[-1][1:]
             if comp not in self.paths:
                 self.paths[comp] = {}
             if hstr not in self.paths[comp]:
@@ -637,8 +636,8 @@ class Timeseries:
             comp = path.split('/')[-5]
             fname = os.path.basename(path)
             vn = fname.split('.')[-3]
-            casename_hstr = fname.split(vn)[0]
-            hstr = casename_hstr.split(self.casename)[-1][1:-1]
+            casename_hstr = fname.split(f'.{vn}.')[0]
+            hstr = casename_hstr.split(self.casename)[-1][1:]
             self.paths[comp][hstr][vn].append(path)
             self.vns[comp][hstr].append(vn)
 
