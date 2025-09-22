@@ -24,7 +24,7 @@ from .spell import Spell
 
 class History:
     def __init__(self, root_dir, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], comps_info=None, casename=None,
-                 path_pattern='comp/hist/casename.hstr.date.nc', avoid_list=['nday1', 'once']):
+                 path_pattern='comp/hist/casename.hstr.date.nc', avoid_list=['once']):
         self.path_pattern = path_pattern
         self.root_dir = root_dir
         self.casename = os.path.basename(root_dir) if casename is None else casename
