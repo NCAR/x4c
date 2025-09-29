@@ -47,7 +47,7 @@ case.gen_ts(
     timespan=('$syr', '$eyr'),
     timestep=$timestep,
     timestep_unit='$timestep_unit',
-    nproc=$((nnodes * ncpus)),
+    nproc=$ncpus,
     overwrite=$overwrite,
 )
 
@@ -58,6 +58,8 @@ EOF
 
 gen_pbs_script() {
   local name=$1
+  local nnodes=$2
+  local ncpus=$3
 
   cat >! ${task_name}_${name}_${syr}-${eyr}.pbs << EOF
 #!/bin/bash
@@ -98,7 +100,7 @@ for entry in "${task_list[@]}"; do
   IFS='|' read -r name comps comps_info nnodes ncpus <<< "$entry"
 
   gen_py_script "$name" "$comps" "${comps_info}" "$ncpus"
-  gen_pbs_script "$name"
+  gen_pbs_script "$name" "$nnodes" "$ncpus" 
   qsub "${task_name}_${name}_${syr}-${eyr}.pbs"
 done
 

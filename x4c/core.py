@@ -461,7 +461,7 @@ class XDataArray:
         ''' the NH area-weighted sum '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        da = self.da.where(lat>0).weighted(gw).sum(['lat', 'lon'])
+        da = self.da.where(lat>0).weighted(gw).sum(gw.dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'NH Sum {da.attrs["long_name"]}'
         return da
@@ -471,7 +471,7 @@ class XDataArray:
         ''' the SH area-weighted sum '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        da = self.da.where(lat<0).weighted(gw).sum(['lat', 'lon'])
+        da = self.da.where(lat<0).weighted(gw).sum(gw.dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'SH Sum {da.attrs["long_name"]}'
         return da
