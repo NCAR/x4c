@@ -45,7 +45,7 @@ case.gen_ts(
     comps=$comps,
     output_dirpath=output_dirpath,
     staging_dirpath=staging_dirpath,
-    timespan=('$syr', '$eyr'),
+    timespan=($syr, $eyr),
     timestep=$timestep,
     timestep_unit='$timestep_unit',
     nproc=$ncpus,
