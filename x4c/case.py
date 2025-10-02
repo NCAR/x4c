@@ -76,11 +76,13 @@ class History:
                 self.vns[comp][hs] = self.get_ts_vns(comp, hs)
                 utils.p_success(f'>>> case.vns["{comp}"]["{hs}"] created')
 
-    def get_ts_vns(self, comp, hstr):
+    def get_ts_vns(self, comp, hstr, exclude_vars=[
+            'time', 'time_bnds', 'time_bounds', 'time_bound',
+            'time_written', 'date', 'datesec', 'date_written',
+        ]):
         vns_ts = []
         ds0 = core.open_dataset(self.paths[comp][hstr][0])
         vns = list(ds0.variables)
-        exclude_vars = ['time', 'time_bnds', 'time_bounds', 'time_written', 'date', 'datesec', 'date_written']
 
         for v in vns:
             # if len(ds0[v].dims) >= 2 and 'time' in ds0[v].dims and 'time' not in v and v not in exclude_vars:
@@ -133,6 +135,7 @@ class History:
                 in_path,
                 '-o', out_path
             ]
+            # print(cmd)
             subprocess.run(cmd, check=True)
 
     def bigbang(self, comp, hstr, output_dirpath, timespan=None, overwrite=True, nproc=1, vns=None):
@@ -200,6 +203,7 @@ class History:
                 *paths_sub,
                 '-o', out_path
             ]
+            # print(cmd)
             subprocess.run(cmd, check=True)
 
     def bigcrunch(self, comp, hstr, input_dirpath, output_dirpath, timespan=None, overwrite=True, nproc=1, compression=1, vns=None):
@@ -233,11 +237,16 @@ class History:
 
         if staging_dirpath is None: staging_dirpath = output_dirpath
         pathlib.Path(staging_dirpath).mkdir(parents=True, exist_ok=True)
-        if timespan is None: raise ValueError('Please specify `timespan`.')
+        if timespan is None:
+            raise ValueError('Please specify `timespan`.')
+        else:
+            if not isinstance(timespan[0], str) and not isinstance(timespan[-1], str):
+                timespan = utils.timespan_int2str(timespan)
+
         timespan_list = utils.parse_timestamps(timespan, timestep=timestep, timestep_unit=timestep_unit)
         if not isinstance(comps, dict): comps = {comp: None for comp in comps}
 
-        move_tasks, clean_tasks = [], []
+        move_tasks = []
         for comp, vns in comps.items():
             hstr = self.comps_info[comp]
             # generate timeseries files for each component and each sub-timespan
@@ -603,8 +612,7 @@ class Timeseries:
         utils.p_header(f'>>> case.root_dir: {self.root_dir}')
         utils.p_header(f'>>> case.path_pattern: {self.path_pattern}')
         utils.p_header(f'>>> case.grid_dict: {self.grid_dict}')
-        if self.casename is not None:
-            utils.p_header(f'>>> case.casename: {self.casename}')
+        if self.casename is not None: utils.p_header(f'>>> case.casename: {self.casename}')
 
         self.paths_all = utils.find_paths(self.root_dir, self.path_pattern)
         self.hstr_all = list(set('.'.join(s.split('.')[:-1]) for s in utils.get_hstr(self.paths_all, casename=self.casename)))
@@ -720,10 +728,7 @@ class Timeseries:
 
         if vtype == 'raw':
             if timespan is not None and not isinstance(timespan[0], str) and not isinstance(timespan[-1], str):
-                start, end = timespan
-                start_str = utils.int_to_timestamp(start)
-                end_str = utils.int_to_timestamp(end)
-                timespan = (start_str, end_str)
+                timespan = utils.timespan_int2str(timespan)
 
             paths = self.get_paths(comp, hstr, vn, timespan=timespan)
             if len(paths) == 0: raise ValueError(f'No timeseries files found for variable `{vn}` in component `{comp}` with hstr `{hstr}` within the timespan `{timespan}`.')

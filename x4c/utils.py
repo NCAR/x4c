@@ -422,18 +422,18 @@ def find_paths(root_dir, path_pattern='comp/proc/tseries/*/casename.hstr.vn.time
         elif e in ['proc', 'tseries', 'nc']:
             pass
         elif e in ['timespan', 'date']:
-            path_pattern = path_pattern.replace(e, '*[0-9]')
+            path_pattern = path_pattern.replace(e, '[0-9]*[0-9]')
         else:
             path_pattern = path_pattern.replace(e, '*')
 
     path_patterns = expand_braces(path_pattern)
     if verbose: p_header(f'path_patterns: {path_patterns}')
     paths = []
-    for pat in path_patterns:
-        paths_tmp = glob.glob(os.path.join(root_dir, pat))
+    for path in path_patterns:
+        paths_tmp = glob.glob(os.path.join(root_dir, path))
         paths.extend(paths_tmp)
 
-    # sort based on timespak h
+    # sort based on timespan
     paths = sorted(paths, key=lambda x: x.split('.')[-2])
     if avoid_list is not None:
         paths_new = [] 
@@ -632,6 +632,12 @@ def int_to_timestamp(t: int) -> str:
         raise ValueError('Invalid integer timestamp format. Supported formats: YYYY, YYYYMM, YYYYMMDD, YYYYMMDDSSSSSS')
 
     return add_dash_to_timestamp(t_str)
+
+def timespan_int2str(timespan: tuple[int, int]) -> tuple[str, str]:
+    start, end = timespan
+    start_str = int_to_timestamp(start)
+    end_str = int_to_timestamp(end)
+    return (start_str, end_str)
 
 def datetime_truncate(dt: datetime.datetime, precision: str = 'day') -> datetime.datetime:
     if precision == 'year':
