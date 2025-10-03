@@ -706,27 +706,41 @@ class Timeseries:
         return found_comp_hstr
 
     
-    def load(self, vn, comp=None, hstr=None, timespan=None, load_idx=-1, verbose=True, reload=False, **kws):
+    def load(self, vn, vtype=None, comp=None, hstr=None, timespan=None, load_idx=-1, verbose=True, reload=False, **kws):
         adjust_month = True if self.cesm_ver == 1 else False
 
-        found_comp_hstr = self.get_comp_hstr(vn)
-        if len(found_comp_hstr) == 0:
-            if vn in diags.Registry.funcs:
-                vtype = 'derived'
-            else:
-                raise ValueError('The input variable name is unknown.')
-        elif len(found_comp_hstr) == 1:
-            vtype = 'raw'
-            comp, hstr = found_comp_hstr[0]
-        else:
-            if (comp, hstr) in found_comp_hstr:
-                vtype = 'raw'
-            else:
-                raise ValueError(f'The input variable name belongs to multiple (comp, hstr) pairs: {found_comp_hstr}. Please specify via the argument `comp` and `hstr`.')
+        if vtype is None:
+            vtype = 'derived' if vn in diags.Registry.funcs else 'raw'
+
+        # if len(found_comp_hstr) == 0:
+        #     if vn in diags.Registry.funcs:
+        #         vtype = 'derived'
+        #     else:
+        #         raise ValueError('The input variable name is unknown.')
+        # elif len(found_comp_hstr) == 1:
+        #     if vn in diags.Registry.funcs:
+        #         vtype = 'derived'
+        #     else:
+        #         vtype = 'raw'
+        #     comp, hstr = found_comp_hstr[0]
+        # else:
+        #     if (comp, hstr) in found_comp_hstr:
+        #         vtype = 'raw'
+        #     else:
+        #         raise ValueError(f'The input variable name belongs to multiple (comp, hstr) pairs: {found_comp_hstr}. Please specify via the argument `comp` and `hstr`.')
 
         if reload: self.clear_ds(vn)
 
         if vtype == 'raw':
+            found_comp_hstr = self.get_comp_hstr(vn)
+            if len(found_comp_hstr) == 0:
+                raise ValueError(f'The input variable name `{vn}` is unknown.')
+            elif len(found_comp_hstr) == 1:
+                comp, hstr = found_comp_hstr[0]
+            else:
+                if comp is None or hstr is None:
+                    raise ValueError(f'The input variable name belongs to multiple (comp, hstr) pairs: {found_comp_hstr}. Please specify via the argument `comp` and `hstr`.')
+
             if timespan is not None and not isinstance(timespan[0], str) and not isinstance(timespan[-1], str):
                 timespan = utils.timespan_int2str(timespan)
 

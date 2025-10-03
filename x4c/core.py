@@ -422,7 +422,8 @@ class XDataArray:
     def gm(self):
         ''' the global area-weighted mean '''
         gw = self.da.attrs['gw']
-        da = self.da.weighted(gw).mean(gw.dims)
+        spatial_dims = list(set(self.da.dims) - {'time'}) # assuming only 'time' is the non-spatial dimension
+        da = self.da.weighted(gw).mean(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'Global Mean {da.attrs["long_name"]}'
         return da
@@ -432,7 +433,8 @@ class XDataArray:
         ''' the NH area-weighted mean '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        da = self.da.where(lat>0).weighted(gw).mean(gw.dims)
+        spatial_dims = list(set(self.da.dims) - {'time'}) # assuming only 'time' is the non-spatial dimension
+        da = self.da.where(lat>0).weighted(gw).mean(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'NH Mean {da.attrs["long_name"]}'
         return da
@@ -442,7 +444,8 @@ class XDataArray:
         ''' the SH area-weighted mean '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        da = self.da.where(lat<0).weighted(gw).mean(gw.dims)
+        spatial_dims = list(set(self.da.dims) - {'time'}) # assuming only 'time' is the non-spatial dimension
+        da = self.da.where(lat<0).weighted(gw).mean(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'SH Mean {da.attrs["long_name"]}'
         return da
@@ -451,7 +454,8 @@ class XDataArray:
     def gs(self):
         ''' the global area-weighted sum '''
         gw = self.da.attrs['gw']
-        da = self.da.weighted(gw).sum(gw.dims)
+        spatial_dims = list(set(self.da.dims) - {'time'}) # assuming only 'time' is the non-spatial dimension
+        da = self.da.weighted(gw).sum(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'Global Sum {da.attrs["long_name"]}'
         return da
@@ -461,7 +465,8 @@ class XDataArray:
         ''' the NH area-weighted sum '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        da = self.da.where(lat>0).weighted(gw).sum(gw.dims)
+        spatial_dims = list(set(self.da.dims) - {'time'}) # assuming only 'time' is the non-spatial dimension
+        da = self.da.where(lat>0).weighted(gw).sum(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'NH Sum {da.attrs["long_name"]}'
         return da
@@ -471,7 +476,8 @@ class XDataArray:
         ''' the SH area-weighted sum '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        da = self.da.where(lat<0).weighted(gw).sum(gw.dims)
+        spatial_dims = list(set(self.da.dims) - {'time'}) # assuming only 'time' is the non-spatial dimension
+        da = self.da.where(lat<0).weighted(gw).sum(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'SH Sum {da.attrs["long_name"]}'
         return da

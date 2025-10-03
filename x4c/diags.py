@@ -496,14 +496,17 @@ class DiagCalc:
 
     @F
     def get_MOC(case, **kws):
-        vn = 'MOC'
-        case.load(vn, **kws)
-        da = case.ds[vn].x.da.isel(transport_reg=0, moc_comp=0)
-        da['moc_z'] = da['moc_z'] / 1e5  # unit: cm -> km
-        da['moc_z'].attrs['units'] = 'km'
-        da = da.rename({'moc_z': 'z_t', 'lat_aux_grid': 'lat'})
-        da.name = 'MOC'
-        da.attrs['lon_name'] = 'Meridional Ocean Circulation'
+        if 'MOC' in case.ds:
+            da = case.ds['MOC']
+        else:
+            vn = 'MOC'
+            case.load(vn, vtype='raw', **kws)  # due to the same variable name in POP
+            da = case.ds[vn].x.da.isel(transport_reg=0, moc_comp=0)
+            da['moc_z'] = da['moc_z'] / 1e5  # unit: cm -> km
+            da['moc_z'].attrs['units'] = 'km'
+            da = da.rename({'moc_z': 'z_t', 'lat_aux_grid': 'lat'})
+            da.name = 'MOC'
+            da.attrs['lon_name'] = 'Meridional Ocean Circulation'
         return da
 
     # def get_SOMOC(case, **kws):
