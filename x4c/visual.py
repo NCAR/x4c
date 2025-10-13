@@ -248,6 +248,8 @@ def infer_cmap(da):
             cmap = 'GnBu'
         elif 'height' in ln_lower:
             cmap = 'PiYG'
+        elif 'kmt' in ln_lower:
+            cmap = 'BrBG'
         else:
             cmap = 'viridis'
     else:
