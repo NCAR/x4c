@@ -187,6 +187,7 @@
 <li class="toctree-l2"><a class="reference internal" href="diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-spell.html">A “spell” system</a></li>
 <li class="toctree-l2"><a class="reference internal" href="diags-new_vars.html">Adding New Diagnostic Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-logs.html">Visualizing Logs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../ug-api.html">API Reference</a></li>
@@ -457,7 +458,7 @@ gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{<
 <span class="s">    comps=$comps,</span>
 <span class="s">    output_dirpath=output_dirpath,</span>
 <span class="s">    staging_dirpath=staging_dirpath,</span>
-<span class="s">    timespan=(&#39;$syr&#39;, &#39;$eyr&#39;),</span>
+<span class="s">    timespan=($syr, $eyr),</span>
 <span class="s">    timestep=$timestep,</span>
 <span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
 <span class="s">    nproc=$ncpus,</span>
@@ -507,7 +508,7 @@ gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{
 <span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span>nnodes<span class="w"> </span>ncpus<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
 
 <span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
-<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$nnodes</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
 <span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
 <span class="k">done</span>
 
@@ -563,10 +564,10 @@ gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{<
 <span class="s">    comps=$comps,</span>
 <span class="s">    output_dirpath=output_dirpath,</span>
 <span class="s">    staging_dirpath=staging_dirpath,</span>
-<span class="s">    timespan=(&#39;$syr&#39;, &#39;$eyr&#39;),</span>
+<span class="s">    timespan=($syr, $eyr),</span>
 <span class="s">    timestep=$timestep,</span>
 <span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
-<span class="s">    nproc=$((nnodes * ncpus)),</span>
+<span class="s">    nproc=$ncpus,</span>
 <span class="s">    overwrite=$overwrite,</span>
 <span class="s">)</span>
 
@@ -616,7 +617,7 @@ gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{
 <span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span>nnodes<span class="w"> </span>ncpus<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
 
 <span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
-<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$nnodes</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
 <span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
 <span class="k">done</span>
 
@@ -672,10 +673,10 @@ gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{<
 <span class="s">    comps=$comps,</span>
 <span class="s">    output_dirpath=output_dirpath,</span>
 <span class="s">    staging_dirpath=staging_dirpath,</span>
-<span class="s">    timespan=(&#39;$syr&#39;, &#39;$eyr&#39;),</span>
+<span class="s">    timespan=($syr, $eyr),</span>
 <span class="s">    timestep=$timestep,</span>
 <span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
-<span class="s">    nproc=$((nnodes * ncpus)),</span>
+<span class="s">    nproc=$ncpus,</span>
 <span class="s">    overwrite=$overwrite,</span>
 <span class="s">)</span>
 
@@ -686,6 +687,8 @@ gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{<
 
 gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">nnodes</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$3</span>
 
 <span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
 <span class="s">#!/bin/bash</span>
@@ -726,7 +729,7 @@ gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{
 <span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span>nnodes<span class="w"> </span>ncpus<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
 
 <span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
-<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$nnodes</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
 <span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
 <span class="k">done</span>
 
@@ -783,7 +786,7 @@ gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{<
 <span class="s">    comps=$comps,</span>
 <span class="s">    output_dirpath=output_dirpath,</span>
 <span class="s">    staging_dirpath=staging_dirpath,</span>
-<span class="s">    timespan=(&#39;$syr&#39;, &#39;$eyr&#39;),</span>
+<span class="s">    timespan=($syr, $eyr),</span>
 <span class="s">    timestep=$timestep,</span>
 <span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
 <span class="s">    nproc=$ncpus,</span>

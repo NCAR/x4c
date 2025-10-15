@@ -52,7 +52,7 @@
     <link rel="icon" href="_static/x4c-logo.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Adding New Diagnostic Variables" href="notebooks/diags-new_vars.html" />
+    <link rel="prev" title="Visualizing Logs" href="notebooks/diags-logs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -184,6 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="notebooks/diags-load_variables.html">Loading Variables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/diags-spell.html">A “spell” system</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/diags-new_vars.html">Adding New Diagnostic Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-logs.html">Visualizing Logs</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">API Reference</a></li>
@@ -679,7 +680,7 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
 <h2>CESM Postprocessing<a class="headerlink" href="#cesm-postprocessing" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="x4c.case.History">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">x4c.case.</span></span><span class="sig-name descname"><span class="pre">History</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['atm',</span> <span class="pre">'ocn',</span> <span class="pre">'lnd',</span> <span class="pre">'ice',</span> <span class="pre">'rof']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comps_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">casename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comp/hist/casename.hstr.date.nc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['nday1',</span> <span class="pre">'once']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.History" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">x4c.case.</span></span><span class="sig-name descname"><span class="pre">History</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['atm',</span> <span class="pre">'ocn',</span> <span class="pre">'lnd',</span> <span class="pre">'ice',</span> <span class="pre">'rof']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comps_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">casename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comp/hist/casename.hstr.date.nc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['once']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.History" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="x4c.case.History.rm_timespan">
 <span class="sig-name descname"><span class="pre">rm_timespan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timespan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['atm',</span> <span class="pre">'ice',</span> <span class="pre">'ocn',</span> <span class="pre">'rof',</span> <span class="pre">'lnd']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nworkers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rehearsal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#x4c.case.History.rm_timespan" title="Link to this definition">#</a></dt>
@@ -749,12 +750,12 @@ in format of (lat_min, lat_max, lon_min, lon_max)</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="notebooks/diags-new_vars.html"
+       href="notebooks/diags-logs.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Adding New Diagnostic Variables</p>
+        <p class="prev-next-title">Visualizing Logs</p>
       </div>
     </a>
 </div>
