@@ -246,7 +246,7 @@ class History:
         timespan_list = utils.parse_timestamps(timespan, timestep=timestep, timestep_unit=timestep_unit)
         if not isinstance(comps, dict): comps = {comp: None for comp in comps}
 
-        move_tasks = []
+        move_tasks, clean_tasks = [], []
         for comp, vns in comps.items():
             hstr = self.comps_info[comp]
             # generate timeseries files for each component and each sub-timespan
@@ -288,9 +288,11 @@ class History:
                     )
                     comm.Barrier()
 
+                    if rank == 0: clean_tasks.append(bigbang_dir)
                     if rank == 0 and staging_dirpath != output_dirpath:
                         dst_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp).replace('hstr', hs))
                         move_tasks.append((bigcrunch_dir, dst_dir, timespan_tmp))
+
 
         move_tasks = comm.bcast(move_tasks if rank == 0 else None, root=0)
         for i, (bigcrunch_dir, dst_dir, timespan_tmp) in enumerate(move_tasks):
@@ -310,6 +312,20 @@ class History:
                             desc=f'[Rank {rank}] Moving files from {bigcrunch_dir} to {dst_dir}',
                         )
                     )
+        comm.Barrier()
+
+        clean_tasks = comm.bcast(clean_tasks if rank == 0 else None, root=0)
+        for i, bb_dir in enumerate(clean_tasks):
+            if i % size != rank: continue
+            if os.path.exists(bb_dir):
+                try:
+                    shutil.rmtree(bb_dir)
+                    print(f'[Rank {rank}] Removed {bb_dir}')
+                except Exception as e:
+                    print(f'[Rank {rank}] Warning: failed to remove {bb_dir}: {e}')
+
+        comm.Barrier()
+
 
 
     # def split_ds(self, comp, in_path, output_dirpath, overwrite=False, nco=True):
