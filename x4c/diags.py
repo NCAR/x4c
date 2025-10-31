@@ -311,7 +311,7 @@ class DiagCalc:
             case.load(vn, **kws)
             sst = case.ds[vn].x.da.isel(z_t=0)
         else:
-            case.load('SST', **kws)
+            case.load('SST', vtype='raw', **kws)
             sst = case.ds['SST'].x.da
 
         sst.attrs['units'] = '°C'
@@ -327,7 +327,7 @@ class DiagCalc:
             case.load(vn, **kws)
             sss = case.ds[vn].x.da.isel(z_t=0)
         else:
-            case.load('SSS', **kws)
+            case.load('SSS', vtype='raw', **kws)
             sss = case.ds['SSS'].x.da
 
         sss.attrs['units'] = 'gram/kilogram'

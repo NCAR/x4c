@@ -823,7 +823,11 @@ class Timeseries:
             #         da = self.ds[vn].x.da
             #     else:
             #         raise ValueError(f'Unknown diagnostic variable: {vn}')
-            self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, verbose=verbose, **kws)
+            if vn in self.diags:
+                da = self.diags[vn]
+                utils.p_warning(f'>>> Variable `{vn}` is already calculated and the calculation is skipped.')
+            else:
+                self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, verbose=verbose, **kws)
             da = self.ds[vn].x.da
 
             if S.regrid is not None:
