@@ -306,13 +306,17 @@ class DiagCalc:
     @F
     def get_SST(case, **kws):
         # if ('SST', 'ocn') not in case.vars_info:
-        if len(case.get_comp_hstr('SST')) == 0:
-            vn = 'TEMP'
-            case.load(vn, **kws)
-            sst = case.ds[vn].x.da.isel(z_t=0)
-        else:
-            case.load('SST', vtype='raw', **kws)
-            sst = case.ds['SST'].x.da
+        # if len(case.get_comp_hstr('SST')) == 0:
+        #     vn = 'TEMP'
+        #     case.load(vn, **kws)
+        #     sst = case.ds[vn].x.da.isel(z_t=0)
+        # else:
+        #     case.load('SST', vtype='raw', **kws)
+        #     sst = case.ds['SST'].x.da
+
+        vn = 'TEMP'
+        case.load(vn, **kws)
+        sst = case.ds[vn].x.da.isel(z_t=0)
 
         sst.attrs['units'] = '°C'
         sst.attrs['long_name'] = 'Sea Surface Temperature'
@@ -322,14 +326,17 @@ class DiagCalc:
     @F
     def get_SSS(case, **kws):
         # if ('SSS', 'ocn') not in case.vars_info:
-        if len(case.get_comp_hstr('SSS')) == 0:
-            vn = 'SALT'
-            case.load(vn, **kws)
-            sss = case.ds[vn].x.da.isel(z_t=0)
-        else:
-            case.load('SSS', vtype='raw', **kws)
-            sss = case.ds['SSS'].x.da
+        # if len(case.get_comp_hstr('SSS')) == 0:
+        #     vn = 'SALT'
+        #     case.load(vn, **kws)
+        #     sss = case.ds[vn].x.da.isel(z_t=0)
+        # else:
+        #     case.load('SSS', vtype='raw', **kws)
+        #     sss = case.ds['SSS'].x.da
 
+        vn = 'SALT'
+        case.load(vn, **kws)
+        sss = case.ds[vn].x.da.isel(z_t=0)
         sss.attrs['units'] = 'gram/kilogram'
         sss.attrs['long_name'] = 'Sea Surface Salinity'
         sss.name = 'SSS'
