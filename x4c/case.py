@@ -24,10 +24,14 @@ from .spell import Spell
 
 class History:
     def __init__(self, root_dir, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], comps_info=None, casename=None,
-                 path_pattern='comp/hist/casename.hstr.date.nc', avoid_list=['once']):
+                 path_pattern='comp/hist/casename.hstr.date.nc', avoid_list=None):
         self.path_pattern = path_pattern
         self.root_dir = root_dir
         self.casename = os.path.basename(root_dir) if casename is None else casename
+
+        self.avoid_list = ['once']
+        if avoid_list is not None: avoid_list.extend(avoid_list)
+
         utils.p_header(f'>>> case.root_dir: {self.root_dir}')
         utils.p_header(f'>>> case.casename: {self.casename}')
 
@@ -38,8 +42,7 @@ class History:
             'ice': '*',
             'rof': '*',
         }
-        if comps_info is not None:
-            _comps_info.update(comps_info)
+        if comps_info is not None: _comps_info.update(comps_info)
 
         self.comps_info = {}
         self.paths = {}
@@ -52,7 +55,7 @@ class History:
                 paths = utils.find_paths(
                     self.root_dir, self.path_pattern,
                     comp=comp, hstr=hstr,
-                    avoid_list=avoid_list,
+                    avoid_list=self.avoid_list,
                 )
                 hstr = utils.get_hstr(paths, casename=self.casename)
                 self.comps_info[comp] = hstr
