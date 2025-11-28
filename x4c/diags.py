@@ -503,11 +503,8 @@ class DiagCalc:
 
     @F
     def get_MOC(case, **kws):
-        # if 'MOC' in case.ds:
-        #     da = case.ds['MOC']
-        # else:
         vn = 'MOC'
-        kws.update({'verbose': False})
+        kws.update({'verbose': False, 'reload': True})
         case.load(vn, vtype='raw', **kws)  # due to the same variable name in POP
         da = case.ds[vn].x.da.isel(transport_reg=0, moc_comp=0)
         da['moc_z'] = da['moc_z'] / 1e5  # unit: cm -> km
