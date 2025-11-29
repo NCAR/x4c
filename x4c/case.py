@@ -30,7 +30,7 @@ class History:
         self.casename = os.path.basename(root_dir) if casename is None else casename
 
         self.avoid_list = ['once']
-        if avoid_list is not None: avoid_list.extend(avoid_list)
+        if avoid_list is not None: self.avoid_list.extend(avoid_list)
 
         utils.p_header(f'>>> case.root_dir: {self.root_dir}')
         utils.p_header(f'>>> case.casename: {self.casename}')
