@@ -15,12 +15,12 @@ from . import utils, visual
 import os
 dirpath = os.path.dirname(__file__)
 
-def load_dataset(path, adjust_month=False, comp=None, hstr=None, grid=None, vn=None, **kws):
+def load_dataset(path, shift_time=False, comp=None, hstr=None, grid=None, vn=None, **kws):
     ''' Load a netCDF file and form a `xarray.Dataset`
 
     Args:
         path (str): path to the netCDF file
-        adjust_month (bool): adjust the month of the `xarray.Dataset` (the CESM1 output has a month shift)
+        shift_time (bool): shift the time of the `xarray.Dataset` (the CESM1 output has a time shift)
         comp (str): the tag for CESM component, including "atm", "ocn", "lnd", "ice", and "rof"
         grid (str): the grid tag for the CESM output (e.g., ne16, g16)
         vn (str): variable name
@@ -29,15 +29,15 @@ def load_dataset(path, adjust_month=False, comp=None, hstr=None, grid=None, vn=N
     _kws = {'use_cftime': True, 'decode_timedelta': True}
     _kws.update(kws)
     ds = xr.load_dataset(path, **_kws)
-    ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, hstr=hstr, grid=grid, adjust_month=adjust_month)
+    ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, hstr=hstr, grid=grid, shift_time=shift_time)
     return ds
 
-def open_dataset(path, adjust_month=False, comp=None, hstr=None, grid=None, vn=None, **kws):
+def open_dataset(path, shift_time=False, comp=None, hstr=None, grid=None, vn=None, **kws):
     ''' Open a netCDF file and form a `xarray.Dataset` with a lazy load mode
 
     Args:
         path (str): path to the netCDF file
-        adjust_month (bool): adjust the month of the `xarray.Dataset` (the CESM1 output has a month shift)
+        shift_time (bool): shift the time of the `xarray.Dataset` (the CESM1 output has a time shift)
         comp (str): the tag for general CESM components, including "atm", "ocn", "lnd", "ice", and "rof"
         grid (str): the grid tag for the CESM output (e.g., ne16, g16)
         vn (str): variable name
@@ -46,15 +46,15 @@ def open_dataset(path, adjust_month=False, comp=None, hstr=None, grid=None, vn=N
     _kws = {'use_cftime': True, 'decode_timedelta': True}
     _kws.update(kws)
     ds = xr.open_dataset(path, **_kws)
-    ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, hstr=hstr, grid=grid, adjust_month=adjust_month)
+    ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, hstr=hstr, grid=grid, shift_time=shift_time)
     return ds
 
-def open_mfdataset(paths, adjust_month=False, comp=None, hstr=None, grid=None, vn=None, **kws):
+def open_mfdataset(paths, shift_time=False, comp=None, hstr=None, grid=None, vn=None, **kws):
     ''' Open multiple netCDF files and form a `xarray.Dataset` in a lazy load mode
 
     Args:
         path (str): path to the netCDF file
-        adjust_month (bool): adjust the month of the `xarray.Dataset` (the default CESM output has a month shift)
+        shift_time (bool): shift the time of the `xarray.Dataset` (the default CESM output has a time shift)
         comp (str): the tag for general CESM components, including "atm", "ocn", "lnd", "ice", and "rof"
         grid (str): the grid tag for the CESM output (e.g., ne16, g16)
         vn (str): variable name
@@ -80,7 +80,7 @@ def open_mfdataset(paths, adjust_month=False, comp=None, hstr=None, grid=None, v
     }
     _kws.update(kws)
     ds = xr.open_mfdataset(paths, **_kws)
-    ds = utils.update_ds(ds, vn=vn, path=paths, comp=comp, hstr=hstr, grid=grid, adjust_month=adjust_month)
+    ds = utils.update_ds(ds, vn=vn, path=paths, comp=comp, hstr=hstr, grid=grid, shift_time=shift_time)
     return ds
 
 @xr.register_dataset_accessor('x')

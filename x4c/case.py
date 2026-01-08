@@ -726,7 +726,7 @@ class Timeseries:
 
     
     def load(self, vn, vtype=None, comp=None, hstr=None, timespan=None, load_idx=-1, verbose=True, reload=False, **kws):
-        adjust_month = True if self.cesm_ver == 1 else False
+        shift_time = True if self.cesm_ver == 1 else False
 
         if vtype is None:
             vtype = 'derived' if vn in diags.Registry.funcs else 'raw'
@@ -778,7 +778,7 @@ class Timeseries:
             else:
                 _kws = {
                    'vn': vn,
-                   'adjust_month': adjust_month, 
+                   'shift_time': shift_time, 
                    'comp': comp,
                    'hstr': hstr,
                    'grid': self.grid_dict[comp],
@@ -820,9 +820,9 @@ class Timeseries:
             #     if comp is None: comp = self.get_vn_comp(vn)
             #     if vn in diags.Registry.funcs:
             #         F = diags.Registry.funcs[vn]
-            #         da = F(self, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
+            #         da = F(self, timespan=timespan, load_idx=load_idx, shift_time=shift_time, verbose=verbose)
             #     elif (vn, comp) in self.vars_info:
-            #         self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, adjust_month=adjust_month, verbose=verbose)
+            #         self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, shift_time=shift_time, verbose=verbose)
             #         da = self.ds[vn].x.da
             #     else:
             #         raise ValueError(f'Unknown diagnostic variable: {vn}')
@@ -1073,46 +1073,46 @@ class Timeseries:
 
         return fig, ax
 
-    def get_climo(self, vn, comp=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
-        ''' Generate the climatology file for the given variable
+    # def get_climo(self, vn, comp=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
+    #     ''' Generate the climatology file for the given variable
 
-        Args:
-            slicing (bool): could be problematic
-        '''
-        adjust_month = True if self.cesm_ver == 1 else False
+    #     Args:
+    #         slicing (bool): could be problematic
+    #     '''
+    #     shift_time = True if self.cesm_ver == 1 else False
 
-        if comp is None: comp = self.get_vn_comp(vn)
-        grid = self.grid_dict[comp]
-        paths = self.get_paths(vn, comp=comp, timespan=timespan)
-        ds = core.open_mfdataset(paths, adjust_month=adjust_month)
+    #     if comp is None: comp = self.get_vn_comp(vn)
+    #     grid = self.grid_dict[comp]
+    #     paths = self.get_paths(vn, comp=comp, timespan=timespan)
+    #     ds = core.open_mfdataset(paths, shift_time=shift_time)
 
-        if slicing: ds = ds.sel(time=slice(timespan[0], timespan[1]))
-        ds_out = ds.x.climo
-        ds_out.attrs['comp'] = comp
-        ds_out.attrs['grid'] = grid
-        if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
-        return ds_out
+    #     if slicing: ds = ds.sel(time=slice(timespan[0], timespan[1]))
+    #     ds_out = ds.x.climo
+    #     ds_out.attrs['comp'] = comp
+    #     ds_out.attrs['grid'] = grid
+    #     if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
+    #     return ds_out
 
-    def save_climo(self, output_dirpath, vn, comp=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
-        adjust_month = True if self.cesm_ver == 1 else False
+    # def save_climo(self, output_dirpath, vn, comp=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+    #     shift_time = True if self.cesm_ver == 1 else False
 
-        output_dirpath = pathlib.Path(output_dirpath)
-        if not output_dirpath.exists():
-            output_dirpath.mkdir(parents=True, exist_ok=True)
-            utils.p_success(f'>>> output directory created at: {output_dirpath}')
+    #     output_dirpath = pathlib.Path(output_dirpath)
+    #     if not output_dirpath.exists():
+    #         output_dirpath.mkdir(parents=True, exist_ok=True)
+    #         utils.p_success(f'>>> output directory created at: {output_dirpath}')
 
-        fname = f'{vn}_climo.nc' if self.casename is None else f'{self.casename}_{vn}_climo.nc'
-        out_path = os.path.join(output_dirpath, fname)
-        if overwrite or not os.path.exists(out_path):
-            if os.path.exists(out_path): os.remove(out_path)
-            if comp is None: comp = self.get_vn_comp(vn)
+    #     fname = f'{vn}_climo.nc' if self.casename is None else f'{self.casename}_{vn}_climo.nc'
+    #     out_path = os.path.join(output_dirpath, fname)
+    #     if overwrite or not os.path.exists(out_path):
+    #         if os.path.exists(out_path): os.remove(out_path)
+    #         if comp is None: comp = self.get_vn_comp(vn)
 
-            climo = self.get_climo(
-                vn, comp=comp, timespan=timespan, adjust_month=adjust_month,
-                slicing=slicing, regrid=regrid, dlat=dlat, dlon=dlon,
-            )
-            climo.to_netcdf(out_path)
-            climo.close()
+    #         climo = self.get_climo(
+    #             vn, comp=comp, timespan=timespan, adjust_month=adjust_month,
+    #             slicing=slicing, regrid=regrid, dlat=dlat, dlon=dlon,
+    #         )
+    #         climo.to_netcdf(out_path)
+    #         climo.close()
 
     # def gen_climo(self, output_dirpath, comp=None, timespan=None, vns=None, nproc=1, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
     #     adjust_month = True if self.cesm_ver == 1 else False
@@ -1175,19 +1175,19 @@ class Timeseries:
     #         # ds.close()
     #         # utils.p_success(f'>>> Combined timeseries file created at: {out_path}')
 
-    def get_mean(self, vn, comp, months=list(range(1, 13)), timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
-        adjust_month = True if self.cesm_ver == 1 else False
+    # def get_mean(self, vn, comp, months=list(range(1, 13)), timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
+    #     adjust_month = True if self.cesm_ver == 1 else False
 
-        grid = self.grid_dict[comp]
-        paths = self.get_paths(vn, comp=comp, timespan=timespan)
-        ds = core.open_mfdataset(paths, adjust_month=adjust_month)
+    #     grid = self.grid_dict[comp]
+    #     paths = self.get_paths(vn, comp=comp, timespan=timespan)
+    #     ds = core.open_mfdataset(paths, adjust_month=adjust_month)
 
-        if slicing: ds = ds.sel(time=slice(timespan[0], timespan[1]))
-        ds_out = ds.x.annualize(months=months)
-        ds_out.attrs['comp'] = comp
-        ds_out.attrs['grid'] = grid
-        if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
-        return ds_out
+    #     if slicing: ds = ds.sel(time=slice(timespan[0], timespan[1]))
+    #     ds_out = ds.x.annualize(months=months)
+    #     ds_out.attrs['comp'] = comp
+    #     ds_out.attrs['grid'] = grid
+    #     if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
+    #     return ds_out
 
     def get_ts(self, vn, comp, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
         adjust_month = True if self.cesm_ver == 1 else False

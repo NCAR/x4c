@@ -468,6 +468,19 @@ class DiagCalc:
         RESTOM.attrs['units'] = 'W/m$^2$'
         return RESTOM
     
+    @F
+    def get_DP(case, **kws):
+        ''' Calculate pressure thickness
+        '''
+        vn = 'PS'
+        case.load(vn, **kws)
+        da_pressure = case.ds[vn]['hyai']*case.ds[vn]['P0'] + case.ds[vn]['hybi']*case.ds[vn][vn]
+        da = da_pressure.diff('ilev').rename({'ilev': 'lev'})
+        da['lev'] = case.ds[vn]['lev']
+        da.name = 'DP'
+        da.attrs['long_name'] = 'Pressure Thickness'
+        da.attrs['units'] = 'Pa'
+        return da
 
 
 

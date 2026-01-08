@@ -9,6 +9,7 @@ import colorama as ca
 import requests
 from tqdm import tqdm
 import datetime
+from dateutil.relativedelta import relativedelta
 import collections.abc
 import cartopy.util
 import shutil
@@ -184,10 +185,24 @@ def update_attrs(da, da_src):
 
     return da
 
-def update_ds(ds, path, vn=None, comp=None, hstr=None, grid=None, adjust_month=False,
+def update_ds(ds, path, vn=None, comp=None, hstr=None, grid=None, shift_time=False,
               gw_name=None, lat_name=None, lon_name=None):
-    if adjust_month:
-        ds['time'] = ds['time'].get_index('time') - datetime.timedelta(days=1)
+    if shift_time:
+        freq = ds['time'].to_index().freq
+        m = re.match(r'(?:(\d+))?([A-Za-z]+)', freq)
+        if not m: raise ValueError(f'Cannot parse time frequency: {freq}')
+        n = int(m.group(1)) if m.group(1) else 1
+        unit = m.group(2)
+
+        times = ds['time'].values
+        if 'M' in unit.upper():
+            ds['time'] = [(t - datetime.timedelta(days=15)).replace(day=1) for t in times]
+        elif 'D' in unit.upper():
+            ds['time'] = times - datetime.timedelta(days=n)
+        elif 'H' in unit.upper():
+            ds['time'] = times - datetime.timedelta(hours=n)
+        else:
+            raise ValueError(f'Unsupported time unit for shifting: {unit}')
 
     if type(path) in (list, tuple):
         ds.attrs['path'] = [os.path.abspath(p) for p in path]
