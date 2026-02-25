@@ -258,7 +258,7 @@ def infer_cmap(da):
     return cmap
 
 def subplots(nrow:int, ncol:int, ax_loc:dict, projs=None, projs_kws=None, figsize=None, wspace=None, hspace=None,
-             annotation=False, annotation_kws=None, annotation_separate=False,):
+             annotation=False, annotation_kws=None, annotation_separate=False, annotation_skip=None):
 
     fig = plt.figure(figsize=figsize)
     gs = GridSpec(nrow, ncol)
@@ -275,6 +275,8 @@ def subplots(nrow:int, ncol:int, ax_loc:dict, projs=None, projs_kws=None, figsiz
     if annotation:
         if annotation_separate:
             for i, k in enumerate(list(ax_loc)):
+                if annotation_skip and k in annotation_skip:
+                    continue
                 annotation_kws = {} if annotation_kws is None else annotation_kws
                 _annotation_kws = {'style': ')'}
                 _annotation_kws.update(annotation_kws[k])

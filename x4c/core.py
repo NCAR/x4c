@@ -292,6 +292,11 @@ class XDataset:
             ds = ds.rename({'month': 'time'})
         return ds
 
+    @property
+    def anom(self):
+        ds = self.ds.groupby('time.month') - self.climo.rename({'time': 'month'})
+        return ds
+
     def to_netcdf(self, path, **kws):
         for v in ['gw', 'lat', 'lon', 'dz']:
             if v in self.ds.attrs: del(self.ds.attrs[v])
@@ -509,8 +514,12 @@ class XDataArray:
         da.attrs['climo_period'] = (self.da['time.year'].values[0], self.da['time.year'].values[-1])
         if 'comp' in self.da.attrs: da.attrs['comp'] = self.da.attrs['comp']
         if 'grid' in self.da.attrs: da.attrs['grid'] = self.da.attrs['grid']
-        if 'month' in da.coords:
-            da = da.rename({'month': 'time'})
+        if 'month' in da.coords: da = da.rename({'month': 'time'})
+        return da
+
+    @property
+    def anom(self):
+        da = self.da.groupby('time.month') - self.climo.rename({'time': 'month'})
         return da
 
     def geo_mean(self, ind=None, latlon_range=(-90, 90, 0, 360), **kws):
