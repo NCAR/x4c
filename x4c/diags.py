@@ -377,7 +377,7 @@ class DiagCalc:
         return da
 
     @F
-    def get_dD(case, **kws):
+    def get_dDp(case, **kws):
         case.load('PRECRC_H2Or', **kws)
         case.load('PRECSC_H2Os', **kws)
         case.load('PRECRL_H2OR', **kws)
@@ -394,12 +394,12 @@ class DiagCalc:
         h2o = h2o.where(h2o > 1e-18, 1e-18)
         hdo = hdo.where(hdo > 1e-18, 1e-18)
 
-        dD = (hdo / h2o - 1)*1000
-        dD.name = 'dD'
-        dD.attrs['long_name'] = 'Precipitation dD'
-        dD.attrs['units'] = 'permil'
+        dDp = (hdo / h2o - 1)*1000
+        dDp.name = 'dDp'
+        dDp.attrs['long_name'] = 'Precipitation dD'
+        dDp.attrs['units'] = 'permil'
 
-        return dD
+        return dDp
         
     @F
     def get_d18Op(case, **kws):
@@ -419,7 +419,7 @@ class DiagCalc:
         p16O = p16O.where(p16O > 1e-18, 1e-18)
         p18O = p18O.where(p18O > 1e-18, 1e-18)
 
-        d18Op = (p18O / p16O - 1)*1000
+        d18Op = (p18O/p16O - 1)*1e3
         d18Op.name = 'd18Op'
         d18Op.attrs['long_name'] = 'Precipitation d18O'
         d18Op.attrs['units'] = 'permil'
@@ -435,6 +435,16 @@ class DiagCalc:
         d18Osw.attrs['long_name'] = 'Sea-water d18O'
         d18Osw.attrs['units'] = 'permil'
         return d18Osw
+
+    @F
+    def get_dDsw(case, **kws):
+        case.load('RHDO', **kws)
+        RHDO = case.ds['RHDO'].x.da
+        dDsw = (RHDO - 1)*1e3
+        dDsw.name = 'dDsw'
+        dDsw.attrs['long_name'] = 'Sea-water dD'
+        dDsw.attrs['units'] = 'permil'
+        return dDsw
 
     @F
     def get_d18Oc(case, **kws):

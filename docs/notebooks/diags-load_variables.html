@@ -392,17 +392,22 @@ document.write(`
                   
   <section id="Loading-Variables">
 <h1>Loading Variables<a class="headerlink" href="#Loading-Variables" title="Link to this heading">#</a></h1>
-<div class="nbinput docutils container">
+<p>In this tutorial, we introduce how to load CESM output variables using the <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system.</p>
+<div style="border-left: 5px solid #787878ff; padding: 0.5em; background: #ebebebff;"><p><strong>Example Datasets:</strong> Zhu, F. &amp; Zhu, J. Long simulations of the Miocene Climatic Optimum, DOI: 10.5065/3QFN-GN70 (2025). <a class="reference external" href="https://rda.ucar.edu/datasets/d010026/">https://rda.ucar.edu/datasets/d010026/</a>.</p>
+</div><div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
-%autoreload 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
 
-import os
-os.chdir(&#39;/glade/u/home/fengzhu/Github/x4c/docsrc/notebooks&#39;)
-import x4c
-print(x4c.__version__)
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">x4c</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;/glade/u/home/fengzhu/Github/x4c/docsrc/notebooks&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x4c</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Last Update: </span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -411,15 +416,16 @@ print(x4c.__version__)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2025.6.22
+2026.3.9
+Last Update: 2026-03-09
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>dirpath = &#39;/glade/campaign/cesm/community/palwg/MCO_LongSims/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;
-case = x4c.Timeseries(dirpath, grid_dict={&#39;atm&#39;: &#39;ne16np4&#39;})
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dirpath</span> <span class="o">=</span> <span class="s1">&#39;./b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005&#39;</span>
+<span class="n">case</span> <span class="o">=</span> <span class="n">x4c</span><span class="o">.</span><span class="n">Timeseries</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">grid_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;atm&#39;</span><span class="p">:</span> <span class="s1">&#39;ne16np4&#39;</span><span class="p">},</span> <span class="n">cesm_ver</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -428,18 +434,27 @@ case = x4c.Timeseries(dirpath, grid_dict={&#39;atm&#39;: &#39;ne16np4&#39;})
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.root_dir: /glade/campaign/univ/ubrn0018/fengzhu/CESM_output/timeseries/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005</span>
+<span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.root_dir: /glade/u/home/fengzhu/Github/x4c/docsrc/notebooks/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005</span>
 <span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.path_pattern: comp/proc/tseries/*/casename.hstr.vn.timespan.nc</span>
 <span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.grid_dict: {&#39;atm&#39;: &#39;ne16np4&#39;, &#39;ocn&#39;: &#39;g16&#39;, &#39;lnd&#39;: &#39;ne16np4&#39;, &#39;rof&#39;: &#39;ne16np4&#39;, &#39;ice&#39;: &#39;g16&#39;}</span>
 <span class="ansi-cyan-intense-fg ansi-bold">&gt;&gt;&gt; case.casename: b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005</span>
-<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vars_info created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;atm&#34;][&#34;cam.h0&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;ocn&#34;][&#34;pop.h&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;lnd&#34;][&#34;clm2.h0&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;rof&#34;][&#34;rtm.h0&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.paths[&#34;ice&#34;][&#34;cice.h&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;atm&#34;][&#34;cam.h0&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;ocn&#34;][&#34;pop.h&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;lnd&#34;][&#34;clm2.h0&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;rof&#34;][&#34;rtm.h0&#34;] created</span>
+<span class="ansi-green-intense-fg ansi-bold">&gt;&gt;&gt; case.vns[&#34;ice&#34;][&#34;cice.h&#34;] created</span>
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>

@@ -183,41 +183,119 @@ class XDataset:
         return ds_rgd
 
     def get_plev(self, ps, vn=None, lev_mode='hybrid', **kws):
+        """
+        Interpolate a hybrid-level field to pressure levels and return a Dataset.
+
+        This method converts a 3D atmospheric variable that is on hybrid model
+        levels (a/k/a k-levels) into pressure levels using the provided surface
+        pressure `ps` (either an `xarray.DataArray` or an `xarray.Dataset` that
+        contains a variable named "PS"). It wraps
+        `geocat.comp.interpolation.interp_hybrid_to_pressure` and returns a
+        copy of the original `Dataset` with the requested variable replaced by
+        its pressure-level version.
+
+        Args:
+            ps (xarray.DataArray or xarray.Dataset): surface pressure. If a
+                `Dataset` is passed the method will look for the variable
+                named "PS". Dimensions must align with the variable being
+                interpolated.
+            vn (str, optional): variable name in `self.ds` to interpolate. If
+                not provided the method will use the dataset attribute
+                `ds.attrs['vn']` and `self.da`.
+            lev_mode (str, optional): currently only supports "hybrid".
+                (Reserved for future expansion.)
+            **kws: additional keyword arguments forwarded to
+                `geocat.comp.interpolation.interp_hybrid_to_pressure`.
+                By default `lev_dim` is set to `'lev'`. If the dataset
+                contains `hyam`/`hybm` arrays they will be passed automatically.
+
+        Returns:
+            xarray.Dataset: a copy of `self.ds` with `vn` replaced by the
+            pressure-level `DataArray` produced by the interpolation.
+
+        Notes:
+            - Requires `geocat.comp` to be available and the dataset to include
+              the hybrid coefficients (`hyam`, `hybm`) when using hybrid
+              vertical coordinates.
+            - The returned dataset preserves the original dataset attributes
+              and coordinate structure except that the specified variable is
+              now on pressure levels.
+        """
+
+        # prepare keyword args for geocat function, default lev dim is 'lev'
         _kws = {'lev_dim': 'lev'}
+        # if the dataset contains hybrid coefficients, pass them through
         if 'hyam' in self.ds: _kws['hyam'] = self.ds['hyam']
         if 'hybm' in self.ds: _kws['hybm'] = self.ds['hybm']
 
         _kws.update(kws)
+
+        # select the variable to interpolate
         if vn is None:
             da = self.da
             vn = self.ds.attrs['vn']
         else:
             da = self.ds[vn]
 
+        # accept either a Dataset containing 'PS' or a DataArray
         if isinstance(ps, xr.Dataset):
             ps_da = ps['PS']
         elif isinstance(ps, xr.DataArray):
             ps_da = ps
+        else:
+            raise TypeError('`ps` must be an xarray.DataArray or xarray.Dataset containing "PS"')
 
+        # perform interpolation for the supported vertical-mode
         if lev_mode == 'hybrid':
             da_plev = gc.interpolation.interp_hybrid_to_pressure(da, ps_da, **_kws)
         else:
             raise ValueError('`lev_mode` unknown')
 
+        # return a dataset copy with the variable replaced by the pressure-level field
         ds_plev = self.ds.copy()
         del(ds_plev[vn])
         ds_plev[vn] = da_plev
         return ds_plev
 
     def zavg(self, depth_top, depth_bot, vn=None):
+        '''
+        Vertically average an ocean/column field between two depths and return a Dataset.
+
+        The method selects the vertical range along the `z_t` coordinate from
+        `depth_top` to `depth_bot`, applies area/volume weights provided by the
+        dataset variable `dz`, computes the weighted mean over the vertical
+        dimension, and returns a copy of the original `Dataset` with the
+        specified variable replaced by its vertically averaged version.
+
+        Args:
+            depth_top (float): upper bound of the vertical slice (same units as `z_t`).
+            depth_bot (float): lower bound of the vertical slice (same units as `z_t`).
+            vn (str, optional): variable name in `self.ds` to average. If not
+                provided the method will use the dataset attribute
+                `ds.attrs['vn']` and `self.da`.
+
+        Returns:
+            xarray.Dataset: a copy of `self.ds` with `vn` replaced by the
+            vertically averaged `DataArray`.
+
+        Notes:
+            - This method expects a vertical coordinate named `z_t` and a
+              thickness/weight variable named `dz` in the dataset. The
+              weighting is `dz` (e.g., layer thickness) and the mean is taken
+              over the `z_t` dimension.
+        '''
+
+        # choose variable to operate on
         if vn is None:
             da = self.da
             vn = self.ds.attrs['vn']
         else:
             da = self.ds[vn]
 
+        # select vertical slice and compute dz-weighted mean over z_t
         da_zavg = da.sel(z_t=slice(depth_top, depth_bot)).weighted(self.ds['dz']).mean('z_t')
 
+        # return a dataset copy with the variable replaced by its vertical average
         ds_zavg = self.ds.copy()
         ds_zavg[vn] = da_zavg
         return ds_zavg
@@ -284,16 +362,54 @@ class XDataset:
 
     @property
     def climo(self):
+        '''
+        Compute the climatology (monthly mean) of the dataset.
+
+        This property groups the dataset by calendar month and computes the
+        mean over the `time` dimension for each month. It also records the
+        `climo_period` as a tuple (start_year, end_year) in the returned
+        dataset's attributes and preserves `comp`/`grid` attributes when
+        present. If the grouping result uses a `month` coordinate it is
+        renamed to `time` to keep downstream interfaces consistent.
+
+        Returns:
+            xarray.Dataset: monthly climatology where the `time` coordinate
+            indexes months (1-12). `ds.attrs['climo_period']` documents the
+            original temporal coverage used to compute the climatology.
+        '''
+
+        # group by calendar month and compute mean over time
         ds = self.ds.groupby('time.month').mean(dim='time')
+
+        # store the period used to compute climatology (start_year, end_year)
         ds.attrs['climo_period'] = (self.ds['time.year'].values[0], self.ds['time.year'].values[-1])
+
+        # preserve useful dataset-level attributes
         if 'comp' in self.ds.attrs: ds.attrs['comp'] = self.ds.attrs['comp']
         if 'grid' in self.ds.attrs: ds.attrs['grid'] = self.ds.attrs['grid']
+
+        # rename the month coordinate to `time` for a consistent API
         if 'month' in ds.coords:
             ds = ds.rename({'month': 'time'})
+
         return ds
 
     @property
     def anom(self):
+        '''
+        Compute monthly anomalies relative to the climatology.
+
+        This property subtracts the monthly climatology (from
+        `XDataset.climo`) from the dataset to produce anomalies for each
+        time step. The climatology is aligned by month before subtraction so
+        that, e.g., all Januaries are compared against the January climatology.
+
+        Returns:
+            xarray.Dataset: dataset of anomalies with the same coordinates as
+            the original dataset.
+        '''
+
+        # subtract the monthly climatology (aligning months) to obtain anomalies
         ds = self.ds.groupby('time.month') - self.climo.rename({'time': 'month'})
         return ds
 
@@ -335,9 +451,25 @@ class XDataArray:
         return da
 
     def regrid(self, **kws):
+        '''
+        Regrid this DataArray by delegating to the parent Dataset regrid.
+
+        This wraps `XDataset.regrid` by converting the `DataArray` to a
+        temporary `Dataset`, calling the dataset-level regrid helper, then
+        extracting and returning the regridded `DataArray`. Any dataset-level
+        `lat`/`lon` attributes added during the transformation are removed from
+        the returned `DataArray` attributes for cleanliness.
+
+        **Forwarded kwargs** are the same as `XDataset.regrid` (e.g., `dlon`,
+        `dlat`, `weight_file`, `gs`, `method`, `periodic`).
+        '''
+
+        # delegate to the Dataset regrid and extract the regridded DataArray
         ds_rgd = self.ds.x.regrid(**kws)
         da = ds_rgd.x.da
         da.name = self.da.name
+
+        # remove dataset-level lat/lon attrs if present
         if 'lat' in da.attrs: del(da.attrs['lat'])
         if 'lon' in da.attrs: del(da.attrs['lon'])
         return da
@@ -364,15 +496,24 @@ class XDataArray:
 
     def nearest2d(self, lat=None, lon=None, lat_coord='lat', lon_coord='lon', lat_dim='lat', lon_dim='lon'):
         '''
-        Select the nearest non-NaN grid point.
-    
+        Select the nearest non-NaN grid point(s) for the given lat/lon targets.
+
+        Given one or more target `lat`/`lon` pairs, this method finds the
+        nearest valid (non-NaN across non-spatial dims) grid cell in the
+        DataArray and returns a concatenated `DataArray` with a new dimension
+        `site` indexing the selected points.
+
         Parameters:
-            da: xarray.DataArray or Dataset
-            lat_name, lon_name: names of coordinate variables in da
-            target_lat, target_lon: float or 1D arrays of lat/lon values to match
-    
+            lat (float or array-like): target latitude(s).
+            lon (float or array-like): target longitude(s).
+            lat_coord (str): name of latitude coordinate in the DataArray.
+            lon_coord (str): name of longitude coordinate in the DataArray.
+            lat_dim (str): latitude dimension name.
+            lon_dim (str): longitude dimension name.
+
         Returns:
-            xarray.DataArray or Dataset sliced at nearest grid points
+            xarray.DataArray: concatenated selections at nearest grid points
+            with a new `site` coordinate.
         '''
         lats = self.da.coords[lat_coord].values
         lons = self.da.coords[lon_coord].values
@@ -388,6 +529,7 @@ class XDataArray:
         # isel_indexer = {dim: 0 for dim in other_dims}
         # da_latlon = self.da.isel(**isel_indexer)
         # mask = ~np.isnan(da_latlon.values)
+        # mask grid cells that contain NaNs along the non-spatial dimensions
         reduce_dims = list(set(self.da.dims) - set([lat_dim, lon_dim]))
         mask = ~self.da.isnull().any(dim=reduce_dims).values
 
@@ -669,12 +811,6 @@ class XDataArray:
             else:
                 cyclic = False
 
-            if cyclic:
-                da_original = da.copy()
-                da = utils.add_cyclic_point(da_original)
-                da.name = da_original.name
-                da.attrs = da_original.attrs
-
             # add coastlines
             if ssv is not None:
                 if cyclic: ssv = utils.add_cyclic_point(ssv)
@@ -767,6 +903,12 @@ class XDataArray:
 
             else:
                 # regular lat-lon grid
+                if cyclic:
+                    da_original = da.copy()
+                    da = utils.add_cyclic_point(da_original)
+                    da.name = da_original.name
+                    da.attrs = da_original.attrs
+
                 im = da.plot.contourf(ax=ax, **_plt_kws)
 
             if df_sites is not None:
