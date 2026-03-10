@@ -48,7 +48,6 @@ extensions = [
     # 'sphinxcontrib.bibtex',
     # 'sphinxcontrib.rsvgconverter',
     # 'sphinx_copybutton',
-    # 'sphinx_gallery.load_style',
 ]
 nbsphinx_allow_errors = True
 autodoc_mock_imports = ["mpi4py", "torch.distributed", "horovod"]
