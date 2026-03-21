@@ -26,7 +26,7 @@ def load_dataset(path, shift_time=False, comp=None, hstr=None, grid=None, vn=Non
         vn (str): variable name
 
     '''
-    _kws = {'use_cftime': True, 'decode_timedelta': True}
+    _kws = {'decode_times': xr.coders.CFDatetimeCoder(use_cftime=True), 'decode_timedelta': True}
     _kws.update(kws)
     ds = xr.load_dataset(path, **_kws)
     ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, hstr=hstr, grid=grid, shift_time=shift_time)
@@ -43,7 +43,7 @@ def open_dataset(path, shift_time=False, comp=None, hstr=None, grid=None, vn=Non
         vn (str): variable name
 
     '''
-    _kws = {'use_cftime': True, 'decode_timedelta': True}
+    _kws = {'decode_times': xr.coders.CFDatetimeCoder(use_cftime=True), 'decode_timedelta': True}
     _kws.update(kws)
     ds = xr.open_dataset(path, **_kws)
     ds = utils.update_ds(ds, vn=vn, path=path, comp=comp, hstr=hstr, grid=grid, shift_time=shift_time)
@@ -75,7 +75,7 @@ def open_mfdataset(paths, shift_time=False, comp=None, hstr=None, grid=None, vn=
         'compat': 'override',
         'chunks': chunk_dict,
         'parallel': True,
-        'use_cftime': True,
+        'decode_times': xr.coders.CFDatetimeCoder(use_cftime=True),
         'decode_timedelta': True,
     }
     _kws.update(kws)

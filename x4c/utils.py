@@ -60,8 +60,7 @@ def regrid_cam_se(ds, weight_file):
     in_shape = weights.src_grid_dims.load().data
 
     # Since xESMF expects 2D vars, we'll insert a dummy dimension of size-1
-    if len(in_shape) == 1:
-        in_shape = [1, in_shape.item()]
+    if len(in_shape) == 1: in_shape = [1, in_shape.item()]
 
     # output variable shapew
     out_shape = weights.dst_grid_dims.load().data.tolist()[::-1]
@@ -69,24 +68,22 @@ def regrid_cam_se(ds, weight_file):
     # print(f"Regridding from {in_shape} to {out_shape}")
 
     # Insert dummy dimension
-    vars_with_ncol = [name for name in dataset.variables if "ncol" in dataset[name].dims]
-    updated = dataset.copy().update(
-        dataset[vars_with_ncol].transpose(..., "ncol").expand_dims("dummy", axis=-2)
-    )
+    vars_with_ncol = [name for name in dataset.variables if 'ncol' in dataset[name].dims]
+    updated = dataset[vars_with_ncol].transpose(..., 'ncol').expand_dims('dummy', axis=-2)
 
     # construct a regridder
     # use empty variables to tell xesmf the right shape
     # https://github.com/pangeo-data/xESMF/issues/202
     dummy_in = xr.Dataset(
         {
-            "lat": ("lat", np.empty((in_shape[0],))),
-            "lon": ("lon", np.empty((in_shape[1],))),
+            'lat': ('lat', np.empty((in_shape[0],))),
+            'lon': ('lon', np.empty((in_shape[1],))),
         }
     )
     dummy_out = xr.Dataset(
         {
-            "lat": ("lat", weights.yc_b.data.reshape(out_shape)[:, 0]),
-            "lon": ("lon", weights.xc_b.data.reshape(out_shape)[0, :]),
+            'lat': ('lat', weights.yc_b.data.reshape(out_shape)[:, 0]),
+            'lon': ('lon', weights.xc_b.data.reshape(out_shape)[0, :]),
         }
     )
 
@@ -94,15 +91,15 @@ def regrid_cam_se(ds, weight_file):
         dummy_in,
         dummy_out,
         weights=weight_file,
-        method="bilinear",
+        method='bilinear',
         reuse_weights=True,
         periodic=True,
     )
 
     # Actually regrid, after renaming
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UserWarning)
-        regridded = regridder(updated.rename({"dummy": "lat", "ncol": "lon"}), keep_attrs=True)
+        warnings.simplefilter('ignore', UserWarning)
+        regridded = regridder(updated.rename({'dummy': 'lat', 'ncol': 'lon'}), keep_attrs=True)
     # merge back any variables that didn't have the ncol dimension
     # And so were not regridded
     ds_out = xr.merge([dataset.drop_vars(regridded.variables, errors='ignore'), regridded])

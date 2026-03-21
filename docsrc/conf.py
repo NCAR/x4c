@@ -17,7 +17,7 @@
 
 project = 'x4c'
 author = 'NSF NCAR (Feng Zhu, Michael Levy, Brian Dobins)'
-copyright = '2025, University Corporation for Atmospheric Research'
+copyright = '2026, University Corporation for Atmospheric Research'
 
 
 # -- General configuration ---------------------------------------------------
