@@ -1884,7 +1884,7 @@ class Logs:
                             vars[v].append(val)
 
             df_tmp = pd.DataFrame(vars)
-            dates = xr.cftime_range(start=f'{yyyy}-{mm}-{dd}', freq='MS', periods=len(df_tmp), calendar='noleap')
+            dates = xr.date_range(start=f'{yyyy}-{mm}-{dd}', freq='MS', periods=len(df_tmp), calendar='noleap')
             years = []
             months = []
             for date in dates:
