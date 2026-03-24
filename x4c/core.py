@@ -10,6 +10,7 @@ from matplotlib.ticker import MultipleLocator
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import geocat.comp as gc
+from eofs.xarray import Eof
 
 from . import utils, visual
 import os
@@ -549,6 +550,23 @@ class XDataArray:
 
         return xr.concat(sel_list, dim='site').assign_coords(site=np.arange(len(sel_list)))
 
+    def eof(self, n=4, weight=True):
+        ''' Perform EOF analysis '''
+        if weight:
+            if 'lat' in self.da.coords:
+                coslat = np.cos(np.deg2rad(self.da.coords['lat']))
+            elif 'lat' in self.da.attrs:
+                coslat = np.cos(np.deg2rad(self.da.attrs['lat']))
+
+            wgts = np.sqrt(coslat).broadcast_like(self.da.isel(time=0))  # (lat, lon)
+            solver = Eof(self.da, weights=wgts)
+        else:
+            solver = Eof(self.da)
+
+        pcs  = solver.pcs(npcs=n, pcscaling=1)       # standardized PCs
+        eofs = solver.eofs(neofs=n, eofscaling=2)     # scaled EOFs
+        var  = solver.varianceFraction(neigs=n)
+        return pcs, eofs, var
 
     @property
     def ds(self):
@@ -665,22 +683,36 @@ class XDataArray:
         return da
 
     def geo_mean(self, ind=None, latlon_range=(-90, 90, 0, 360), **kws):
-        ''' The lat-weighted mean given a lat/lon range or a climate index name
-
-        Args:
-            latlon_range (tuple or list): the lat/lon range for lat-weighted average 
-                in format of (lat_min, lat_max, lon_min, lon_max)
-
-            ind (str): a climate index name; supported names include:
-            
-                * 'nino3.4'
-                * 'nino1+2'
-                * 'nino3'
-                * 'nino4'
-                * 'tpi'
-                * 'wp'
-                * 'dmi'
-                * 'iobw'
+        '''
+        Calculate the geospatial-weighted (latitude or area) mean over a specified region or climate index.
+        Parameters
+        ----------
+        ind : str, optional
+            Climate index name. Supported indices include:
+            - 'nino3.4': Niño 3.4 region
+            - 'nino1+2': Niño 1+2 region
+            - 'nino3': Niño 3 region
+            - 'nino4': Niño 4 region
+            - 'wpi': Western Pacific Index
+            - 'tpi': Tri-Pole Index
+            - 'dmi': Dipole Mode Index (Indian Ocean)
+            - 'iobw': Indian Ocean Basin-Wide Index
+            If None, uses latlon_range instead. Default is None.
+        latlon_range : tuple or list, optional
+            Latitude and longitude range for computing the mean in the format
+            (lat_min, lat_max, lon_min, lon_max). Default is (-90, 90, 0, 360).
+        **kws : dict
+            Additional keyword arguments passed to utils.geo_mean().
+        Returns
+        -------
+        xarray.DataArray
+            Latitude-weighted mean values over the specified region or index.
+            Attributes from the original data are preserved. Time coordinate
+            long_name is updated to 'Model Year' if applicable.
+        Raises
+        ------
+        ValueError
+            If ind is not one of the supported climate index names.
         '''
 
         if ind is None:

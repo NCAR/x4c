@@ -7,18 +7,36 @@ class Registry:
 
     @classmethod
     def get_F(cls, name):
-        """Retrieve a diagnostic function by name."""
+        '''Retrieve a diagnostic function by name.'''
         return cls.funcs.get(name)
 
-def F(func):
-    """Decorator to register a diagnostic function."""
-    name = func.__name__
-    if name.startswith("get_"):
-        key = name[4:]  # strip "get_"
+# def F(func):
+#     """Decorator to register a diagnostic function."""
+#     name = func.__name__
+#     if name.startswith("get_"):
+#         key = name[4:]  # strip "get_"
+#     else:
+#         key = name
+#     Registry.funcs[key] = func
+#     return func
+
+def F(func=None, *, name=None):
+    '''Decorator to register a diagnostic function, with optional custom key.'''
+    def decorator(f):
+        if name is not None:
+            key = name  # use explicit override, e.g. "NINO3.4"
+        else:
+            n = f.__name__
+            key = n[4:] if n.startswith('get_') else n
+        Registry.funcs[key] = f
+        return f
+
+    if func is not None:
+        # Called as @F (no arguments)
+        return decorator(func)
     else:
-        key = name
-    Registry.funcs[key] = func
-    return func
+        # Called as @F(name='...') 
+        return decorator
 
     # General calculations
     # def calc_ts(case, vn, load_idx=-1, adjust_month=True, sm_method='gm', ann_method='ann', long_name=None, units=None):
@@ -492,7 +510,49 @@ class DiagCalc:
         da.attrs['units'] = 'Pa'
         return da
 
+    @F(name='NINO3.4')
+    def get_NINO34(case, **kws):
+        ''' Calculate NINO3.4
+        '''
+        vn = 'SST'
+        case.load(vn, **kws)
+        da_sst = case.ds[vn]
+        if 'lat' not in da_sst.coords or 'lon' not in da_sst.coords:
+            da_sst = da_sst.x.regrid()
 
+        da = da_sst.x.geo_mean(ind='nino3.4')
+        da.name = 'NINO3.4'
+        da.attrs['long_name'] = 'NINO3.4 Index'
+        da.attrs['units'] = 'K'
+        return da
+
+    @F(name='NAO')
+    def get_NAO(case, **kws):
+        ''' Calculate site-based NAO index
+        '''
+        vn = 'PSL'
+        case.load(vn, **kws)
+        ds_psl = case.ds[vn]
+        if 'lat' not in ds_psl.coords or 'lon' not in ds_psl.coords:
+            da_psl = ds_psl.x.regrid()[vn]
+
+        # Extract PSL at the two stations
+        lisbon    = da_psl.sel(lat=38.7,  lon=351.0, method='nearest')
+        reykjavik = da_psl.sel(lat=64.1,  lon=338.0, method='nearest')
+
+        def standardize(da):
+            da_std = (da - da.mean('time').values) / da.std('time').values
+            return da_std
+
+        lisbon_std    = standardize(lisbon)
+        reykjavik_std = standardize(reykjavik)
+
+        # NAO = south minus north
+        da = lisbon_std - reykjavik_std
+        da.name = 'NAO'
+        da.attrs['long_name'] = 'NAO Index'
+        da.attrs['units'] = 'N/A'
+        return da
 
     # def get_d18Oc(case, **kws):
     #     ''' Calculate d18Oc = f(TEMP, d18Osw) based on the Eq (1) of the Ref.:

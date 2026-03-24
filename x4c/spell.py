@@ -58,8 +58,10 @@ class Spell:
             self.vn = self.vn.split('|')[0]
     
     def parse_slicing(self):
-        if '.' in self.vn:
-            self.slicing = self.vn.split('.', 1)[-1]
+        if '.isel' in self.vn:
+            self.slicing = self.vn.split('.isel', 1)[-1]
+        elif '.sel' in self.vn:
+            self.slicing = self.vn.split('.sel', 1)[-1]
 
     def parse_regrid(self):
         if '|regrid' in self.sentence:

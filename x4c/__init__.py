@@ -4,6 +4,7 @@ __version__ = version('x4c')
 
 from .core import load_dataset, open_dataset, open_mfdataset, XDataset, XDataArray
 from .case import History, Timeseries, Logs
+from .spell import Spell
 
 from . import utils
 from .visual import (
