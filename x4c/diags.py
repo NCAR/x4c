@@ -526,33 +526,45 @@ class DiagCalc:
         da.attrs['units'] = 'K'
         return da
 
-    @F(name='NAO')
-    def get_NAO(case, **kws):
-        ''' Calculate site-based NAO index
-        '''
-        vn = 'PSL'
-        case.load(vn, **kws)
-        ds_psl = case.ds[vn]
-        if 'lat' not in ds_psl.coords or 'lon' not in ds_psl.coords:
-            da_psl = ds_psl.x.regrid()[vn]
+    # @F
+    # def get_PSL(case, **kws):
+    #     ''' Calculate site-based NAO index
+    #     '''
+    #     vn = 'PSL'
+    #     case.load(vn, vtype='raw', **kws)
+    #     da = case.ds[vn].x[vn] / 100
+    #     da.name = 'PSL'
+    #     da.attrs['long_name'] = 'Sea Level Pressure'
+    #     da.attrs['units'] = 'hPa'
+    #     return da
 
-        # Extract PSL at the two stations
-        lisbon    = da_psl.sel(lat=38.7,  lon=351.0, method='nearest')
-        reykjavik = da_psl.sel(lat=64.1,  lon=338.0, method='nearest')
+    # @F(name='NAO')
+    # def get_NAO(case, **kws):
+    #     ''' Calculate site-based NAO index
+    #     '''
+    #     vn = 'PSL'
+    #     case.load(vn, **kws)
+    #     ds_psl = case.ds[vn]
+    #     if 'lat' not in ds_psl.coords or 'lon' not in ds_psl.coords:
+    #         da_psl = ds_psl.x.regrid()[vn]
 
-        def standardize(da):
-            da_std = (da - da.mean('time').values) / da.std('time').values
-            return da_std
+    #     # Extract PSL at the two stations
+    #     lisbon    = da_psl.sel(lat=38.7,  lon=351.0, method='nearest')
+    #     reykjavik = da_psl.sel(lat=64.1,  lon=338.0, method='nearest')
 
-        lisbon_std    = standardize(lisbon)
-        reykjavik_std = standardize(reykjavik)
+    #     def standardize(da):
+    #         da_std = (da - da.mean('time').values) / da.std('time').values
+    #         return da_std
 
-        # NAO = south minus north
-        da = lisbon_std - reykjavik_std
-        da.name = 'NAO'
-        da.attrs['long_name'] = 'NAO Index'
-        da.attrs['units'] = 'N/A'
-        return da
+    #     lisbon_std    = standardize(lisbon)
+    #     reykjavik_std = standardize(reykjavik)
+
+    #     # NAO = south minus north
+    #     da = lisbon_std - reykjavik_std
+    #     da.name = 'NAO'
+    #     da.attrs['long_name'] = 'NAO Index'
+    #     da.attrs['units'] = 'N/A'
+    #     return da
 
     # def get_d18Oc(case, **kws):
     #     ''' Calculate d18Oc = f(TEMP, d18Osw) based on the Eq (1) of the Ref.:

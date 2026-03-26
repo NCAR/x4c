@@ -234,6 +234,8 @@ def infer_cmap(da):
         ln_lower = da.attrs['long_name'].lower()
         if 'temperature' in ln_lower:
             cmap = 'RdBu_r'
+        elif 'pressure' in ln_lower:
+            cmap = 'RdBu_r'
         elif 'precipitation' in ln_lower:
             cmap = 'BrBG'
         elif 'correlation' in ln_lower:
