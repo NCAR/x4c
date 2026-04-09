@@ -1,0 +1,954 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PBS Scripts &#8212; x4c  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=51bff9d2" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=fca5bd30" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/post-pbs';</script>
+    <link rel="icon" href="../_static/x4c-logo.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CESM Diagnostics" href="../ug-diags.html" />
+    <link rel="prev" title="Timeseries Generation" href="post-gen_ts.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/x4c-logo.png" class="logo__image only-light" alt="x4c  documentation - Home"/>
+    <script>document.write(`<img src="../_static/x4c-logo.png" class="logo__image only-dark" alt="x4c  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../ug-installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="core-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-annualization.html">Annualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-geo_mean.html">Geospatial Averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-regridding.html">Regridding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core-visualization.html">Visualization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../ug-post.html">CESM Postprocessing</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="post-gen_ts.html">Timeseries Generation</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">PBS Scripts</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ug-diags.html">CESM Diagnostics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-load_variables.html">Loading Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-spell.html">A “spell” system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-new_vars.html">Adding New Diagnostic Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diags-logs.html">Visualizing Logs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../ug-api.html">API Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NCAR/x4c" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NCAR/x4c/edit/main/notebooks/post-pbs.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NCAR/x4c/issues/new?title=Issue%20on%20page%20%2Fnotebooks/post-pbs.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/post-pbs.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>PBS Scripts</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CESM1-Example">CESM1 Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CESM2-Example">CESM2 Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CESM3-Example">CESM3 Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CMIP7-Example">CMIP7 Example</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="PBS-Scripts">
+<h1>PBS Scripts<a class="headerlink" href="#PBS-Scripts" title="Link to this heading">#</a></h1>
+<p>In production mode, we usually submit a PBS (Portable Batch System) job to the HPC for a high-performance timeseries generation for the all available CESM output components and variables. Below we show three Zsh scripts that work for CESM1, 2, and 3, respectively. Each script follows the same workflow:</p>
+<ol class="arabic simple">
+<li><p>Python scripts generation</p></li>
+<li><p>PBS job scripts generation</p></li>
+<li><p>PBS jobs submission</p></li>
+</ol>
+<section id="CESM1-Example">
+<h2>CESM1 Example<a class="headerlink" href="#CESM1-Example" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">hist_root</span><span class="o">=</span>/glade/derecho/scratch/jiangzhu/archive
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_staging</span><span class="o">=</span>/glade/derecho/scratch/fengzhu/x4c/gen_ts
+<span class="nb">export</span><span class="w"> </span><span class="nv">casename</span><span class="o">=</span>b.e13.B1850.f19_g16.icesm131_icam6_paleo.PI.010
+<span class="nb">export</span><span class="w"> </span><span class="nv">syr</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">eyr</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep</span><span class="o">=</span><span class="m">100</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep_unit</span><span class="o">=</span>year
+<span class="nb">export</span><span class="w"> </span><span class="nv">task_name</span><span class="o">=</span>gts
+<span class="nb">export</span><span class="w"> </span><span class="nv">overwrite</span><span class="o">=</span>True
+<span class="nb">export</span><span class="w"> </span><span class="nv">account</span><span class="o">=</span>P93300324
+<span class="nb">export</span><span class="w"> </span><span class="nv">pyenv</span><span class="o">=</span>x4c-py313
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># create d case directory</span>
+<span class="c1"># =====================================================================</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># define functions</span>
+<span class="c1"># =====================================================================</span>
+gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps_info</span><span class="o">=</span><span class="nv">$3</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$4</span>
+
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">import os</span>
+<span class="s">import x4c</span>
+<span class="s">import time</span>
+
+<span class="s">start = time.time()</span>
+
+<span class="s">dirpath = &#39;$hist_root/$casename&#39;</span>
+<span class="s">case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info})</span>
+
+<span class="s">output_dirpath = &#39;$ts_root/$casename&#39;</span>
+<span class="s">staging_dirpath = &#39;$ts_staging/$casename&#39;</span>
+<span class="s">case.gen_ts(</span>
+<span class="s">    comps=$comps,</span>
+<span class="s">    output_dirpath=output_dirpath,</span>
+<span class="s">    staging_dirpath=staging_dirpath,</span>
+<span class="s">    timespan=($syr, $eyr),</span>
+<span class="s">    timestep=$timestep,</span>
+<span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
+<span class="s">    nproc=$ncpus,</span>
+<span class="s">    overwrite=$overwrite,</span>
+<span class="s">)</span>
+
+<span class="s">end = time.time()</span>
+<span class="s">print(f&#39;Elapsed wall-clock time: {(end-start)/60:.1f} mins&#39;)</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">nnodes</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$3</span>
+
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
+<span class="s">#PBS -q main</span>
+<span class="s">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
+<span class="s">#PBS -l walltime=12:00:00</span>
+<span class="s">#PBS -A ${account}</span>
+
+<span class="s">source \$LMOD_ROOT/lmod/init/zsh</span>
+
+<span class="s">module load ncarenv/23.09</span>
+<span class="s">module load nco</span>
+<span class="s">module load conda</span>
+<span class="s">conda activate ${pyenv}</span>
+
+<span class="s">mpiexec -n $nnodes python ${task_name}_${name}_${syr}-${eyr}.py</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># call functions</span>
+<span class="c1"># =====================================================================</span>
+<span class="c1"># Define task entries: name|components|comps_info|nndoes|ncpus</span>
+<span class="nv">task_list</span><span class="o">=(</span>
+<span class="w">  </span><span class="s2">&quot;o|[&#39;ocn&#39;]|{}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;ai|[&#39;atm&#39;, &#39;ice&#39;]|{}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;lr|[&#39;lnd&#39;, &#39;rof&#39;]|{}|1|128&quot;</span>
+<span class="o">)</span>
+
+<span class="k">for</span><span class="w"> </span>entry<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_list</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span>nnodes<span class="w"> </span>ncpus<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
+
+<span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$nnodes</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
+<span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
+<span class="k">done</span>
+
+<span class="nb">exit</span>
+</pre></div>
+</div>
+</section>
+<section id="CESM2-Example">
+<h2>CESM2 Example<a class="headerlink" href="#CESM2-Example" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">hist_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_staging</span><span class="o">=</span>/glade/derecho/scratch/fengzhu/x4c/gen_ts
+<span class="nb">export</span><span class="w"> </span><span class="nv">casename</span><span class="o">=</span>b.e23_alpha17f.BLT1850.ne30_t232.092
+<span class="nb">export</span><span class="w"> </span><span class="nv">syr</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">eyr</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep</span><span class="o">=</span><span class="m">10</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep_unit</span><span class="o">=</span>year
+<span class="nb">export</span><span class="w"> </span><span class="nv">task_name</span><span class="o">=</span>gts
+<span class="nb">export</span><span class="w"> </span><span class="nv">overwrite</span><span class="o">=</span>True
+<span class="nb">export</span><span class="w"> </span><span class="nv">account</span><span class="o">=</span>P93300324
+<span class="nb">export</span><span class="w"> </span><span class="nv">pyenv</span><span class="o">=</span>x4c-py313
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># create d case directory</span>
+<span class="c1"># =====================================================================</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># define functions</span>
+<span class="c1"># =====================================================================</span>
+gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps_info</span><span class="o">=</span><span class="nv">$3</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$4</span>
+
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">import os</span>
+<span class="s">import x4c</span>
+<span class="s">import time</span>
+
+<span class="s">start = time.time()</span>
+
+<span class="s">dirpath = &#39;$hist_root/$casename&#39;</span>
+<span class="s">case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info})</span>
+
+<span class="s">output_dirpath = &#39;$ts_root/$casename&#39;</span>
+<span class="s">staging_dirpath = &#39;$ts_staging/$casename&#39;</span>
+<span class="s">case.gen_ts(</span>
+<span class="s">    comps=$comps,</span>
+<span class="s">    output_dirpath=output_dirpath,</span>
+<span class="s">    staging_dirpath=staging_dirpath,</span>
+<span class="s">    timespan=($syr, $eyr),</span>
+<span class="s">    timestep=$timestep,</span>
+<span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
+<span class="s">    nproc=$ncpus,</span>
+<span class="s">    overwrite=$overwrite,</span>
+<span class="s">)</span>
+
+<span class="s">end = time.time()</span>
+<span class="s">print(f&#39;Elapsed wall-clock time: {(end-start)/60:.1f} mins&#39;)</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">nnodes</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$3</span>
+
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
+<span class="s">#PBS -q main</span>
+<span class="s">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
+<span class="s">#PBS -l walltime=12:00:00</span>
+<span class="s">#PBS -A ${account}</span>
+
+<span class="s">source \$LMOD_ROOT/lmod/init/zsh</span>
+
+<span class="s">module load ncarenv/23.09</span>
+<span class="s">module load nco</span>
+<span class="s">module load conda</span>
+<span class="s">conda activate ${pyenv}</span>
+
+<span class="s">mpiexec -n $nnodes python ${task_name}_${name}_${syr}-${eyr}.py</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># call functions</span>
+<span class="c1"># =====================================================================</span>
+<span class="c1"># Define task entries: name|components|comps_info|nnodes|ncpus</span>
+<span class="nv">task_list</span><span class="o">=(</span>
+<span class="w">  </span><span class="s2">&quot;o.sfc|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.sfc&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.z|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.z&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.rho2|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.rho2&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.native|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.native&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h0a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h0a&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;lir|[&#39;lnd&#39;, &#39;ice&#39;, &#39;rof&#39;]|{}|1|128&quot;</span>
+<span class="o">)</span>
+
+<span class="k">for</span><span class="w"> </span>entry<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_list</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span>nnodes<span class="w"> </span>ncpus<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
+
+<span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$nnodes</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
+<span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
+<span class="k">done</span>
+
+<span class="nb">exit</span>
+</pre></div>
+</div>
+</section>
+<section id="CESM3-Example">
+<h2>CESM3 Example<a class="headerlink" href="#CESM3-Example" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">hist_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/CESM_output_for_testing
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_staging</span><span class="o">=</span>/glade/derecho/scratch/fengzhu/x4c/gen_ts
+<span class="nb">export</span><span class="w"> </span><span class="nv">casename</span><span class="o">=</span>b.e30_beta02.BLT1850.ne30_t232.104
+<span class="nb">export</span><span class="w"> </span><span class="nv">syr</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">eyr</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep</span><span class="o">=</span><span class="m">10</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep_unit</span><span class="o">=</span>year
+<span class="nb">export</span><span class="w"> </span><span class="nv">task_name</span><span class="o">=</span>gts
+<span class="nb">export</span><span class="w"> </span><span class="nv">overwrite</span><span class="o">=</span>True
+<span class="nb">export</span><span class="w"> </span><span class="nv">account</span><span class="o">=</span>P93300324
+<span class="nb">export</span><span class="w"> </span><span class="nv">pyenv</span><span class="o">=</span>x4c-py313
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># create d case directory</span>
+<span class="c1"># =====================================================================</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">casename</span><span class="si">}</span>
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># define functions</span>
+<span class="c1"># =====================================================================</span>
+gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps_info</span><span class="o">=</span><span class="nv">$3</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$4</span>
+
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">import os</span>
+<span class="s">import x4c</span>
+<span class="s">import time</span>
+
+<span class="s">start = time.time()</span>
+
+<span class="s">dirpath = &#39;$hist_root/$casename&#39;</span>
+<span class="s">case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info})</span>
+
+<span class="s">output_dirpath = &#39;$ts_root/$casename&#39;</span>
+<span class="s">staging_dirpath = &#39;$ts_staging/$casename&#39;</span>
+<span class="s">case.gen_ts(</span>
+<span class="s">    comps=$comps,</span>
+<span class="s">    output_dirpath=output_dirpath,</span>
+<span class="s">    staging_dirpath=staging_dirpath,</span>
+<span class="s">    timespan=($syr, $eyr),</span>
+<span class="s">    timestep=$timestep,</span>
+<span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
+<span class="s">    nproc=$ncpus,</span>
+<span class="s">    overwrite=$overwrite,</span>
+<span class="s">)</span>
+
+<span class="s">end = time.time()</span>
+<span class="s">print(f&#39;Elapsed wall-clock time: {(end-start)/60:.1f} mins&#39;)</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">nnodes</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$3</span>
+
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
+<span class="s">#PBS -q main</span>
+<span class="s">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
+<span class="s">#PBS -l walltime=12:00:00</span>
+<span class="s">#PBS -A ${account}</span>
+
+<span class="s">source \$LMOD_ROOT/lmod/init/zsh</span>
+
+<span class="s">module load ncarenv/23.09</span>
+<span class="s">module load nco</span>
+<span class="s">module load conda</span>
+<span class="s">conda activate ${pyenv}</span>
+
+<span class="s">mpiexec -n $nnodes python ${task_name}_${name}_${syr}-${eyr}.py</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># call functions</span>
+<span class="c1"># =====================================================================</span>
+<span class="c1"># Define task entries: name|components|comps_info|nnodes|ncpus</span>
+<span class="nv">task_list</span><span class="o">=(</span>
+<span class="w">  </span><span class="s2">&quot;o.sfc|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.sfc&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.z|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.z&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.rho2|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.rho2&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.native|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.native&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h0a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h0a&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h2a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h2a&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h3a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h3a&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;a.h4a|[&#39;atm&#39;]|{&#39;atm&#39;: [&#39;cam.h4a&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;lir|[&#39;lnd&#39;, &#39;ice&#39;, &#39;rof&#39;]|{}|1|128&quot;</span>
+<span class="o">)</span>
+
+<span class="k">for</span><span class="w"> </span>entry<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_list</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span>nnodes<span class="w"> </span>ncpus<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
+
+<span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$nnodes</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
+<span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
+<span class="k">done</span>
+
+<span class="nb">exit</span>
+</pre></div>
+</div>
+</section>
+<section id="CMIP7-Example">
+<h2>CMIP7 Example<a class="headerlink" href="#CMIP7-Example" title="Link to this heading">#</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/zsh</span>
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">hist_root</span><span class="o">=</span>/glade/derecho/scratch/cmip7/archive/
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_root</span><span class="o">=</span>/glade/campaign/cesm/development/cross-wg/diagnostic_framework/x4c/timeseries
+<span class="nb">export</span><span class="w"> </span><span class="nv">ts_staging</span><span class="o">=</span>/glade/derecho/scratch/fengzhu/x4c/gen_ts
+<span class="nb">export</span><span class="w"> </span><span class="nv">casename</span><span class="o">=</span>b.e30_beta06.B1850C_LTso.ne30_t232_wgx3.192.wrkflw.1
+<span class="nb">export</span><span class="w"> </span><span class="nv">casefolder</span><span class="o">=</span>b.e30_beta06.B1850C_LTso.ne30_t232_wgx3.192.wrkflw.1_32
+<span class="nb">export</span><span class="w"> </span><span class="nv">syr</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">eyr</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep</span><span class="o">=</span><span class="m">10</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">timestep_unit</span><span class="o">=</span>year
+<span class="nb">export</span><span class="w"> </span><span class="nv">task_name</span><span class="o">=</span>gts
+<span class="nb">export</span><span class="w"> </span><span class="nv">overwrite</span><span class="o">=</span>True
+<span class="nb">export</span><span class="w"> </span><span class="nv">account</span><span class="o">=</span>P93300324
+<span class="nb">export</span><span class="w"> </span><span class="nv">pyenv</span><span class="o">=</span>x4c-py313
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># create d case directory</span>
+<span class="c1"># =====================================================================</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">casefolder</span><span class="si">}</span>
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">casefolder</span><span class="si">}</span>
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># define functions</span>
+<span class="c1"># =====================================================================</span>
+gen_py_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">comps_info</span><span class="o">=</span><span class="nv">$3</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$4</span>
+
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.py<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">import os</span>
+<span class="s">import x4c</span>
+<span class="s">import time</span>
+
+<span class="s">start = time.time()</span>
+
+<span class="s">dirpath = &#39;$hist_root/$casefolder&#39;</span>
+<span class="s">case = x4c.History(dirpath, comps=$comps, comps_info=${comps_info}, casename=&#39;$casename&#39;)</span>
+
+<span class="s">output_dirpath = &#39;$ts_root/$casefolder&#39;</span>
+<span class="s">staging_dirpath = &#39;$ts_staging/$casefolder&#39;</span>
+<span class="s">case.gen_ts(</span>
+<span class="s">    comps=$comps,</span>
+<span class="s">    output_dirpath=output_dirpath,</span>
+<span class="s">    staging_dirpath=staging_dirpath,</span>
+<span class="s">    timespan=($syr, $eyr),</span>
+<span class="s">    timestep=$timestep,</span>
+<span class="s">    timestep_unit=&#39;$timestep_unit&#39;,</span>
+<span class="s">    nproc=$ncpus,</span>
+<span class="s">    overwrite=$overwrite,</span>
+<span class="s">)</span>
+
+<span class="s">end = time.time()</span>
+<span class="s">print(f&#39;Elapsed wall-clock time: {(end-start)/60:.1f} mins&#39;)</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+gen_pbs_script<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">name</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">nnodes</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">  </span><span class="nb">local</span><span class="w"> </span><span class="nv">ncpus</span><span class="o">=</span><span class="nv">$3</span>
+
+<span class="w">  </span>cat<span class="w"> </span>&gt;!<span class="w"> </span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">name</span><span class="si">}</span>_<span class="si">${</span><span class="nv">syr</span><span class="si">}</span>-<span class="si">${</span><span class="nv">eyr</span><span class="si">}</span>.pbs<span class="w"> </span><span class="s">&lt;&lt; EOF</span>
+<span class="s">#!/bin/bash</span>
+<span class="s">#PBS -N ${task_name}_${name}_${syr}-${eyr}</span>
+<span class="s">#PBS -q main</span>
+<span class="s">#PBS -l select=$nnodes:ncpus=$ncpus:mpiprocs=1</span>
+<span class="s">#PBS -l walltime=12:00:00</span>
+<span class="s">#PBS -A ${account}</span>
+
+<span class="s">source \$LMOD_ROOT/lmod/init/zsh</span>
+
+<span class="s">module load ncarenv/23.09</span>
+<span class="s">module load nco</span>
+<span class="s">module load conda</span>
+<span class="s">conda activate ${pyenv}</span>
+
+<span class="s">mpiexec -n $nnodes python ${task_name}_${name}_${syr}-${eyr}.py</span>
+<span class="s">EOF</span>
+<span class="o">}</span>
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># call functions</span>
+<span class="c1"># =====================================================================</span>
+<span class="c1"># Define task entries: name|components|comps_info|nnodes|ncpus</span>
+<span class="nv">task_list</span><span class="o">=(</span>
+<span class="w">  </span><span class="s2">&quot;o.sz|[&#39;ocn&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.sfc&#39;, &#39;mom6.h.z&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;o.nr+r|[&#39;ocn&#39;, &#39;rof&#39;]|{&#39;ocn&#39;: [&#39;mom6.h.native&#39;, &#39;mom6.h.rho2&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;ail|[&#39;atm&#39;, &#39;ice&#39;, &#39;lnd&#39;]|{&#39;atm&#39;: [&#39;cam.h0a&#39;, &#39;cam.h1a&#39;, &#39;cam.h2a&#39;],&#39;ice&#39;: [&#39;cice.h&#39;]}|1|128&quot;</span>
+<span class="w">  </span><span class="s2">&quot;i.h1|[&#39;ice&#39;]|{&#39;ice&#39;: [&#39;cice.h1&#39;]}|13|128&quot;</span>
+<span class="o">)</span>
+
+<span class="k">for</span><span class="w"> </span>entry<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_list</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nv">IFS</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>name<span class="w"> </span>comps<span class="w"> </span>comps_info<span class="w"> </span>nnodes<span class="w"> </span>ncpus<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$entry</span><span class="s2">&quot;</span>
+
+<span class="w">  </span>gen_py_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$comps</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">comps_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
+<span class="w">  </span>gen_pbs_script<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$name</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$nnodes</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ncpus</span><span class="s2">&quot;</span>
+<span class="w">  </span>qsub<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">task_name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">name</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">syr</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">eyr</span><span class="si">}</span><span class="s2">.pbs&quot;</span>
+<span class="k">done</span>
+
+<span class="nb">exit</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="post-gen_ts.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Timeseries Generation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../ug-diags.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">CESM Diagnostics</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CESM1-Example">CESM1 Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CESM2-Example">CESM2 Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CESM3-Example">CESM3 Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#CMIP7-Example">CMIP7 Example</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By NSF NCAR (Feng Zhu, Michael Levy, Brian Dobins)
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, University Corporation for Atmospheric Research.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+<div class="extra_footer">
+  <em>The National Center for Atmospheric Research is sponsored by the National Science Foundation. Any opinions, findings and conclusions or recommendations expressed in this material do not necessarily reflect the views of the National Science Foundation.</em>
+</div>
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
