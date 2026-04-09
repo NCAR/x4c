@@ -917,9 +917,6 @@ class Timeseries:
                 self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, verbose=verbose, **kws)
             da = self.ds[vn].x.da
 
-            if S.regrid is not None:
-                da = eval(f'da.x.{S.regrid}')
-
             if S.slicing is not None:
                 cmd = f'da.{S.slicing}'
                 da = eval(cmd)
@@ -942,6 +939,9 @@ class Timeseries:
             if S.ann_method is not None:
                 utils.p_hint(f'>>> Timespan: [{da.time.values[0]}, {da.time.values[-1]}]')
                 da = utils.ann_modifier(da, ann_method=S.ann_method, long_name=da.long_name)
+
+            if S.regrid is not None:
+                da = eval(f'da.x.{S.regrid}')
 
             if S.sa_method is not None:
                 if S.sa_method in ['gm', 'nhm', 'shm', 'zm', 'gs', 'nhs', 'shs', 'somin']:

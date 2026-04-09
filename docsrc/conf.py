@@ -39,6 +39,7 @@ exclude_patterns = [
 ]
 
 extensions = [
+    'myst_parser',
     'nbsphinx',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
@@ -48,6 +49,15 @@ extensions = [
     # 'sphinxcontrib.bibtex',
     # 'sphinxcontrib.rsvgconverter',
     # 'sphinx_copybutton',
+]
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
+
+myst_enable_extensions = [
+    'colon_fence',
 ]
 nbsphinx_allow_errors = True
 autodoc_mock_imports = ["mpi4py", "torch.distributed", "horovod"]
@@ -69,12 +79,17 @@ html_theme = 'sphinx_book_theme'
 # html_theme = 'sphinx_material'
 # html_theme = 'bootstrap'
 # html_theme = "sphinxawesome_theme"
+html_context = {
+    'default_mode': 'light',
+}
+
 html_theme_options = {
     'repository_url': 'https://github.com/NCAR/x4c',
     'use_edit_page_button': True,
     'use_repository_button': True,
     'use_issues_button': True,
     'use_fullscreen_button': False,
+    'use_download_button': True,
     'extra_footer': '<em>The National Center for Atmospheric Research is sponsored by the National Science Foundation. Any opinions, findings and conclusions or recommendations expressed in this material do not necessarily reflect the views of the National Science Foundation.</em>',
 }
 

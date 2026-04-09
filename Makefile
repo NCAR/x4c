@@ -1,4 +1,4 @@
 pypi:
 	rm -f ./dist/*
-	python setup.py sdist
+	python -m build
 	twine upload ./dist/*

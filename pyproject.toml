@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "x4c"
+version = "2026.03.23"
+description = "x4c: Xarray for CESM"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Feng Zhu", email = "fengzhu@ucar.edu" },
+]
+keywords = ["Xarray", "CESM", "Climate Data Analysis and Visualization"]
+classifiers = [
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "netCDF4",
+    "xarray",
+    "dask",
+    "nc-time-axis",
+    "colorama",
+    "tqdm",
+    "mpi4py",
+    "eofs",
+]
+
+[project.urls]
+Homepage = "https://github.com/NCAR/x4c"
+
+[tool.setuptools.packages.find]
+include = ["x4c*"]
+
+[tool.setuptools.package-data]
+x4c = ["regrid_wgts/*.gz"]
