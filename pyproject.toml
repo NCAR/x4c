@@ -1,10 +1,10 @@
 [build-system]
 requires = ["setuptools>=64", "setuptools-scm"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "x4c"
-version = "2026.03.23"
+version = "2026.4.9"
 description = "x4c: Xarray for CESM"
 readme = "README.md"
 license = "Apache-2.0"
