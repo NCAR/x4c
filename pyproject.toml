@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "x4c"
-version = "2026.4.9"
+version = "2026.4.11"
 description = "x4c: Xarray for CESM"
 readme = "README.md"
 license = "Apache-2.0"
