@@ -431,8 +431,18 @@ class DiagCalc:
         case.load('PRECRL_H218OR', **kws)
         case.load('PRECSL_H218OS', **kws)
 
-        p16O = case.ds['PRECRC_H216Or'].x.da + case.ds['PRECSC_H216Os'].x.da + case.ds['PRECRL_H216OR'].x.da + case.ds['PRECSL_H216OS'].x.da
-        p18O = case.ds['PRECRC_H218Or'].x.da + case.ds['PRECSC_H218Os'].x.da + case.ds['PRECRL_H218OR'].x.da + case.ds['PRECSL_H218OS'].x.da
+        precrc_h216or = case.ds['PRECRC_H216Or'].x.da.clip(max=2e-3)
+        precsc_h216os = case.ds['PRECSC_H216Os'].x.da.clip(max=1e-3)
+        precrl_h216or = case.ds['PRECRL_H216OR'].x.da.clip(max=2e-3)
+        precsl_h216os = case.ds['PRECSL_H216OS'].x.da.clip(max=1e-3)
+
+        precrc_h218or = case.ds['PRECRC_H218Or'].x.da.clip(max=1e-5)
+        precsc_h218os = case.ds['PRECSC_H218Os'].x.da.clip(max=5e-6)
+        precrl_h218or = case.ds['PRECRL_H218OR'].x.da.clip(max=1e-5)
+        precsl_h218os = case.ds['PRECSL_H218OS'].x.da.clip(max=5e-6)
+
+        p16O = precrc_h216or + precsc_h216os + precrl_h216or + precsl_h216os
+        p18O = precrc_h218or + precsc_h218os + precrl_h218or + precsl_h218os
 
         p16O = p16O.where(p16O > 1e-18, 1e-18)
         p18O = p18O.where(p18O > 1e-18, 1e-18)

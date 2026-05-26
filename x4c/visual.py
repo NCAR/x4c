@@ -500,7 +500,7 @@ def infer_cmap(da):
         if 'temperature' in ln_lower:
             cmap = 'RdBu_r'
         elif 'pressure' in ln_lower:
-            cmap = 'RdBu_r'
+            cmap = 'bwr_r'
         elif 'precipitation' in ln_lower:
             cmap = 'BrBG'
         elif 'correlation' in ln_lower:
@@ -517,6 +517,8 @@ def infer_cmap(da):
             cmap = 'PiYG'
         elif 'kmt' in ln_lower:
             cmap = 'BrBG'
+        elif 'ice' in ln_lower:
+            cmap = 'Blues'
         else:
             cmap = 'viridis'
     else:

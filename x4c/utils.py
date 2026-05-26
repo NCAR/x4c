@@ -242,7 +242,11 @@ def update_ds(ds, path, vn=None, comp=None, hstr=None, grid=None, shift_time=Fal
     elif 'gw' in ds.variables:
         ds.attrs['gw'] = ds['gw']
     elif 'lat' in ds.variables:
-        ds.attrs['gw'] = ds['lat']
+        coslat = np.cos(np.deg2rad(ds['lat']))
+        if 'lon' in ds.variables:
+            ds.attrs['gw'] = coslat.broadcast_like(ds['lat'] * ds['lon'])  # 2-D cos(lat) area weight spanning (lat, lon)
+        else:
+            ds.attrs['gw'] = coslat
 
     if lat_name is not None and lat_name in ds: ds.attrs['lat'] = ds[lat_name]
     if lon_name is not None and lon_name in ds: ds.attrs['lon'] = ds[lon_name]
