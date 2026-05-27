@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=51bff9d2" />
+    <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=db61ab07" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/style.css?v=fca5bd30" />
   
@@ -400,12 +400,518 @@ document.write(`
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
 <section id="core-features">
 <h2>Core Features<a class="headerlink" href="#core-features" title="Link to this heading">#</a></h2>
+<p>.. py:module:: x4c.core</p>
+<p>.. py:function:: load_dataset(path, shift_time=False, comp=None, hstr=None, grid=None, vn=None, **kws)
+:module: x4c.core</p>
+<p>Load a netCDF file and form a <code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code></p>
+<p>:param path: path to the netCDF file
+:type path: str
+:param shift_time: shift the time of the <code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code> (the CESM1 output has a time shift)
+:type shift_time: bool
+:param comp: the tag for CESM component, including “atm”, “ocn”, “lnd”, “ice”, and “rof”
+:type comp: str
+:param grid: the grid tag for the CESM output (e.g., ne16, g16)
+:type grid: str
+:param vn: variable name
+:type vn: str</p>
+<p>.. py:function:: open_mfdataset(paths, shift_time=False, comp=None, hstr=None, grid=None, vn=None, **kws)
+:module: x4c.core</p>
+<p>Open multiple netCDF files and form a <code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code> in a lazy load mode</p>
+<p>:param path: path to the netCDF file
+:type path: str
+:param shift_time: shift the time of the <code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code> (the default CESM output has a time shift)
+:type shift_time: bool
+:param comp: the tag for general CESM components, including “atm”, “ocn”, “lnd”, “ice”, and “rof”
+:type comp: str
+:param grid: the grid tag for the CESM output (e.g., ne16, g16)
+:type grid: str
+:param vn: variable name
+:type vn: str</p>
+<p>.. py:class:: XDataset(ds=None)
+:module: x4c.core</p>
+<p>.. py:method:: XDataset.annualize(months=None, days_weighted=False, time2year=False)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Annualize/seasonalize a `xarray.Dataset`
+
+  :param months: a list of integers to represent month combinations,
+                 e.g., `None` means calendar year annualization, [7,8,9] means JJA annualization, and [-12,1,2] means DJF annualization
+  :type months: list of int
+</pre></div>
+</div>
+<p>.. py:property:: XDataset.anom
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Compute monthly anomalies relative to the climatology.
+
+  This property subtracts the monthly climatology (from
+  `XDataset.climo`) from the dataset to produce anomalies for each
+  time step. The climatology is aligned by month before subtraction so
+  that, e.g., all Januaries are compared against the January climatology.
+
+  :returns: dataset of anomalies with the same coordinates as
+            the original dataset.
+  :rtype: xarray.Dataset
+</pre></div>
+</div>
+<p>.. py:property:: XDataset.climo
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Compute the climatology (monthly mean) of the dataset.
+
+  This property groups the dataset by calendar month and computes the
+  mean over the `time` dimension for each month. It also records the
+  `climo_period` as a tuple (start_year, end_year) in the returned
+  dataset&#39;s attributes and preserves `comp`/`grid` attributes when
+  present. If the grouping result uses a `month` coordinate it is
+  renamed to `time` to keep downstream interfaces consistent.
+
+  :returns: monthly climatology where the `time` coordinate
+            indexes months (1-12). `ds.attrs[&#39;climo_period&#39;]` documents the
+            original temporal coverage used to compute the climatology.
+  :rtype: xarray.Dataset
+</pre></div>
+</div>
+<p>.. py:property:: XDataset.da
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  get its `xarray.DataArray` version
+</pre></div>
+</div>
+<p>.. py:method:: XDataset.get_plev(ps, vn=None, lev_mode=’hybrid’, **kws)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Interpolate a hybrid-level field to pressure levels and return a Dataset.
+
+  This method converts a 3D atmospheric variable that is on hybrid model
+  levels (a/k/a k-levels) into pressure levels using the provided surface
+  pressure `ps` (either an `xarray.DataArray` or an `xarray.Dataset` that
+  contains a variable named &quot;PS&quot;). It wraps
+  `geocat.comp.interpolation.interp_hybrid_to_pressure` and returns a
+  copy of the original `Dataset` with the requested variable replaced by
+  its pressure-level version.
+
+  :param ps: surface pressure. If a
+             `Dataset` is passed the method will look for the variable
+             named &quot;PS&quot;. Dimensions must align with the variable being
+             interpolated.
+  :type ps: xarray.DataArray or xarray.Dataset
+  :param vn: variable name in `self.ds` to interpolate. If
+             not provided the method will use the dataset attribute
+             `ds.attrs[&#39;vn&#39;]` and `self.da`.
+  :type vn: str, optional
+  :param lev_mode: currently only supports &quot;hybrid&quot;.
+                   (Reserved for future expansion.)
+  :type lev_mode: str, optional
+  :param \*\*kws: additional keyword arguments forwarded to
+                  `geocat.comp.interpolation.interp_hybrid_to_pressure`.
+                  By default `lev_dim` is set to `&#39;lev&#39;`. If the dataset
+                  contains `hyam`/`hybm` arrays they will be passed automatically.
+
+  :returns: a copy of `self.ds` with `vn` replaced by the
+            pressure-level `DataArray` produced by the interpolation.
+  :rtype: xarray.Dataset
+
+  .. rubric:: Notes
+
+  - Requires `geocat.comp` to be available and the dataset to include
+    the hybrid coefficients (`hyam`, `hybm`) when using hybrid
+    vertical coordinates.
+  - The returned dataset preserves the original dataset attributes
+    and coordinate structure except that the specified variable is
+    now on pressure levels.
+</pre></div>
+</div>
+<p>.. py:method:: XDataset.regrid(dlon=1, dlat=1, weight_file=None, gs=’T’, method=’bilinear’, periodic=True)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Regrid the CESM output to a normal lat/lon grid
+
+  Supported atmosphere regridding: ne16np4, ne16pg3, ne30np4, ne30pg3, ne120np4, ne120pg4 TO 1x1d / 2x2d.
+  Supported ocean regridding: any grid similar to g16 TO 1x1d / 2x2d.
+  For any other regridding, `weight_file` must be provided by the user.
+
+  For the atmosphere grid regridding, the default method is area-weighted;
+  while for the ocean grid, the default is bilinear.
+
+  :param dlon: longitude spacing
+  :type dlon: float
+  :param dlat: latitude spacing
+  :type dlat: float
+  :param weight_file: the path to an ESMF-generated weighting file for regridding
+  :type weight_file: str
+  :param gs: grid style in &#39;T&#39; or &#39;U&#39; for the ocean grid
+  :type gs: str
+  :param method: regridding method for the ocean grid
+  :type method: str
+  :param periodic: the assumption of the periodicity of the data when perform the regrid method
+  :type periodic: bool
+</pre></div>
+</div>
+<p>.. py:method:: XDataset.zavg(depth_top, depth_bot, vn=None)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Vertically average an ocean/column field between two depths and return a Dataset.
+
+  The method selects the vertical range along the `z_t` coordinate from
+  `depth_top` to `depth_bot`, applies area/volume weights provided by the
+  dataset variable `dz`, computes the weighted mean over the vertical
+  dimension, and returns a copy of the original `Dataset` with the
+  specified variable replaced by its vertically averaged version.
+
+  :param depth_top: upper bound of the vertical slice (same units as `z_t`).
+  :type depth_top: float
+  :param depth_bot: lower bound of the vertical slice (same units as `z_t`).
+  :type depth_bot: float
+  :param vn: variable name in `self.ds` to average. If not
+             provided the method will use the dataset attribute
+             `ds.attrs[&#39;vn&#39;]` and `self.da`.
+  :type vn: str, optional
+
+  :returns: a copy of `self.ds` with `vn` replaced by the
+            vertically averaged `DataArray`.
+  :rtype: xarray.Dataset
+
+  .. rubric:: Notes
+
+  - This method expects a vertical coordinate named `z_t` and a
+    thickness/weight variable named `dz` in the dataset. The
+    weighting is `dz` (e.g., layer thickness) and the mean is taken
+    over the `z_t` dimension.
+</pre></div>
+</div>
+<p>.. py:class:: XDataArray(da=None)
+:module: x4c.core</p>
+<p>.. py:method:: XDataArray.annualize(months=None, days_weighted=False)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Annualize/seasonalize a `xarray.DataArray`
+
+  :param months: a list of integers to represent month combinations,
+                 e.g., [7,8,9] means JJA annualization, and [-12,1,2] means DJF annualization
+  :type months: list of int
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.ds
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  get its `xarray.Dataset` version
+</pre></div>
+</div>
+<p>.. py:method:: XDataArray.eof(n=4, weight=True)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Perform EOF analysis
+</pre></div>
+</div>
+<p>.. py:method:: XDataArray.geo_mean(ind=None, latlon_range=(-90, 90, 0, 360), **kws)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Calculate the geospatial-weighted (latitude or area) mean over a specified region or climate index.
+  :param ind: Climate index name. Supported indices include:
+              - &#39;nino3.4&#39;: Niño 3.4 region
+              - &#39;nino1+2&#39;: Niño 1+2 region
+              - &#39;nino3&#39;: Niño 3 region
+              - &#39;nino4&#39;: Niño 4 region
+              - &#39;wpi&#39;: Western Pacific Index
+              - &#39;tpi&#39;: Tri-Pole Index
+              - &#39;dmi&#39;: Dipole Mode Index (Indian Ocean)
+              - &#39;iobw&#39;: Indian Ocean Basin-Wide Index
+              If None, uses latlon_range instead. Default is None.
+  :type ind: str, optional
+  :param latlon_range: Latitude and longitude range for computing the mean in the format
+                       (lat_min, lat_max, lon_min, lon_max). Default is (-90, 90, 0, 360).
+  :type latlon_range: tuple or list, optional
+  :param \*\*kws: Additional keyword arguments passed to utils.geo_mean().
+  :type \*\*kws: dict
+
+  :returns: Latitude-weighted mean values over the specified region or index.
+            Attributes from the original data are preserved. Time coordinate
+            long_name is updated to &#39;Model Year&#39; if applicable.
+  :rtype: xarray.DataArray
+
+  :raises ValueError: If ind is not one of the supported climate index names.
+</pre></div>
+</div>
+<p>.. py:method:: XDataArray.get_plev(**kws)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  See: https://geocat-comp.readthedocs.io/en/v2024.04.0/user_api/generated/geocat.comp.interpolation.interp_hybrid_to_pressure.html
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.gm
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  the global area-weighted mean
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.gs
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  the global area-weighted sum
+</pre></div>
+</div>
+<p>.. py:method:: XDataArray.nearest2d(lat=None, lon=None, lat_coord=’lat’, lon_coord=’lon’, lat_dim=’lat’, lon_dim=’lon’)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Select the nearest non-NaN grid point(s) for the given lat/lon targets.
+
+  Given one or more target `lat`/`lon` pairs, this method finds the
+  nearest valid (non-NaN across non-spatial dims) grid cell in the
+  DataArray and returns a concatenated `DataArray` with a new dimension
+  `site` indexing the selected points.
+
+  :param lat: target latitude(s).
+  :type lat: float or array-like
+  :param lon: target longitude(s).
+  :type lon: float or array-like
+  :param lat_coord: name of latitude coordinate in the DataArray.
+  :type lat_coord: str
+  :param lon_coord: name of longitude coordinate in the DataArray.
+  :type lon_coord: str
+  :param lat_dim: latitude dimension name.
+  :type lat_dim: str
+  :param lon_dim: longitude dimension name.
+  :type lon_dim: str
+
+  :returns: concatenated selections at nearest grid points
+            with a new `site` coordinate.
+  :rtype: xarray.DataArray
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.nhm
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  the NH area-weighted mean
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.nhs
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  the NH area-weighted sum
+</pre></div>
+</div>
+<p>.. py:method:: XDataArray.plot(title=None, figsize=None, ax=None, latlon_range=None, add_clabels=False, clevels=None, clabel_kwargs=None, projection=’Robinson’, transform=’PlateCarree’, central_longitude=180, proj_args=None, bad_color=’dimgray’, add_gridlines=False, gridline_labels=True, gridline_style=’–’, ssv=None, log=False, vmin=None, vmax=None, coastline_zorder=99, coastline_width=1, site_markersizes=100, df_sites=None, colname_dict=None, gs=’T’, ux=False, site_marker_dict=None, site_color_dict=None, count_site_num=False, lgd_kws=None, legend=True, return_im=False, **kws)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  The plotting functionality
+
+  :param title: figure title
+  :type title: str
+  :param figsize: figure size in format of (w, h)
+  :type figsize: tuple or list
+  :param ax: a `matplotlib.axes`
+  :type ax: `matplotlib.axes`
+  :param latlon_range: lat/lon range in format of (lat_min, lat_max, lon_min, lon_max)
+  :type latlon_range: tuple or list
+  :param projection: a projection name supported by `Cartopy`
+  :type projection: str
+  :param transform: a projection name supported by `Cartopy`
+  :type transform: str
+  :param central_longitude: the central longitude of the map to plot
+  :type central_longitude: float
+  :param proj_args: other keyword arguments for projection
+  :type proj_args: dict
+  :param add_gridlines: if True, the map will be added with gridlines
+  :type add_gridlines: bool
+  :param gridline_labels: if True, the lat/lon ticklabels will appear
+  :type gridline_labels: bool
+  :param gridline_style: the gridline style, e.g., &#39;-&#39;, &#39;--&#39;
+  :type gridline_style: str
+  :param ssv: a sea surface variable used for plotting the coastlines
+  :type ssv: `xarray.DataArray`
+  :param gs: grid style in &#39;T&#39; or &#39;U&#39; for the ocean grid
+  :type gs: str
+  :param coastline_zorder: the layer order for the coastlines
+  :type coastline_zorder: int
+  :param coastline_width: the width of the coastlines
+  :type coastline_width: float
+  :param df_sites: a `pandas.DataFrame` that stores the information of a collection of sites
+  :type df_sites: `pandas.DataFrame`
+  :param colname_dict: a dictionary of column names for `df_sites` in the &quot;key:value&quot; format &quot;assumed name:real name&quot;
+  :type colname_dict: dict
+</pre></div>
+</div>
+<p>.. py:method:: XDataArray.regrid(**kws)
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Regrid this DataArray by delegating to the parent Dataset regrid.
+
+  This wraps `XDataset.regrid` by converting the `DataArray` to a
+  temporary `Dataset`, calling the dataset-level regrid helper, then
+  extracting and returning the regridded `DataArray`. Any dataset-level
+  `lat`/`lon` attributes added during the transformation are removed from
+  the returned `DataArray` attributes for cleanliness.
+
+  **Forwarded kwargs** are the same as `XDataset.regrid` (e.g., `dlon`,
+  `dlat`, `weight_file`, `gs`, `method`, `periodic`).
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.shm
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  the SH area-weighted mean
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.shs
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  the SH area-weighted sum
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.somin
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  the Southern Ocean min
+</pre></div>
+</div>
+<p>.. py:property:: XDataArray.zm
+:module: x4c.core</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  the zonal mean
+</pre></div>
+</div>
 </section>
 <section id="cesm-postprocessing">
 <h2>CESM Postprocessing<a class="headerlink" href="#cesm-postprocessing" title="Link to this heading">#</a></h2>
+<p>.. py:class:: History(root_dir, comps=[‘atm’, ‘ocn’, ‘lnd’, ‘ice’, ‘rof’], comps_info=None, casename=None, path_pattern=’comp/hist/casename.hstr.date.nc’, avoid_list=None)
+:module: x4c.case</p>
+<p>Handle CESM history files for a single case.</p>
+<p>Provides utilities to discover history file paths, list time-series
+variables, split (isolate) variables into separate files, and
+re-merge them across time ranges. Designed to work with NCO tools
+and MPI for parallel operations.</p>
+<p>.. py:method:: History.bigbang(comp, hstr, output_dirpath, timespan=None, overwrite=True, nproc=1, vns=None)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Split history files into per-variable files in parallel using MPI.
+
+  Each MPI rank handles a subset of (file,variable) tasks.
+</pre></div>
+</div>
+<p>.. py:method:: History.bigcrunch(comp, hstr, input_dirpath, output_dirpath, timespan=None, overwrite=True, nproc=1, compression=1, vns=None)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Merge per-variable files back into timeseries files in parallel.
+
+  Coordinates work across MPI ranks similar to `bigbang`.
+</pre></div>
+</div>
+<p>.. py:method:: History.gen_ts(output_dirpath, staging_dirpath=None, comps=[‘atm’, ‘ocn’, ‘lnd’, ‘ice’, ‘rof’], timespan=None, timestep=None, timestep_unit=’year’, dir_structure=’comp/proc/tseries/hstr’, overwrite=True, nproc=1, compression=1)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Generate timeseries files for selected components and timespans.
+
+  This orchestrates splitting (`bigbang`) and merging
+  (`bigcrunch`) stages and moves results from staging to final
+  output directories.
+</pre></div>
+</div>
+<p>.. py:method:: History.get_hstr_based_on_vn(vn)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Return the first hstr that contains variable `vn`.
+
+  This searches across all components and hstrs and returns the
+  matching hstr string or None if not found.
+</pre></div>
+</div>
+<p>.. py:method:: History.get_paths(comp, hstr, timespan=None)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Return history file paths for a component/hstr optionally
+  filtered by a timespan.
+
+  timespan may be provided in a variety of formats accepted by
+  utils.parse_timespan.
+</pre></div>
+</div>
+<p>.. py:method:: History.get_ts_vns(comp, hstr, exclude_vars=[‘time’, ‘time_bnds’, ‘time_bounds’, ‘time_bound’, ‘time_written’, ‘date’, ‘datesec’, ‘date_written’])
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Return list of time-varying variable names for a given component
+  and hstr by inspecting the first history file.
+</pre></div>
+</div>
+<p>.. py:method:: History.isolate_vn(vn, comp, hstr, in_path, output_dirpath, overwrite=True)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Create a new netCDF file containing only variable `vn` from
+  the input history file `in_path`.
+
+  Uses `ncks` to drop other variables and writes result to
+  `output_dirpath` with a standardized filename.
+</pre></div>
+</div>
+<p>.. py:method:: History.merge_vn(hstr, vn, input_dirpath, output_dirpath, timespan=None, overwrite=True, compression=1)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Concatenate per-variable files across time into a single file.
+
+  Uses `ncrcat` with optional compression level to produce an
+  aggregated timeseries file for `vn` and `hstr`.
+</pre></div>
+</div>
+<p>.. py:method:: History.rm_timespan(timespan, comps=[‘atm’, ‘ice’, ‘ocn’, ‘rof’, ‘lnd’], nworkers=None, rehearsal=True)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Rename the archive files within a timespan
+
+  :param timespan: [start_year, end_year] with elements being integers
+  :type timespan: tuple or list
+</pre></div>
+</div>
 </section>
 <section id="cesm-diagnostics">
 <h2>CESM Diagnostics<a class="headerlink" href="#cesm-diagnostics" title="Link to this heading">#</a></h2>
+<p>.. py:class:: Timeseries(root_dir, grid_dict=None, casename=None, cesm_ver=3)
+:module: x4c.case</p>
+<p>CESM Timeseries case helper.</p>
+<p>Manages discovery and loading of preprocessed CESM timeseries files
+produced by CESM postprocessing. Provides convenience methods to
+locate paths, load raw or derived diagnostics, compute spells, and
+create plots and seasonal means.</p>
+<p>.. py:method:: Timeseries.calc(spell: str, comp=None, timespan=None, load_idx=-1, recalculate=False, verbose=True, **kws)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Compute a diagnostic spell and cache the result.
+
+  The `spell` string controls regridding, slicing, spatial/vertical
+  averaging and other modifiers parsed by `Spell`. The final
+  xarray DataArray is stored in `self.diags[spell]`.
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.clear_ds(vn=None)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Clear the existing `.ds` property
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.copy()
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Return a deep copy of this Timeseries instance.
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.get_comp_hstr(vn)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Find all (component, hstr) pairs where `vn` is present.
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.get_paths(comp, hstr, vn, timespan=None)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Return list of timeseries file paths for `vn` under `comp/hstr`.
+
+  If `timespan` is provided it filters the returned paths to those
+  fully covering the requested interval.
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.get_ts(vn, comp, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Open and return a Dataset for `vn` on `comp`.
+
+  Applies optional slicing and regridding before returning the
+  Dataset; does not cache the result.
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.load(vn, vtype=None, comp=None, hstr=None, timespan=None, load_idx=-1, verbose=True, reload=False, **kws)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Load a variable or derived diagnostic into `self.ds`.
+
+  Automatically detects whether `vn` is a raw timeseries or a
+  derived diagnostic and loads or computes it. Results are stored
+  in `self.ds[vn]`.
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.plot(spell, t_idx=None, regrid=False, gs=’T’, ssv=’SSH’, recalculate_ssv=False, timespan=None, **kws)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Plot a computed diagnostic `spell`.
+
+  Detects plot type (map, ts, zm, yz) from the DataArray and
+  dispatches to the plotting helpers in `diags`/`visual`.
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.quickview(timespan=None, nrow=None, ncol=None, wspace=0.3, hspace=0.5, ax_loc=None, figsize=None, stat_period=-50, roll_int=50, ylim_dict=None, spells=None, recalculate=False)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Create a multi-panel overview figure for a selection of spells.
+
+  Returns `(fig, ax)` where `ax` is a dict of axes keyed by spell
+  keys.
+</pre></div>
+</div>
+<p>.. py:method:: Timeseries.save_means(vn, comp, output_dirpath, timespan, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False)
+:module: x4c.case</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Save seasonal and annual mean files for `vn` into `output_dirpath`.
+
+  Writes files for ANN, DJF, MAM, JJA and SON for the given
+  `timespan` and optionally regrids results.
+</pre></div>
+</div>
 </section>
 </section>
 
