@@ -294,11 +294,21 @@ class XDataset:
             da = self.ds[vn]
 
         # select vertical slice and compute dz-weighted mean over z_t
-        da_zavg = da.sel(z_t=slice(depth_top, depth_bot)).weighted(self.ds['dz']).mean('z_t')
+        da_sel = da.sel(z_t=slice(depth_top, depth_bot))
+        dz = self.ds['dz'].sel(z_t=slice(depth_top, depth_bot))
+        da_zavg = da_sel.weighted(dz.fillna(0)).mean('z_t')
 
         # return a dataset copy with the variable replaced by its vertical average
         ds_zavg = self.ds.copy()
         ds_zavg[vn] = da_zavg
+        # Convert the horizontal area weight into a *volume* weight (area x wet column
+        # thickness) so a subsequent area-mean yields a true volume-weighted average.
+        if 'gw' in self.ds.attrs:
+            mask = da_sel.notnull()
+            if 'time' in mask.dims:
+                mask = mask.isel(time=0)
+            col_thick = dz.where(mask).sum('z_t')
+            ds_zavg.attrs['gw'] = self.ds.attrs['gw'] * col_thick
         return ds_zavg
         
     def annualize(self, months=None, days_weighted=False, time2year=False):
@@ -486,7 +496,22 @@ class XDataArray:
         return da
 
     def zavg(self, depth_top, depth_bot):
-        da_zavg = self.da.sel(z_t=slice(depth_top, depth_bot)).weighted(self.da.attrs['dz']).mean('z_t')
+        # dz-weighted vertical average over [depth_top, depth_bot], per water column
+        da = self.da.sel(z_t=slice(depth_top, depth_bot))
+        dz = self.da.attrs['dz'].sel(z_t=slice(depth_top, depth_bot))
+        da_zavg = da.weighted(dz.fillna(0)).mean('z_t')
+        da_zavg.attrs = dict(self.da.attrs)
+        # Convert the horizontal area weight into a *volume* weight (area x wet column
+        # thickness within the depth range) so that a subsequent area-mean (e.g. .x.gm)
+        # returns a true volume-weighted average rather than a dz-weighted mean of
+        # per-level area means (the latter mis-weights levels where the ocean area
+        # changes with depth). Requires zavg to run before the horizontal mean.
+        if 'gw' in self.da.attrs:
+            mask = da.notnull()
+            if 'time' in mask.dims:
+                mask = mask.isel(time=0)
+            col_thick = dz.where(mask).sum('z_t')
+            da_zavg.attrs['gw'] = self.da.attrs['gw'] * col_thick
         return da_zavg
 
     def to_netcdf(self, path, **kws):
@@ -547,6 +572,77 @@ class XDataArray:
             best_idx = np.argmin(dists)
             iy, ix = valid_indices[best_idx]
             sel_list.append(self.da.isel({lat_dim: iy, lon_dim: ix}))
+
+        return xr.concat(sel_list, dim='site').assign_coords(site=np.arange(len(sel_list)))
+
+    def nearest3d(self, lat=None, lon=None, depth=None,
+                  lat_coord='lat', lon_coord='lon',
+                  lat_dim='lat', lon_dim='lon',
+                  depth_coord='z_t', depth_dim='z_t',
+                  depth_unit='cm'):
+        '''
+        Select the nearest non-NaN 3D grid cell(s) for the given lat/lon/depth targets.
+
+        Given one or more target `lat`/`lon`/`depth` triples, this method finds the
+        nearest valid (non-NaN across non-spatial dims) grid cell in the full 3D
+        (depth, lat, lon) domain of the DataArray and returns a concatenated
+        `DataArray` with a new `site` dimension indexing the selected points.
+
+        Distance is Euclidean in km, combining horizontal great-circle distance
+        and absolute vertical |dz|. The `depth_coord` is converted from
+        `depth_unit` to km, while target `depth` values are assumed to be in
+        meters.
+
+        Parameters:
+            lat (float or array-like): target latitude(s).
+            lon (float or array-like): target longitude(s).
+            depth (float or array-like): target depth(s) in meters.
+            lat_coord (str): name of latitude coordinate.
+            lon_coord (str): name of longitude coordinate.
+            lat_dim (str): latitude dimension name.
+            lon_dim (str): longitude dimension name.
+            depth_coord (str): name of vertical coordinate.
+            depth_dim (str): vertical dimension name.
+            depth_unit (str): unit of `depth_coord` ('cm' for CESM POP, 'm', or 'km').
+
+        Returns:
+            xarray.DataArray: concatenated selections at nearest 3D grid points
+            with a new `site` coordinate.
+        '''
+        da = self.da
+
+        # 2D lat/lon grids, kept as DataArrays so distance ops broadcast cleanly
+        lats = da.coords[lat_coord]
+        lons = da.coords[lon_coord]
+        if lats.ndim == 1 and lons.ndim == 1:
+            lon2d_np, lat2d_np = np.meshgrid(lons.values, lats.values)
+            lat2d = xr.DataArray(lat2d_np, dims=(lat_dim, lon_dim))
+            lon2d = xr.DataArray(lon2d_np, dims=(lat_dim, lon_dim))
+        else:
+            lat2d = lats
+            lon2d = lons
+
+        # vertical coordinate in km
+        unit_scale = {'cm': 1e-5, 'm': 1e-3, 'km': 1.0}
+        if depth_unit not in unit_scale:
+            raise ValueError(f"depth_unit must be one of {list(unit_scale)}, got {depth_unit!r}")
+        z_km = da.coords[depth_coord] * unit_scale[depth_unit]
+
+        # mask cells with NaN across non-spatial dims
+        reduce_dims = [d for d in da.dims if d not in (depth_dim, lat_dim, lon_dim)]
+        mask = ~da.isnull().any(dim=reduce_dims) if reduce_dims else ~da.isnull()
+
+        target_lat = np.atleast_1d(lat)
+        target_lon = np.atleast_1d(lon)
+        target_depth = np.atleast_1d(depth)
+
+        sel_list = []
+        for lat0, lon0, depth0 in zip(target_lat, target_lon, target_depth):
+            h = utils.gcd(lat0, lon0, lat2d, lon2d)        # (lat_dim, lon_dim), km
+            v = np.abs(z_km - depth0 * 1e-3)               # (depth_dim,), km
+            dist = np.sqrt(h ** 2 + v ** 2).where(mask)    # (depth, lat, lon)
+            idx = dist.argmin(dim=[depth_dim, lat_dim, lon_dim])
+            sel_list.append(da.isel(idx))
 
         return xr.concat(sel_list, dim='site').assign_coords(site=np.arange(len(sel_list)))
 
@@ -1057,7 +1153,7 @@ class XDataArray:
 
             if 'xlabel' not in kws:
                 xlabel = ax.xaxis.get_label()
-                if 'climo_period' in da.attrs:
+                if 'climo_period' in da.attrs and ('time' in da.dims or 'month' in da.dims):
                     ax.set_xlabel('Month')
                     ax.set_xticks(range(1, 13))
                     ax.set_xticklabels(range(1, 13))

@@ -943,6 +943,12 @@ class Timeseries:
             if S.regrid is not None:
                 da = eval(f'da.x.{S.regrid}')
 
+            # zavg must run before the horizontal mean: it folds the vertical into a
+            # volume weight, so a following sa_method (e.g. gm) yields a true
+            # volume-weighted average.
+            if S.zavg is not None:
+                da = eval(f'da.x.{S.zavg}')
+
             if S.sa_method is not None:
                 if S.sa_method in ['gm', 'nhm', 'shm', 'zm', 'gs', 'nhs', 'shs', 'somin']:
                     da = getattr(da.x, S.sa_method)
@@ -953,9 +959,6 @@ class Timeseries:
                         da = da.x.zm
                 else:
                     raise ValueError(f'Unknown spatial average method: {S.sa_method}')
-
-            if S.zavg is not None:
-                da = eval(f'da.x.{S.zavg}')
 
             if da.units == 'degC':
                 da.attrs['units'] = '°C'

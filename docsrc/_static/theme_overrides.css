@@ -13,8 +13,3 @@
     text-align: left;
     margin-left: max(45px, 15%);
 }
-
-/* Hide the light/dark theme toggle button */
-button.theme-switch-button {
-    display: none !important;
-}

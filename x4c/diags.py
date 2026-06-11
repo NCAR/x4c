@@ -502,6 +502,7 @@ class DiagCalc:
 
         RESTOM = case.ds['FSNT'].x.da - case.ds['FLNT'].x.da
         RESTOM.name = 'RESTOM'
+        RESTOM.attrs['gw'] = case.ds['FSNT'].attrs['gw']
         RESTOM.attrs['long_name'] = 'Net Radiation Flux'
         RESTOM.attrs['units'] = 'W/m$^2$'
         return RESTOM
