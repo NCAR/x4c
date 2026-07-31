@@ -17,17 +17,6 @@ def showfig(fig, close=True):
         if True, close the figure automatically
 
     '''
-    # if in_notebook:
-    #     try:
-    #         from IPython.display import display
-    #     except ImportError as error:
-    #         # Output expected ImportErrors.
-    #         print(f'{error.__class__.__name__}: {error.message}')
-
-    #     display(fig)
-
-    # else:
-    #     plt.show()
 
     plt.show()
 
@@ -77,11 +66,14 @@ def savefig(fig, path, verbose=True, **kws):
         if verbose:
             print(f'Directory created at: "{dirpath}"')
 
-    path_str = str(path)
+    # append the default suffix, then save to *that* path. Previously the updated
+    # `path` was computed but `path_str` (the original, extension-less) was passed to
+    # savefig, so the `.pdf` default never took effect and the reported path pointed
+    # at a file that did not exist.
     if path.suffix not in ['.eps', '.pdf', '.png', '.ps']:
-        path = pathlib.Path(f'{path_str}.pdf')
+        path = path.with_suffix(path.suffix + '.pdf')
 
-    fig.savefig(path_str, **savefig_args)
+    fig.savefig(str(path), **savefig_args)
     plt.close(fig)
 
     if verbose:

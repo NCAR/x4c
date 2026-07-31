@@ -4,12 +4,10 @@ import re
 import itertools
 import numpy as np
 import xarray as xr
-import xesmf as xe
 import colorama as ca
 import requests
 from tqdm import tqdm
 import datetime
-from dateutil.relativedelta import relativedelta
 import collections.abc
 import cartopy.util
 import shutil
@@ -30,6 +28,36 @@ def p_fail(text):
 
 def p_warning(text):
     print(ca.Fore.YELLOW + ca.Style.BRIGHT + text + ca.Style.RESET_ALL)
+
+
+def import_xesmf():
+    ''' Import xesmf on demand
+
+    Lazy because xesmf (and its ESMF/esmpy backend) is conda-only and awkward to
+    build from PyPI, so requiring it at import time made the whole package
+    uninstallable from PyPI. Only the regridding paths need it.
+    '''
+    try:
+        import xesmf as xe
+    except ImportError as e:
+        raise ImportError(
+            'xesmf is required for regridding. Install it with '
+            '`conda install -c conda-forge xesmf esmpy` (or `pip install "x4c[regrid]"` '
+            'if you have a working ESMF).'
+        ) from e
+    return xe
+
+
+def import_geocat_comp():
+    ''' Import geocat.comp on demand (see :func:`import_xesmf`) '''
+    try:
+        import geocat.comp as gc
+    except ImportError as e:
+        raise ImportError(
+            'geocat-comp is required for hybrid-to-pressure-level interpolation. '
+            'Install it with `conda install -c conda-forge geocat-comp`.'
+        ) from e
+    return gc
 
 def regrid_cam_se(ds, weight_file):
     """
@@ -87,6 +115,7 @@ def regrid_cam_se(ds, weight_file):
         }
     )
 
+    xe = import_xesmf()
     regridder = xe.Regridder(
         dummy_in,
         dummy_out,
@@ -112,20 +141,29 @@ def annualize(ds, months=None, days_weighted=False):
     anchor = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
     idx = months[-1]-1
 
-    if days_weighted:
-        # weighted version
-        days_in_month = sds.time.dt.days_in_month
-        weights = days_in_month.groupby('time.year') / days_in_month.groupby('time.year').sum()
-        ds_weighted = sds * weights
-        ds_ann = ds_weighted.resample(time=f'YE-{anchor[idx]}').sum()
-        ds_ann = ds_ann.where(sds.notnull())
-    else:
-        ds_ann = sds.resample(time=f'YE-{anchor[idx]}').mean()  # unweighted version
+    anchor_str = f'YE-{anchor[idx]}'
 
-    try:
+    if days_weighted:
+        # Day-length weighted mean, normalized over each resample bin rather than
+        # over the calendar year. Calendar-year normalization is wrong for any
+        # wraparound season (e.g. DJF, where a bin spans two calendar years) and
+        # for incomplete leading/trailing bins, whose weights then sum to well
+        # under 1 and pull the value toward zero.
+        # Dividing by the weights that actually contributed also keeps bins with
+        # missing months (or NaNs in the data) unbiased -- matching the `.mean()`
+        # behavior of the unweighted branch -- and leaves NaN, not 0, wherever a
+        # bin has no valid input at all (`sum` counts NaNs as zeros, so the
+        # denominator has to carry the masking).
+        days_in_month = sds.time.dt.days_in_month
+        num = (sds * days_in_month).resample(time=anchor_str).sum()
+        den = (sds.notnull() * days_in_month).resample(time=anchor_str).sum()
+        ds_ann = num / den.where(den > 0)
+    else:
+        ds_ann = sds.resample(time=anchor_str).mean()  # unweighted version
+
+    # a Dataset has no `.name`; only propagate it for the DataArray case
+    if isinstance(sds, xr.DataArray):
         ds_ann.name = sds.name
-    except:
-        pass
 
     return ds_ann
 
@@ -173,7 +211,80 @@ def geo_mean(da, lat_min=-90, lat_max=90, lon_min=0, lon_max=360, lat_name='lat'
         lat = kws['lat']
         lon = kws['lon']
         m = da.where((lat>lat_min) & (lat<lat_max) & (lon>lon_min) & (lon<lon_max)).weighted(gw).mean(list(gw.dims))
+    else:
+        # e.g. `gw` present but `lat`/`lon` missing -- the state a regrid used to
+        # leave behind. Without this the function fell through to `return m` with
+        # `m` unbound and raised `UnboundLocalError`.
+        raise ValueError(
+            'Cannot compute a geographical mean: need either no `gw` at all (to use '
+            'the cos(lat) fallback on the lat/lon coordinates), or `gw` together with '
+            '`lat` and `lon` -- in `da.attrs` or as keyword arguments. '
+            f'Found attrs: {sorted(k for k in da.attrs if k in GRID_ATTRS)}; '
+            f'kwargs: {sorted(k for k in kws if k in GRID_ATTRS)}.'
+        )
+
     return m
+
+#: the `xarray.DataArray`-valued attrs that x4c parks in `.attrs` to drive the
+#: accessors; netCDF attributes must be scalars or strings, so these have to be
+#: stripped before writing (see :func:`drop_grid_attrs`)
+GRID_ATTRS = ('gw', 'lat', 'lon', 'dz')
+
+def drop_grid_attrs(obj):
+    ''' Return a copy of `obj` with the x4c grid attrs stripped, ready to serialize
+
+    `gw`/`lat`/`lon`/`dz` are `xarray.DataArray`s carried in `.attrs` so that the
+    accessors (`.x.gm`, `.x.nhm`, `.x.zavg`, ...) can find the grid metadata. netCDF
+    attributes may only be scalars or strings, so they must come off before writing.
+
+    Two things matter here:
+
+    - The strip happens on a **copy**. Doing it in place would leave the object the
+      caller still holds without its weights, so every subsequent `.x.gm`/`.x.nhm`/
+      `.x.zavg` on it would raise `KeyError` far away from the write that caused it.
+    - For a `Dataset`, the attrs are cleaned off the **variables as well as the
+      dataset**. A variable that came through `XDataset.__getitem__` (or
+      `XDataArray.ds`) carries its own copy of them, and those alone are enough to
+      make `to_netcdf` fail.
+
+    Args:
+        obj (`xarray.Dataset` or `xarray.DataArray`): the object to clean
+
+    Returns:
+        the same type as `obj`, with :data:`GRID_ATTRS` removed at every level
+    '''
+    out = obj.copy()
+    out.attrs = {k: v for k, v in obj.attrs.items() if k not in GRID_ATTRS}
+
+    if isinstance(out, xr.Dataset):
+        for vn in out.variables:
+            var = out.variables[vn]
+            var.attrs = {k: v for k, v in var.attrs.items() if k not in GRID_ATTRS}
+
+    return out
+
+def coslat_weight(ds, lat_name='lat', lon_name='lon'):
+    ''' The cos(lat) area weight for a regular lat/lon grid
+
+    Args:
+        ds (`xarray.Dataset`): a dataset with a regular lat (and optionally lon) coordinate
+        lat_name (str): the name of the latitude coordinate
+        lon_name (str): the name of the longitude coordinate
+
+    Returns:
+        `xarray.DataArray`: cos(lat) broadcast over (lat, lon) when both are
+        present, otherwise the 1-D cos(lat).
+
+    Used both when attaching `gw` at load time (:func:`update_ds`) and after
+    regridding onto a regular grid (:func:`x4c.core.XDataset.regrid`), so that
+    the two agree on the weighting convention.
+    '''
+    coslat = np.cos(np.deg2rad(ds[lat_name]))
+    if lon_name in ds.variables:
+        # 2-D cos(lat) area weight spanning (lat, lon)
+        return coslat.broadcast_like(ds[lat_name] * ds[lon_name])
+    else:
+        return coslat
 
 def update_attrs(da, da_src):
     da.attrs = dict(da_src.attrs)
@@ -212,11 +323,16 @@ def update_ds(ds, path, vn=None, comp=None, hstr=None, grid=None, shift_time=Fal
     if grid is not None: ds.attrs['grid'] = grid
 
     if 'comp' in ds.attrs:
+        # `rof` (RTM/MOSART) is on a regular lat/lon grid, like `atm`/`lnd`.
+        # Unlisted components fall back to the regular lat/lon convention rather than
+        # raising: the lookups below are all guarded by an `in ds` check, so a name that
+        # turns out to be absent simply degrades to the cos(lat) weight.
         gw_dict = {
             'atm': 'area',
             'ocn': 'TAREA',
             'ice': 'tarea',
             'lnd': 'area',
+            'rof': 'area',
         }
 
         lon_dict = {
@@ -224,6 +340,7 @@ def update_ds(ds, path, vn=None, comp=None, hstr=None, grid=None, shift_time=Fal
             'ocn': 'TLONG',
             'ice': 'TLON',
             'lnd': 'lon',
+            'rof': 'lon',
         }
 
         lat_dict = {
@@ -231,22 +348,20 @@ def update_ds(ds, path, vn=None, comp=None, hstr=None, grid=None, shift_time=Fal
             'ocn': 'TLAT',
             'ice': 'TLAT',
             'lnd': 'lat',
+            'rof': 'lat',
         }
 
-        gw_name = gw_dict[ds.attrs['comp']] if gw_name is None else gw_name
-        lat_name = lat_dict[ds.attrs['comp']] if lat_name is None else lat_name
-        lon_name = lon_dict[ds.attrs['comp']] if lon_name is None else lon_name
+        comp = ds.attrs['comp']
+        gw_name = gw_dict.get(comp, 'area') if gw_name is None else gw_name
+        lat_name = lat_dict.get(comp, 'lat') if lat_name is None else lat_name
+        lon_name = lon_dict.get(comp, 'lon') if lon_name is None else lon_name
 
     if gw_name is not None and gw_name in ds:
         ds.attrs['gw'] = ds[gw_name]
     elif 'gw' in ds.variables:
         ds.attrs['gw'] = ds['gw']
     elif 'lat' in ds.variables:
-        coslat = np.cos(np.deg2rad(ds['lat']))
-        if 'lon' in ds.variables:
-            ds.attrs['gw'] = coslat.broadcast_like(ds['lat'] * ds['lon'])  # 2-D cos(lat) area weight spanning (lat, lon)
-        else:
-            ds.attrs['gw'] = coslat
+        ds.attrs['gw'] = coslat_weight(ds)
 
     if lat_name is not None and lat_name in ds: ds.attrs['lat'] = ds[lat_name]
     if lon_name is not None and lon_name in ds: ds.attrs['lon'] = ds[lon_name]
@@ -355,70 +470,6 @@ def expand_braces(pattern):
 
     return expanded
 
-# def find_paths(root_dir, path_pattern='comp/proc/tseries/month_1/casename.mdl.hstr.vn.timespan.nc', delimiters=['/', '.'],
-#                avoid_list=None, verbose=False, **kws):
-#     s = path_pattern
-#     for d in delimiters:
-#         s = ' '.join(s.split(d))
-#     path_elements = s.split()
-
-#     for e in path_elements:
-#         if e in kws:
-#             value = kws[e]
-#             if isinstance(value, list):
-#                 pattern_str = '{' + ','.join(value) + '}'
-#                 path_pattern = path_pattern.replace(e, pattern_str)
-#             else:
-#                 path_pattern = path_pattern.replace(e, value)
-#         elif e in ['proc', 'tseries', 'month_1', 'nc']:
-#             pass
-#         elif e in ['timespan', 'date']:
-#             path_pattern = path_pattern.replace(e, '*[0-9]')
-#         else:
-#             path_pattern = path_pattern.replace(e, '*')
-
-#     path_patterns = expand_braces(path_pattern)
-#     if verbose: p_header(f'path_patterns: {path_patterns}')
-#     paths = []
-#     for pat in path_patterns:
-#         paths_tmp = glob.glob(os.path.join(root_dir, pat))
-#         paths.extend(paths_tmp)
-
-#     # sort based on timespak h
-#     paths = sorted(paths, key=lambda x: x.split('.')[-2])
-#     if avoid_list is not None:
-#         paths_new = [] 
-#         for path in paths:
-#             add_path = True
-#             for avoid_str in avoid_list:
-#                 if avoid_str in path:
-#                     add_path = False
-#                     break
-#             if add_path: paths_new.append(path)
-#         paths = paths_new
-#     return paths
-
-# def get_hstr(paths, mdl):
-#     hstr_set = set()
-
-#     # Pattern to extract what's after mdl.
-#     pattern = re.compile(rf'{re.escape(mdl)}\.((?:[^0-9][^.]*\.?)+)')
-
-#     # Pattern to remove trailing date strings like .0001-01 or .0001-01-0001-12
-#     date_like_pattern = re.compile(r'(\.?\d{4}-\d{2}(?:-\d{4}-\d{2})?)$')
-
-#     for path in paths:
-#         filename = os.path.basename(path)
-#         match = pattern.search(filename)
-#         if match:
-#             hstr = match.group(1)
-#             # Remove date-like suffix
-#             hstr = date_like_pattern.sub('', hstr)
-#             hstr = hstr.rstrip('.')
-#             if 'h' in hstr:  # Only keep if 'h' is present
-#                 hstr_set.add(hstr)
-
-#     return sorted(hstr_set)
 
 def find_paths(root_dir, path_pattern='comp/proc/tseries/*/casename.hstr.vn.timespan.nc', delimiters=['/', '.'],
                avoid_list=None, verbose=False, **kws):
@@ -452,11 +503,15 @@ def find_paths(root_dir, path_pattern='comp/proc/tseries/*/casename.hstr.vn.time
     # sort based on timespan
     paths = sorted(paths, key=lambda x: x.split('.')[-2])
     if avoid_list is not None:
-        paths_new = [] 
+        paths_new = []
         for path in paths:
             add_path = True
+            # match the basename, not the full path: the tokens describe filename
+            # segments (`.once.`, `.h0.`), so matching the whole path let an avoid
+            # token in any parent directory silently discard every file
+            basename = os.path.basename(path)
             for avoid_str in avoid_list:
-                if avoid_str in path:
+                if avoid_str in basename:
                     add_path = False
                     break
             if add_path: paths_new.append(path)
@@ -553,17 +608,17 @@ def parse_timestamps(timespan: tuple[str, str], timestep:int, timestep_unit:str=
     current = start_dt
     while current <= end_dt:
         if timestep_unit == 'year':
-            next = add_months(current, timestep * 12)
-            current_end = minus_months(next, 1)
+            nxt = add_months(current, timestep * 12)
+            current_end = minus_months(nxt, 1)
         elif timestep_unit == 'month':
-            next = add_months(current, timestep)
-            current_end = minus_months(next, 1)
+            nxt = add_months(current, timestep)
+            current_end = minus_months(nxt, 1)
         elif timestep_unit == 'day':
-            next = current + datetime.timedelta(days=timestep)
-            current_end = next - datetime.timedelta(days=1)
+            nxt = current + datetime.timedelta(days=timestep)
+            current_end = nxt - datetime.timedelta(days=1)
         elif timestep_unit == 'hour':
-            next = current + datetime.timedelta(hours=timestep)
-            current_end = next - datetime.timedelta(hours=1)
+            nxt = current + datetime.timedelta(hours=timestep)
+            current_end = nxt - datetime.timedelta(hours=1)
         else:
             raise ValueError('Unsupported timestep_unit. Choose from year, month, day, hour.')
 
@@ -581,7 +636,7 @@ def parse_timestamps(timespan: tuple[str, str], timestep:int, timestep_unit:str=
             current_end_str = f'{current_end.year:04d}-{current_end.month:02d}-{current_end.day:02d}-{current_end.hour*3600:05d}'
 
         timestamp_list.append((current_str, current_end_str))
-        current = next
+        current = nxt
 
     return timestamp_list
 
@@ -602,8 +657,15 @@ def cesm_str2datetime(s: str) -> datetime.datetime:
             year, month = s.split('-')
             res = datetime.datetime(int(year), int(month), 1)
         elif nparts == 1:
-            year = s.split('-')
-            res = datetime.datetime(int(year), 1, 1)
+            # unreachable while guarded by `'-' in s`, but it used to do
+            # `int(s.split('-'))` -- int() of a list -- and would raise TypeError the
+            # moment the guard changed
+            res = datetime.datetime(int(s), 1, 1)
+        else:
+            raise ValueError(
+                f'Cannot parse CESM timestamp {s!r}: expected 1-4 dash-separated '
+                'fields (YYYY[-MM[-DD[-SSSSS]]]).'
+            )
     else:  # compact format, e.g. "YYYYMMDDSSSSSS"
         year   = int(s[0:4])
         month  = int(s[4:6])
@@ -655,6 +717,28 @@ def timespan_int2str(timespan: tuple[int, int]) -> tuple[str, str]:
     end_str = int_to_timestamp(end)
     return (start_str, end_str)
 
+def normalize_timespan(timespan):
+    ''' Coerce a timespan to the ``('YYYY-MM', 'YYYY-MM')`` string form
+
+    Accepts ints (``(1, 20)``), strings (``('0001-01', '0020-12')``), or a mix.
+    Element-wise on purpose: the all-or-nothing checks this replaces either skipped
+    conversion for a mixed tuple, or -- if the check were simply loosened -- fed an
+    already-formatted string back through `int_to_timestamp`, which zero-pads it into
+    nonsense (``'0001-01'`` -> ``'00001-01'`` -> ``'0000-1-01'``).
+
+    Args:
+        timespan (tuple): (start, end), each an int or a timestamp string
+
+    Returns:
+        tuple[str, str]
+    '''
+    if timespan is None: return None
+    start, end = timespan[0], timespan[-1]
+    return (
+        start if isinstance(start, str) else int_to_timestamp(start),
+        end if isinstance(end, str) else int_to_timestamp(end),
+    )
+
 def datetime_truncate(dt: datetime.datetime, precision: str = 'day') -> datetime.datetime:
     if precision == 'year':
         return dt.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -667,25 +751,104 @@ def datetime_truncate(dt: datetime.datetime, precision: str = 'day') -> datetime
     else:
         raise ValueError(f"Unsupported precision '{precision}'. Choose from 'year', 'month', 'day', 'hour'.")
 
-def download(url: str, fname: str, chunk_size=1024, show_bar=True):
-    os.makedirs(os.path.dirname(fname), exist_ok=True)
-    resp = requests.get(url, stream=True)
+#: base URL for the on-demand regrid weight / SCRIP files
+WGTS_URL = 'https://github.com/fzhu2e/x4c-regrid-wgts/raw/main/data'
+
+
+def cache_dir():
+    ''' The directory x4c downloads regrid weight files into
+
+    Resolution order:
+
+    1. ``$X4C_CACHE_DIR``, if set
+    2. ``$XDG_CACHE_HOME/x4c``, if set
+    3. ``~/.cache/x4c``
+
+    Deliberately *not* the installed package directory: that fails outright on a
+    read-only or shared ``site-packages``, and in an editable install it drops
+    multi-MB binaries into the source tree.
+    '''
+    base = os.environ.get('X4C_CACHE_DIR')
+    if not base:
+        xdg = os.environ.get('XDG_CACHE_HOME') or os.path.join(os.path.expanduser('~'), '.cache')
+        base = os.path.join(xdg, 'x4c')
+    return base
+
+
+def fetch_wgt_file(fname, verbose=True):
+    ''' Return a local path to the weight file `fname`, downloading it if needed
+
+    Looks in the user cache first, then alongside the package (so files shipped in
+    the wheel, or already sitting in a source checkout, are still found), and only
+    then downloads into the cache.
+
+    Args:
+        fname (str): the file's basename, e.g. ``map_ne30pg3_TO_1x1d_aave.nc.gz``
+
+    Returns:
+        str: an existing local path
+    '''
+    cached = os.path.join(cache_dir(), fname)
+    if os.path.exists(cached):
+        return cached
+
+    # files bundled with the package, or left in a source checkout by older versions
+    packaged = os.path.join(os.path.dirname(__file__), 'regrid_wgts', fname)
+    if os.path.exists(packaged):
+        return packaged
+
+    url = f'{WGTS_URL}/{fname}'
+    if verbose: p_header(f'Downloading the weight file from: {url}')
+    download(url, cached)
+    if verbose: p_success(f'>>> cached at: {cached}')
+    return cached
+
+
+def download(url: str, fname: str, chunk_size=1024, show_bar=True, timeout=60):
+    ''' Download `url` to `fname`, atomically
+
+    Two failure modes this guards against, both of which used to poison the cache:
+
+    - **An HTTP error body written as if it were data.** Without
+      `raise_for_status()`, a 404 wrote GitHub's HTML error page into the target,
+      and since callers only check `os.path.exists` the corrupt file was never
+      re-fetched -- every later run failed inside `xr.open_dataset` with an
+      unrelated-looking error.
+    - **A partial file from an interrupted transfer.** The download goes to a
+      temporary path in the same directory and is renamed into place only after it
+      completes, so `fname` either does not exist or is whole.
+    '''
+    dirname = os.path.dirname(fname) or '.'
+    os.makedirs(dirname, exist_ok=True)
+
+    resp = requests.get(url, stream=True, timeout=timeout)
+    resp.raise_for_status()
     total = int(resp.headers.get('content-length', 0))
-    if show_bar:
-        with open(fname, 'wb') as file, tqdm(
-            desc='Fetching data',
-            total=total,
-            unit='iB',
-            unit_scale=True,
-            unit_divisor=1024,
-        ) as bar:
-            for data in resp.iter_content(chunk_size=chunk_size):
-                size = file.write(data)
-                bar.update(size)
-    else:
-        with open(fname, 'wb') as file:
-            for data in resp.iter_content(chunk_size=chunk_size):
-                size = file.write(data)
+
+    tmp_fname = f'{fname}.part'
+    try:
+        if show_bar:
+            with open(tmp_fname, 'wb') as file, tqdm(
+                desc='Fetching data',
+                total=total,
+                unit='iB',
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as bar:
+                for data in resp.iter_content(chunk_size=chunk_size):
+                    size = file.write(data)
+                    bar.update(size)
+        else:
+            with open(tmp_fname, 'wb') as file:
+                for data in resp.iter_content(chunk_size=chunk_size):
+                    file.write(data)
+
+        os.replace(tmp_fname, fname)
+    except BaseException:
+        # never leave a truncated file where a valid cache entry is expected
+        if os.path.exists(tmp_fname):
+            os.remove(tmp_fname)
+        raise
 
 
 def move_with_overwrite(src, dst_dir):
@@ -706,7 +869,7 @@ def rsync_move(src_paths, dst_dir):
     for path in src_paths:
         cmd += [str(path)]
     cmd += [str(dst_dir)]
-    print('>>> {cmd}')
+    print(f'>>> {" ".join(cmd)}')
     subprocess.run(cmd, check=True)
 
 

@@ -1,0 +1,38 @@
+# Conda environment for running the x4c test suite (used by .github/workflows/tests.yml).
+#
+# This lists the *actual* import-time requirements of the package, which is a
+# superset of `pyproject.toml`'s `dependencies` — see review finding 4.1. Several
+# of these (xesmf, esmpy, geocat-comp, cartopy) are conda-only, which is why CI
+# installs the package with `--no-deps` and gets its dependencies from here.
+name: x4c-test
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.12
+  # declared in pyproject.toml
+  - netCDF4
+  - xarray>=2025.1
+  - dask
+  - nc-time-axis
+  - colorama
+  - tqdm
+  - eofs
+  # imported at module load but NOT declared in pyproject.toml (finding 4.1)
+  - numpy
+  - pandas
+  - requests
+  - python-dateutil
+  - matplotlib-base
+  - cartopy
+  - cftime
+  - xesmf
+  - esmpy
+  - geocat-comp
+  # `x4c.case` does `from mpi4py import MPI` at import time (finding 3.6), so the
+  # whole package is unimportable without it. mpich is used rather than openmpi
+  # because it initializes cleanly in containers without extra MCA settings.
+  - mpi4py
+  - mpich
+  # test tooling
+  - pytest
+  - pytest-cov

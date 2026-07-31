@@ -1,12 +1,11 @@
 import os
 import glob
+from collections import defaultdict
 import pandas as pd
 import gzip
-import datetime
 from tqdm import tqdm
 import xarray as xr
 import multiprocessing as mp
-from mpi4py import MPI
 import pathlib
 import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -21,6 +20,41 @@ from copy import deepcopy
 
 from . import core, utils, diags
 from .spell import Spell
+
+
+class _star:
+    ''' Adapt a function of many args for `imap_unordered`, which passes one
+
+    A module-level class rather than a lambda or closure because the wrapped callable
+    has to survive pickling to the worker processes.
+    '''
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, args):
+        return self.func(*args)
+
+
+def _get_mpi_comm():
+    ''' Import mpi4py lazily and return (comm, rank, size)
+
+    Deliberately not a module-level import: `from mpi4py import MPI` initializes the
+    MPI runtime for *every* user of x4c, including notebook sessions that only ever
+    touch `Timeseries`. That can emit warnings, interact badly with forked worker
+    processes, and makes an MPI stack a hard requirement for pure analysis work.
+    Only `bigbang`/`bigcrunch`/`gen_ts` actually need it.
+    '''
+    try:
+        from mpi4py import MPI
+    except ImportError as e:
+        raise ImportError(
+            'mpi4py is required for the parallel timeseries generation methods '
+            '(`bigbang`, `bigcrunch`, `gen_ts`). Install it via '
+            '`conda install -c conda-forge mpi4py`.'
+        ) from e
+
+    comm = MPI.COMM_WORLD
+    return comm, comm.Get_rank(), comm.Get_size()
 
 class History:
     '''Handle CESM history files for a single case.
@@ -75,15 +109,18 @@ class History:
                     avoid_list=self.avoid_list,
                 )
                 hstr = utils.get_hstr(paths, casename=self.casename)
-                self.comps_info[comp] = hstr
-            else:
-                self.comps_info[comp] = hstr
+            elif isinstance(hstr, str):
+                # a single hstr given as a plain string, e.g. `comps_info={'atm': 'h0a'}`;
+                # wrap it so the loops below iterate over hstrs rather than characters
+                hstr = [hstr]
+
+            self.comps_info[comp] = hstr
 
             for hs in hstr:
                 self.paths[comp][hs] = utils.find_paths(
                     self.root_dir, self.path_pattern,
                     comp=comp, hstr=hs,
-                    avoid_list=avoid_list,
+                    avoid_list=self.avoid_list,  # not the bare arg: keeps the 'once' default applied
                 )
                 utils.p_success(f'>>> case.paths["{comp}"]["{hs}"] created')
 
@@ -180,9 +217,7 @@ class History:
 
         Each MPI rank handles a subset of (file,variable) tasks.
         '''
-        comm = MPI.COMM_WORLD
-        rank = comm.Get_rank()
-        size = comm.Get_size()
+        comm, rank, size = _get_mpi_comm()
 
         output_dirpath = pathlib.Path(output_dirpath)
         if rank == 0: output_dirpath.mkdir(parents=True, exist_ok=True)
@@ -199,7 +234,11 @@ class History:
                 self.isolate_vn(*arg)
         else:
             with mp.Pool(processes=nproc) as p:
-                p.starmap(self.isolate_vn, tqdm(tasks, total=len(tasks), desc=desc))
+                # imap_unordered, not starmap: starmap consumes the whole iterable up
+                # front, so a tqdm wrapped around it reports 100% before any work runs
+                for _ in tqdm(p.imap_unordered(_star(self.isolate_vn), tasks),
+                              total=len(tasks), desc=desc):
+                    pass
     
     def get_hstr_based_on_vn(self, vn):
         '''Return the first hstr that contains variable `vn`.
@@ -262,9 +301,7 @@ class History:
 
         Coordinates work across MPI ranks similar to `bigbang`.
         '''
-        comm = MPI.COMM_WORLD
-        rank = comm.Get_rank()
-        size = comm.Get_size()
+        comm, rank, size = _get_mpi_comm()
 
         output_dirpath = pathlib.Path(output_dirpath)
         if rank == 0: output_dirpath.mkdir(parents=True, exist_ok=True)
@@ -280,7 +317,9 @@ class History:
                 self.merge_vn(*arg)
         else:
             with mp.Pool(processes=nproc) as p:
-                p.starmap(self.merge_vn, tqdm(tasks, total=len(tasks), desc=desc))
+                for _ in tqdm(p.imap_unordered(_star(self.merge_vn), tasks),
+                              total=len(tasks), desc=desc):
+                    pass
 
     def gen_ts(self, output_dirpath, staging_dirpath=None, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'],
                timespan=None, timestep=None, timestep_unit='year',
@@ -291,17 +330,21 @@ class History:
         (`bigcrunch`) stages and moves results from staging to final
         output directories.
         '''
-        comm = MPI.COMM_WORLD
-        rank = comm.Get_rank()
-        size = comm.Get_size()
+        comm, rank, size = _get_mpi_comm()
 
         if staging_dirpath is None: staging_dirpath = output_dirpath
         pathlib.Path(staging_dirpath).mkdir(parents=True, exist_ok=True)
         if timespan is None:
             raise ValueError('Please specify `timespan`.')
-        else:
-            if not isinstance(timespan[0], str) and not isinstance(timespan[-1], str):
-                timespan = utils.timespan_int2str(timespan)
+        if timestep is None:
+            # otherwise this surfaces much later as `TypeError: unsupported operand
+            # type(s) for *: 'NoneType' and 'int'` inside parse_timestamps
+            raise ValueError(
+                'Please specify `timestep` (the chunk length of each output file, in '
+                f'units of `timestep_unit={timestep_unit!r}`), e.g. `timestep=10`.'
+            )
+        # element-wise, so a mixed tuple like ('0001-01', 20) is handled correctly
+        timespan = utils.normalize_timespan(timespan)
 
         timespan_list = utils.parse_timestamps(timespan, timestep=timestep, timestep_unit=timestep_unit)
         if not isinstance(comps, dict): comps = {comp: None for comp in comps}
@@ -365,13 +408,12 @@ class History:
             if src_paths:
                 with mp.Pool(processes=nproc) as pool:
                     arg_list = [(src_path, dst_dir) for src_path in src_paths]
-                    pool.starmap(
-                        utils.move_and_overwrite,
-                        tqdm(
-                            arg_list, total=len(arg_list),
-                            desc=f'[Rank {rank}] Moving files from {bigcrunch_dir} to {dst_dir}',
-                        )
-                    )
+                    for _ in tqdm(
+                        pool.imap_unordered(_star(utils.move_and_overwrite), arg_list),
+                        total=len(arg_list),
+                        desc=f'[Rank {rank}] Moving files from {bigcrunch_dir} to {dst_dir}',
+                    ):
+                        pass
         comm.Barrier()
 
         clean_tasks = comm.bcast(clean_tasks if rank == 0 else None, root=0)
@@ -388,278 +430,87 @@ class History:
 
 
 
-    # def split_ds(self, comp, in_path, output_dirpath, overwrite=False, nco=True):
-    #     if not nco: ds = xr.load_dataset(in_path)
-    #     for vn in self.vns[comp]:
-    #         bn_elements = os.path.basename(in_path).split('.')
-    #         bn_elements.insert(-2, vn)
 
-    #         if self.casename is not None:
-    #             fname = '.'.join(bn_elements[-5:])
-    #             fname = f'{self.casename}.{fname}'
-    #         else:
-    #             fname = '.'.join(bn_elements)
+    def find_timespan_files(self, timespan, comps=['atm', 'ice', 'ocn', 'rof', 'lnd']):
+        ''' List the history files within a timespan, without touching them
 
-    #         out_path = os.path.join(output_dirpath, fname)
-    #         if overwrite or not os.path.exists(out_path):
-    #             if os.path.exists(out_path): os.remove(out_path)
-    #             vns = self.vns[comp].copy()
-    #             vns.remove(vn)
-    #             if nco:
-    #                 cmd = f'ncks -C -x -v {",".join(vns)} {in_path} -o {out_path}'
-    #                 subprocess.run(cmd, shell=True)
-    #             else:
-    #                 ds_vn = ds.drop_vars(vns)
-    #                 ds_vn.to_netcdf(out_path)
-    #                 ds_vn.close()
-
-    #     if not nco: ds.close()
-
-    # def bigbang(self, comp, output_dirpath, timespan=None, overwrite=False, nproc=1, nco=True):
-    #     output_dirpath = pathlib.Path(output_dirpath)
-    #     if not output_dirpath.exists():
-    #         output_dirpath.mkdir(parents=True, exist_ok=True)
-    #         # utils.p_success(f'>>> output directory created at: {output_dirpath}')
-
-    #     paths = self.get_paths(comp, timespan=timespan)
-    #     if nproc == 1:
-    #         for path in tqdm(paths, desc='Spliting history files'):
-    #             self.split_ds(comp, in_path=path, output_dirpath=output_dirpath, overwrite=overwrite, nco=nco)
-    #     else:
-    #         utils.p_hint(f'>>> nproc: {nproc}')
-    #         with mp.Pool(processes=nproc) as p:
-    #             arg_list = []
-    #             for path in paths:
-    #                 arg_list.append((comp, path, output_dirpath, overwrite, nco))
-    #             p.starmap(self.split_ds, tqdm(arg_list, total=len(arg_list), desc=f'Spliting history files'))
-
-    # def merge_ds(self, vn, comp, input_dirpath, output_dirpath, timespan=None, overwrite=False, nco=True):
-    #     paths = sorted(glob.glob(os.path.join(input_dirpath, f'*.{vn}.*.nc')))
-    #     if timespan is None:
-    #         paths_sub = paths
-    #     else:
-    #         syr, eyr = timespan
-    #         paths_sub = []
-    #         for path in paths:
-    #             year = int(path.split('.')[-2].split('-')[0])
-    #             if (year >= syr and year <= eyr) or (year >= syr and year <= eyr):
-    #                 paths_sub.append(path)
-
-    #     date_start = ''.join(paths[0].split('.')[-2].split('-'))
-    #     date_end = ''.join(paths[-1].split('.')[-2].split('-'))
-
-    #     bn_elements = os.path.basename(paths[0]).split('.')
-    #     bn_elements[-2] = f'{date_start}-{date_end}'
-
-    #     if self.casename is not None:
-    #         fname = '.'.join(bn_elements[-5:])
-    #         fname = f'{self.casename}.{fname}'
-    #     else:
-    #         fname = '.'.join(bn_elements)
-    #     out_path = os.path.join(output_dirpath, fname)
-
-    #     if overwrite or not os.path.exists(out_path):
-    #         if os.path.exists(out_path): os.remove(out_path)
-    #         if nco:
-    #             cmd = f'ncrcat {" ".join(paths_sub)} -o {out_path}'
-    #             subprocess.run(cmd, shell=True)
-
-    #         else:
-    #             if comp == 'ocn':
-    #                 ds =  xr.open_mfdataset(paths_sub, coords='minimal', data_vars=[vn], compat='override')
-    #             else:
-    #                 ds_list = [xr.load_dataset(path) for path in paths_sub]
-    #                 ds = xr.concat(ds_list, dim='time', data_vars=[vn], coords='minimal')
-
-    #             ds.to_netcdf(out_path)
-    #             ds.close()
-
-    # def bigcrunch(self, comp, input_dirpath, output_dirpath, timespan=None, overwrite=False, nproc=1, nco=True):
-    #     output_dirpath = pathlib.Path(output_dirpath)
-    #     if not output_dirpath.exists():
-    #         output_dirpath.mkdir(parents=True, exist_ok=True)
-    #         utils.p_success(f'>>> output directory created at: {output_dirpath}')
-
-    #     desc = 'Merging variables'
-    #     if nproc == 1:
-    #         for vn in tqdm(self.vns[comp], desc=desc):
-    #             self.merge_ds(vn, comp, input_dirpath=input_dirpath, output_dirpath=output_dirpath, timespan=timespan, overwrite=overwrite, nco=nco)
-    #     else:
-    #         utils.p_hint(f'>>> nproc: {nproc}')
-    #         with mp.Pool(processes=nproc) as p:
-    #             arg_list = []
-    #             for vn in self.vns[comp]:
-    #                 arg_list.append((vn, comp, input_dirpath, output_dirpath, timespan, overwrite, nco))
-    #             p.starmap(self.merge_ds, tqdm(arg_list, total=len(arg_list), desc=desc))
-
-    # def gen_ts(self, output_dirpath, comps=['atm', 'ocn', 'lnd', 'ice', 'rof'], timestep=50, timespan=None,
-    #            dir_structure='comp/proc/tseries/month_1' , overwrite=False, nproc=1, nco=True):
-
-    #     syr = timespan[0]
-    #     nt = (timespan[-1] - timespan[0] + 1) // timestep
-    #     timespan_list = []
-    #     for i in range(nt):
-    #         timespan_list.append((syr, syr+timestep-1))
-    #         syr += timestep 
-
-    #     for comp in comps:
-    #         utils.p_header(f'>>> Processing component: {comp}')
-
-    #         bigbang_dir = os.path.join(output_dirpath, f'.bigbang_{comp}')
-    #         if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-    #         self.bigbang(comp=comp, output_dirpath=bigbang_dir, timespan=timespan, overwrite=overwrite, nproc=nproc, nco=nco)
-
-    #         bigcrunch_dir = os.path.join(output_dirpath, dir_structure.replace('comp', comp))
-    #         self.bigcrunch(comp=comp, input_dirpath=bigbang_dir, output_dirpath=bigcrunch_dir, timespan=timespan, overwrite=overwrite, nproc=nproc, nco=nco)
-
-    #     for comp in comps:
-    #         utils.p_header(f'>>> Removing temporary files at: {bigbang_dir}')
-    #         bigbang_dir = os.path.join(output_dirpath, f'.bigbang_{comp}')
-    #         if os.path.exists(bigbang_dir): shutil.rmtree(bigbang_dir)
-
-
-
-
-    # def _split_vn(self, path, comp, vn, output_dirpath, rewrite=False):
-    #     date = os.path.basename(path).split('.')[-2]
-    #     out_path = os.path.join(output_dirpath, f'{comp}.{vn}.{date}.nc')
-    #     if rewrite or not os.path.exists(out_path):
-    #         da = xr.open_dataset(path)[vn]
-    #         da.to_netcdf(out_path)
-    #         da.close()
-    
-    # def split_hist(self, comp, output_dirpath, timespan=None, nproc=1):
-    #     output_dirpath = pathlib.Path(output_dirpath)
-    #     if not output_dirpath.exists():
-    #         output_dirpath.mkdir(parents=True, exist_ok=True)
-    #         utils.p_success(f'>>> output directory created at: {output_dirpath}')
-
-    #     paths = self.get_paths(comp, timespan=timespan)
-
-    #     with mp.Pool(processes=nproc) as p:
-    #         arg_list = []
-    #         for path in paths:
-    #             for vn in self.vns[comp]:
-    #                 arg_list.append((path, comp, vn, f'{output_dirpath}/.{timespan[0]}-{timespan[1]}'))
-    #         p.starmap(self._split_vn, tqdm(arg_list, total=len(arg_list), desc=f'Spliting history files'))
-
-    # def get_ts(self, comp, vn, timespan=None, nproc=1):
-    #     paths = self.get_paths(comp, timespan=timespan)
-
-    #     with mp.Pool(processes=nproc) as p:
-    #         arg_list = [(path, ) for path in paths]
-    #         ds_list = p.starmap(xr.open_dataset, tqdm(arg_list, total=len(paths), desc=f'Loading history files'))
-
-    #     ds = xr.concat(ds_list, dim='time', data_vars=[vn])
-
-    #     da = ds[vn]
-    #     ds_out = ds.drop_vars(self.vns[comp])
-    #     ds_out[vn] = da
-    #     return ds_out
-
-    # def save_ts(self, comp, vn, output_dirpath,timespan=None, overwrite=False, casename=None):
-    #     output_dirpath = pathlib.Path(output_dirpath)
-    #     if not output_dirpath.exists():
-    #         output_dirpath.mkdir(parents=True, exist_ok=True)
-    #         utils.p_success(f'>>> output directory created at: {output_dirpath}')
-
-    #     paths = self.get_paths(comp, timespan=timespan)
-    #     date_start = ''.join(paths[0].split('.')[-2].split('-'))
-    #     date_end = ''.join(paths[-1].split('.')[-2].split('-'))
-
-    #     bn_elements = os.path.basename(self.paths[comp][0]).split('.')
-    #     bn_elements[-2] = f'{date_start}-{date_end}'
-    #     bn_elements.insert(-2, vn)
-
-    #     if casename is not None:
-    #         fname = '.'.join(bn_elements[-5:])
-    #         fname = f'{casename}.{fname}'
-    #     else:
-    #         fname = '.'.join(bn_elements)
-
-    #     out_path = os.path.join(output_dirpath, fname)
-
-    #     if overwrite or not os.path.exists(out_path):
-    #         ds = self.get_ts(comp, vn, timespan=timespan)
-    #         ds.to_netcdf(out_path)
-    #         ds.close()
-
-    # def gen_ts(self, output_dirpath, comp=None, vns=None, timestep=50, timespan=None, dir_structure=None, overwrite=False,
-    #            nproc=1, casename=None):
-    #     if comp is None: raise ValueError('Please specify component via the argument `comp`.')
-    #     if timespan is None: raise ValueError('Please specify timespan via the argument `timespan`.')
-    #     if vns is None: vns = self.get_real_vns(comp)
-    #     if dir_structure is None: dir_structure = f'{comp}/proc/tseries/month_1' 
-    #     output_dirpath = os.path.join(output_dirpath, dir_structure)
-
-    #     syr = timespan[0]
-    #     nt = (timespan[-1] - timespan[0] + 1) // timestep
-    #     timespan_list = []
-    #     for i in range(nt):
-    #         timespan_list.append((syr, syr+timestep-1))
-    #         syr += timestep 
-
-    #     utils.p_header(f'>>> Generating timeseries for {len(vns)} variables:')
-    #     for i in range(len(vns)//10+1):
-    #         print(vns[10*i:10*i+10])
-
-    #     if nproc == 1:
-    #         for v in tqdm(vns, total=len(vns), desc=f'Generating timeseries files'):
-    #             for span in timespan_list:
-    #                 self.save_ts(comp, v, output_dirpath=output_dirpath, timespan=span, overwrite=overwrite, casename=casename)
-    #     else:
-    #         utils.p_hint(f'>>> nproc: {nproc}')
-    #         with mp.Pool(processes=nproc) as p:
-    #             arg_list = []
-    #             for v in vns:
-    #                 for span in timespan_list:
-    #                     arg_list.append((comp, v, output_dirpath, span, overwrite, casename))
-
-    #             p.starmap(self.save_ts, tqdm(arg_list, total=len(vns)*len(timespan_list), desc=f'Generating timeseries files'))
-
-    #     utils.p_success(f'>>> {len(timespan_list)*len(vns)} climo files created in: {output_dirpath}')
-
-    def rm_timespan(self, timespan, comps=['atm', 'ice', 'ocn', 'rof', 'lnd'], nworkers=None, rehearsal=True):
-        ''' Rename the archive files within a timespan
+        Resolves the glob in Python rather than through a shell, so no part of
+        `root_dir` is ever interpreted as shell syntax.
 
         Args:
-            timespan (tuple or list): [start_year, end_year] with elements being integers
+            timespan (tuple or list): [start_year, end_year], inclusive, integers
+            comps (list): components to search
+
+        Returns:
+            list of str: matching paths, sorted
         '''
-        if nworkers is None:
-            nworkers = threading.active_count()
-            utils.p_header(f'nworkers = {nworkers}')
-
         start_year, end_year = timespan
-        year_list = []
-        for y in range(start_year, end_year+1):
-            year_list.append(f'{y:04d}')
-
-        def rm_path(year, comp=None, rehearsal=True):
-            if rehearsal:
-                if comp is None:
-                    cmd = f'ls {self.root_dir}/*/hist/*{year}-[01][0-9][-.]*'
-                else:
-                    cmd = f'ls {self.root_dir}/{comp}/hist/*{year}-[01][0-9][-.]*'
-            else:
-                if comp is None:
-                    cmd = f'rm -f {self.root_dir}/*/hist/*{year}-[01][0-9][-.]*'
-                else:
-                    cmd = f'rm -f {self.root_dir}/{comp}/hist/*{year}-[01][0-9][-.]*'
-
-            subprocess.run(cmd, shell=True)
-            
-        if comps == ['atm', 'ice', 'ocn', 'rof', 'lnd']:
-            with tqdm(desc=f'Removing files for year', total=len(year_list)) as pbar:
-                with ThreadPoolExecutor(nworkers) as exe:
-                    futures = [exe.submit(rm_path, year, comp=None, rehearsal=rehearsal) for year in year_list]
-                    [pbar.update(1) for future in as_completed(futures)]
-        else:
+        paths = []
+        for y in range(start_year, end_year + 1):
             for comp in comps:
-                utils.p_header(f'Processing {comp} ...')
-                with tqdm(desc=f'Removing files for year #', total=len(year_list)) as pbar:
-                    with ThreadPoolExecutor(nworkers) as exe:
-                        futures = [exe.submit(rm_path, year, comp=comp, rehearsal=rehearsal) for year in year_list]
-                        [pbar.update(1) for future in as_completed(futures)]
+                pattern = os.path.join(
+                    self.root_dir, comp, 'hist', f'*{y:04d}-[01][0-9][-.]*',
+                )
+                paths.extend(glob.glob(pattern))
+        return sorted(set(paths))
+
+    def rm_timespan(self, timespan, comps=['atm', 'ice', 'ocn', 'rof', 'lnd'],
+                    nworkers=None, rehearsal=True):
+        ''' Delete the archived history files within a timespan
+
+        This is the one destructive operation in x4c, so it is deliberately
+        conservative:
+
+        - `rehearsal=True` (the default) only *reports* what would be deleted.
+        - The file list is resolved with `glob` and removed with `os.remove`, rather
+          than interpolated into a `rm -f ... shell=True` command. A `root_dir`
+          containing a space or a shell metacharacter used to change which files were
+          deleted.
+        - The exact list is printed before anything is removed.
+
+        Args:
+            timespan (tuple or list): [start_year, end_year], inclusive, integers
+            comps (list): components to clean
+            nworkers (int): parallel workers for the deletion (default: 8)
+            rehearsal (bool): if True, only list the files; nothing is deleted
+
+        Returns:
+            list of str: the paths that were (or would be) removed
+        '''
+        # the old default was `threading.active_count()`, which is however many
+        # threads happen to be alive -- not a meaningful degree of parallelism
+        if nworkers is None: nworkers = 8
+
+        paths = self.find_timespan_files(timespan, comps=comps)
+
+        if len(paths) == 0:
+            utils.p_warning(f'>>> No history files found for timespan {timespan} in {comps}.')
+            return []
+
+        if rehearsal:
+            utils.p_header(f'>>> [rehearsal] {len(paths)} files would be removed:')
+            for p in paths:
+                print(p)
+            utils.p_hint('>>> Nothing was deleted. Re-run with `rehearsal=False` to remove them.')
+            return paths
+
+        utils.p_warning(f'>>> Removing {len(paths)} files ...')
+
+        def rm_path(path):
+            try:
+                os.remove(path)
+            except FileNotFoundError:
+                pass  # already gone; nothing to do
+
+        with tqdm(desc='Removing files', total=len(paths)) as pbar:
+            with ThreadPoolExecutor(nworkers) as exe:
+                futures = [exe.submit(rm_path, p) for p in paths]
+                for future in as_completed(futures):
+                    future.result()  # surface any unexpected error
+                    pbar.update(1)
+
+        utils.p_success(f'>>> {len(paths)} files removed.')
+        return paths
 
 
 
@@ -707,34 +558,25 @@ class Timeseries:
         self.ds = {}
         self.diags = {}
 
-        self.paths = {}
-        self.vns = {}
-        for path in self.paths_all:
-            comp = path.split('/')[-5]
-            fname = os.path.basename(path)
-            vn = fname.split('.')[-3]
-            casename_hstr = fname.split(f'.{vn}.')[0]
-            hstr = casename_hstr.split(self.casename)[-1][1:]
-            if comp not in self.paths:
-                self.paths[comp] = {}
-            if hstr not in self.paths[comp]:
-                self.paths[comp][hstr] = {}
-            if vn not in self.paths[comp][hstr]:
-                self.paths[comp][hstr][vn] = []
-
-            if comp not in self.vns:
-                self.vns[comp] = {}
-            if hstr not in self.vns[comp]:
-                self.vns[comp][hstr] = []
+        # one pass, not two: the original walked `paths_all` twice, the first time only
+        # to create empty containers. `defaultdict` collapses that.
+        paths = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+        vns = defaultdict(lambda: defaultdict(set))
 
         for path in self.paths_all:
-            comp = path.split('/')[-5]
-            fname = os.path.basename(path)
-            vn = fname.split('.')[-3]
-            casename_hstr = fname.split(f'.{vn}.')[0]
-            hstr = casename_hstr.split(self.casename)[-1][1:]
-            self.paths[comp][hstr][vn].append(path)
-            self.vns[comp][hstr].append(vn)
+            parsed = self._parse_ts_path(path)
+            if parsed is None:
+                continue
+            comp, hstr, vn = parsed
+            paths[comp][hstr][vn].append(path)
+            # a set, so a variable split across N timespan files is listed once rather
+            # than N times
+            vns[comp][hstr].add(vn)
+
+        # freeze back to plain dicts so `case.paths['atm']['nope']` raises KeyError
+        # instead of silently materializing an empty entry
+        self.paths = {c: {h: dict(v) for h, v in hs.items()} for c, hs in paths.items()}
+        self.vns = {c: {h: sorted(v) for h, v in hs.items()} for c, hs in vns.items()}
 
         for comp in self.paths:
             for hstr in self.paths[comp]:
@@ -744,20 +586,48 @@ class Timeseries:
             for hstr in self.vns[comp]:
                 utils.p_success(f'>>> case.vns["{comp}"]["{hstr}"] created')
 
-    # def get_paths(self, comp, hstr, vn, timespan=None):
-    #     paths = self.paths[comp][hstr][vn]
-    #     if timespan is None:
-    #         paths_sub = paths
-    #     else:
-    #         syr, eyr = timespan
-    #         paths_sub = []
-    #         for path in paths:
-    #             syr_tmp = int(path.split('.')[-2].split('-')[0][:4])
-    #             eyr_tmp = int(path.split('.')[-2].split('-')[1][:4])
-    #             if (syr_tmp >= syr and syr_tmp <= eyr) or (eyr_tmp >= syr and eyr_tmp <= eyr):
-    #                 paths_sub.append(path)
+    def _parse_ts_path(self, path):
+        ''' Pull (comp, hstr, vn) out of a timeseries path
 
-    #     return paths_sub
+        The layout is positional -- ``<root>/<comp>/proc/tseries/<freq>/<case>.<hstr>.<vn>.<timespan>.nc``
+        -- so validate rather than trust: an unexpected depth or a filename that does
+        not contain the casename used to yield plausible-looking garbage (a directory
+        name as `comp`, a mangled `hstr`) with no indication anything was wrong.
+
+        Returns:
+            tuple or None: (comp, hstr, vn), or None if the path does not match, in
+            which case a warning names the file.
+        '''
+        rel = os.path.relpath(path, self.root_dir)
+        parts = rel.split(os.sep)
+        fname = parts[-1]
+
+        # comp/proc/tseries/<freq>/<file>
+        if len(parts) != 5 or parts[1] != 'proc' or parts[2] != 'tseries':
+            utils.p_warning(f'>>> Skipping unexpected timeseries path layout: {rel}')
+            return None
+
+        comp = parts[0]
+        elements = fname.split('.')
+        if len(elements) < 4:
+            utils.p_warning(f'>>> Skipping unparseable timeseries filename: {fname}')
+            return None
+
+        vn = elements[-3]
+        casename_hstr = fname.split(f'.{vn}.')[0]
+        if not casename_hstr.startswith(self.casename):
+            utils.p_warning(
+                f'>>> Skipping {fname}: does not start with casename `{self.casename}`.'
+            )
+            return None
+
+        hstr = casename_hstr[len(self.casename):].lstrip('.')
+        if hstr == '':
+            utils.p_warning(f'>>> Skipping {fname}: could not determine the history stream.')
+            return None
+
+        return comp, hstr, vn
+
 
     def get_paths(self, comp, hstr, vn, timespan=None):
         '''Return list of timeseries file paths for `vn` under `comp/hstr`.
@@ -785,7 +655,9 @@ class Timeseries:
 
             return paths_sub
         else:
-            return None
+            # empty rather than None, so callers can `len()` it and report
+            # "no files found" instead of raising `TypeError`
+            return []
 
     def get_comp_hstr(self, vn):
         '''Find all (component, hstr) pairs where `vn` is present.'''
@@ -811,22 +683,6 @@ class Timeseries:
         if vtype is None:
             vtype = 'derived' if vn in diags.Registry.funcs else 'raw'
 
-        # if len(found_comp_hstr) == 0:
-        #     if vn in diags.Registry.funcs:
-        #         vtype = 'derived'
-        #     else:
-        #         raise ValueError('The input variable name is unknown.')
-        # elif len(found_comp_hstr) == 1:
-        #     if vn in diags.Registry.funcs:
-        #         vtype = 'derived'
-        #     else:
-        #         vtype = 'raw'
-        #     comp, hstr = found_comp_hstr[0]
-        # else:
-        #     if (comp, hstr) in found_comp_hstr:
-        #         vtype = 'raw'
-        #     else:
-        #         raise ValueError(f'The input variable name belongs to multiple (comp, hstr) pairs: {found_comp_hstr}. Please specify via the argument `comp` and `hstr`.')
 
         if reload: self.clear_ds(vn)
 
@@ -840,8 +696,7 @@ class Timeseries:
                 if comp is None or hstr is None:
                     raise ValueError(f'The input variable name belongs to multiple (comp, hstr) pairs: {found_comp_hstr}. Please specify via the argument `comp` and `hstr`.')
 
-            if timespan is not None and not isinstance(timespan[0], str) and not isinstance(timespan[-1], str):
-                timespan = utils.timespan_int2str(timespan)
+            timespan = utils.normalize_timespan(timespan)
 
             paths = self.get_paths(comp, hstr, vn, timespan=timespan)
             if len(paths) == 0: raise ValueError(f'No timeseries files found for variable `{vn}` in component `{comp}` with hstr `{hstr}` within the timespan `{timespan}`.')
@@ -892,34 +747,21 @@ class Timeseries:
             utils.p_warning(f'>>> Spell `{spell}` is already calculated and the calculation is skipped.')
         else:
             S = Spell(spell)
-            if S.slicing is None:
-                vn = S.vn
-            else:
-                vn = S.vn.split('.')[0]
+            # `Spell.vn` is already the bare name with any slicing call removed, so
+            # no `.split('.')` is needed -- which also stops a dotted variable name
+            # like `NINO3.4` from being truncated to `NINO3`.
+            vn = S.vn
 
-            # if vn in self.diags:
-            #     da = self.diags[vn]
-            #     utils.p_warning(f'>>> Variable `{vn}` is already calculated and the calculation is skipped.')
-            # else:
-            #     if comp is None: comp = self.get_vn_comp(vn)
-            #     if vn in diags.Registry.funcs:
-            #         F = diags.Registry.funcs[vn]
-            #         da = F(self, timespan=timespan, load_idx=load_idx, shift_time=shift_time, verbose=verbose)
-            #     elif (vn, comp) in self.vars_info:
-            #         self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, shift_time=shift_time, verbose=verbose)
-            #         da = self.ds[vn].x.da
-            #     else:
-            #         raise ValueError(f'Unknown diagnostic variable: {vn}')
             if vn in self.diags:
+                # reuse a previously calculated bare-variable spell (e.g. `case.calc('TS')`)
                 da = self.diags[vn]
                 utils.p_warning(f'>>> Variable `{vn}` is already calculated and the calculation is skipped.')
             else:
                 self.load(vn, comp=comp, timespan=timespan, load_idx=load_idx, verbose=verbose, **kws)
-            da = self.ds[vn].x.da
+                da = self.ds[vn].x.da
 
-            if S.slicing is not None:
-                cmd = f'da.{S.slicing}'
-                da = eval(cmd)
+            if S.slicing_method is not None:
+                da = getattr(da, S.slicing_method)(*S.slicing_args, **S.slicing_kwargs)
 
             if S.plev is not None:
                 self.load('PS')
@@ -927,12 +769,8 @@ class Timeseries:
                 hyam = self.ds[vn]['hyam']
                 hybm = self.ds[vn]['hybm']
                 _kws = {'lev_dim': 'lev'}
-                if '(' in S.plev and ')' in S.plev:
-                    new_levels = eval(S.plev.split('plev')[-1])
-                    if type(new_levels) not in (list, tuple):
-                        new_levels = [new_levels]
-
-                    _kws.update({'new_levels': np.array(new_levels)})
+                if S.plev_levels is not None:
+                    _kws['new_levels'] = np.array(S.plev_levels)
 
                 da = da.x.get_plev(ps=PS, hyam=hyam, hybm=hybm, **_kws)
 
@@ -941,28 +779,26 @@ class Timeseries:
                 da = utils.ann_modifier(da, ann_method=S.ann_method, long_name=da.long_name)
 
             if S.regrid is not None:
-                da = eval(f'da.x.{S.regrid}')
+                da = da.x.regrid(*S.regrid_args, **S.regrid_kwargs)
 
             # zavg must run before the horizontal mean: it folds the vertical into a
             # volume weight, so a following sa_method (e.g. gm) yields a true
             # volume-weighted average.
             if S.zavg is not None:
-                da = eval(f'da.x.{S.zavg}')
+                da = da.x.zavg(*S.zavg_args, **S.zavg_kwargs)
 
             if S.sa_method is not None:
-                if S.sa_method in ['gm', 'nhm', 'shm', 'zm', 'gs', 'nhs', 'shs', 'somin']:
-                    da = getattr(da.x, S.sa_method)
-                elif S.sa_method == 'yz':
-                    if da.name == 'MOC':
-                        da = da
-                    else:
+                # `Spell` has already validated the name against Spell.SA_METHODS
+                if S.sa_method == 'yz':
+                    if da.name != 'MOC':
                         da = da.x.zm
                 else:
-                    raise ValueError(f'Unknown spatial average method: {S.sa_method}')
+                    da = getattr(da.x, S.sa_method)
 
-            if da.units == 'degC':
+            units = da.attrs.get('units')
+            if units == 'degC':
                 da.attrs['units'] = '°C'
-            elif da.units == 'K':
+            elif units == 'K':
                 da -= 273.15
                 da.attrs['units'] = '°C'
 
@@ -1087,6 +923,12 @@ class Timeseries:
             'MOC': (1, 3),
         } if ax_loc is None else ax_loc
 
+        # if the caller supplied their own spells but no layout, lay them out in order
+        # rather than indexing the default `ax_loc` with unknown keys
+        if set(ax_loc) != set(spells):
+            ncol_tmp = np.min([len(spells), 4]) if ncol is None else ncol
+            ax_loc = {k: (i // ncol_tmp, i % ncol_tmp) for i, k in enumerate(spells)}
+
         nsubplots = len(spells)
         utils.p_header(f'>>> Plotting {nsubplots} subplots')
         ncol = np.min([nsubplots, 4]) if ncol is None else ncol
@@ -1132,16 +974,26 @@ class Timeseries:
             else:
                 self.calc(v, timespan=timespan, recalculate=recalculate)
 
+        # `.get`, not `[...]`: `spells` is user-overridable, so a custom key is not in
+        # these hard-coded dicts and used to raise KeyError
         for k, v in spells.items():
             utils.p_header(f'>>> Plotting {k}')
+            title = title_dict.get(k, k)
+            color = clr_dict.get(k)
             if len(self.diags[v].dims) == 1 and 'time' in self.diags[v].dims:
                 # timeseries
                 if '_clim' in k:
-                    self.plot(v, ax=ax[k], title=title_dict[k], color=clr_dict[k], alpha=1)
+                    self.plot(v, ax=ax[k], title=title, color=color, alpha=1)
                 else:
-                    self.plot(v, ax=ax[k], title=title_dict[k], color=clr_dict[k], alpha=0.1)
-                    vals = self.diags[v].rolling(time=roll_int, center=True).mean().data
-                    ax[k].plot(self.diags[v].time, vals, color=clr_dict[k])
+                    self.plot(v, ax=ax[k], title=title, color=color, alpha=0.1)
+                    # clamp the smoothing window to the record: the default (50) is
+                    # tuned for long runs, and xarray raises
+                    # "Moving window must be between 1 and N" on anything shorter
+                    nt = self.diags[v].sizes['time']
+                    win = int(np.clip(roll_int, 1, nt))
+                    if win > 1:
+                        vals = self.diags[v].rolling(time=win, center=True).mean().data
+                        ax[k].plot(self.diags[v].time, vals, color=color)
 
                 if timespan is not None and 'climo_period' not in self.diags[v].attrs:
                     start_date = cftime.DatetimeNoLeap(timespan[0], 1, 1)
@@ -1149,9 +1001,9 @@ class Timeseries:
                     ax[k].set_xlim(start_date, end_date)
 
             elif k in ['TS']:
-                self.plot(v, ax=ax[k], title=title_dict[k], cbar_kwargs={'orientation': 'horizontal', 'aspect': 20, 'pad': 0.05})
+                self.plot(v, ax=ax[k], title=title, cbar_kwargs={'orientation': 'horizontal', 'aspect': 20, 'pad': 0.05})
             else:
-                self.plot(v, ax=ax[k], title=title_dict[k])
+                self.plot(v, ax=ax[k], title=title)
 
             if ylim_dict is not None and k in ylim_dict:
                 ax[k].set_ylim(ylim_dict[k])
@@ -1164,167 +1016,86 @@ class Timeseries:
                     verticalalignment='bottom',
                     horizontalalignment='right',
                     transform=ax[k].transAxes,
-                    color=clr_dict[k],
+                    color=clr_dict.get(k),
                     fontsize=15,
                 )
 
         return fig, ax
 
-    # def get_climo(self, vn, comp=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
-    #     ''' Generate the climatology file for the given variable
 
-    #     Args:
-    #         slicing (bool): could be problematic
-    #     '''
-    #     shift_time = True if self.cesm_ver == 1 else False
+    def get_ts(self, vn, comp=None, hstr=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
+        '''Open and return a Dataset for `vn`, without caching it in `self.ds`.
 
-    #     if comp is None: comp = self.get_vn_comp(vn)
-    #     grid = self.grid_dict[comp]
-    #     paths = self.get_paths(vn, comp=comp, timespan=timespan)
-    #     ds = core.open_mfdataset(paths, shift_time=shift_time)
+        Applies optional slicing and regridding before returning the Dataset.
 
-    #     if slicing: ds = ds.sel(time=slice(timespan[0], timespan[1]))
-    #     ds_out = ds.x.climo
-    #     ds_out.attrs['comp'] = comp
-    #     ds_out.attrs['grid'] = grid
-    #     if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
-    #     return ds_out
-
-    # def save_climo(self, output_dirpath, vn, comp=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
-    #     shift_time = True if self.cesm_ver == 1 else False
-
-    #     output_dirpath = pathlib.Path(output_dirpath)
-    #     if not output_dirpath.exists():
-    #         output_dirpath.mkdir(parents=True, exist_ok=True)
-    #         utils.p_success(f'>>> output directory created at: {output_dirpath}')
-
-    #     fname = f'{vn}_climo.nc' if self.casename is None else f'{self.casename}_{vn}_climo.nc'
-    #     out_path = os.path.join(output_dirpath, fname)
-    #     if overwrite or not os.path.exists(out_path):
-    #         if os.path.exists(out_path): os.remove(out_path)
-    #         if comp is None: comp = self.get_vn_comp(vn)
-
-    #         climo = self.get_climo(
-    #             vn, comp=comp, timespan=timespan, adjust_month=adjust_month,
-    #             slicing=slicing, regrid=regrid, dlat=dlat, dlon=dlon,
-    #         )
-    #         climo.to_netcdf(out_path)
-    #         climo.close()
-
-    # def gen_climo(self, output_dirpath, comp=None, timespan=None, vns=None, nproc=1, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
-    #     adjust_month = True if self.cesm_ver == 1 else False
-
-    #     if comp is None:
-    #         raise ValueError('Please specify component via the argument `comp`.')
-
-    #     if vns is None:
-    #         vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
-
-    #     utils.p_header(f'>>> Generating climo for {len(vns)} variables:')
-    #     for i in range(len(vns)//10+1):
-    #         print(vns[10*i:10*i+10])
-
-    #     if nproc == 1:
-    #         for v in tqdm(vns, total=len(vns), desc=f'Generating climo files'):
-    #             self.save_climo(
-    #                 output_dirpath, v, comp=comp, timespan=timespan,
-    #                 adjust_month=adjust_month, slicing=slicing,
-    #                 regrid=regrid, dlat=dlat, dlon=dlon,
-    #                 overwrite=overwrite,
-    #             )
-    #     else:
-    #         utils.p_hint(f'>>> nproc: {nproc}')
-    #         with mp.Pool(processes=nproc) as p:
-    #             arg_list = [(output_dirpath, v, comp, timespan, adjust_month, slicing, regrid, dlat, dlon, overwrite) for v in vns]
-    #             p.starmap(self.save_climo, tqdm(arg_list, total=len(vns), desc=f'Generating climo files'))
-
-    #     utils.p_success(f'>>> {len(vns)} climo files created in: {output_dirpath}')
-
-    # def save_combined_ts(self, output_dirpath, comp, vns=None, timespan=None, adjust_month=True, overwrite=False, chunk_nt=None):
-    #     output_dirpath = pathlib.Path(output_dirpath)
-    #     if not output_dirpath.exists():
-    #         output_dirpath.mkdir(parents=True, exist_ok=True)
-    #         utils.p_success(f'>>> output directory created at: {output_dirpath}')
-
-    #     if vns is None:
-    #         vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
-
-    #     utils.p_header(f'>>> Combining timeseries files for {len(vns)} variables:')
-    #     for i in range(len(vns)//10+1):
-    #         print(vns[10*i:10*i+10])
-
-    #     fname = f'{timespan[0]}_{timespan[1]}_ts.nc' if self.casename is None else f'{self.casename}_{timespan[0]}_{timespan[1]}_ts.nc'
-    #     out_path = os.path.join(output_dirpath, fname)
-    #     if overwrite or not os.path.exists(out_path):
-    #         paths_list = []
-    #         for vn in vns:
-    #             paths = self.get_paths(vn, comp=comp, timespan=timespan)
-    #             paths_list.append(*paths)
-
-    #         if chunk_nt is None:
-    #             ds = core.open_mfdataset(paths_list, adjust_month=adjust_month, coords='minimal', data_vars='minimal')
-    #         else:
-    #             ds = core.open_mfdataset(paths_list, adjust_month=adjust_month, coords='minimal', data_vars='minimal', chunks={'time': chunk_nt})
-
-    #         # ds.attrs['comp'] = comp
-    #         # ds.attrs['grid'] = self.grid_dict[comp]
-    #         # ds.to_netcdf(out_path)
-    #         # ds.close()
-    #         # utils.p_success(f'>>> Combined timeseries file created at: {out_path}')
-
-    # def get_mean(self, vn, comp, months=list(range(1, 13)), timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
-    #     adjust_month = True if self.cesm_ver == 1 else False
-
-    #     grid = self.grid_dict[comp]
-    #     paths = self.get_paths(vn, comp=comp, timespan=timespan)
-    #     ds = core.open_mfdataset(paths, adjust_month=adjust_month)
-
-    #     if slicing: ds = ds.sel(time=slice(timespan[0], timespan[1]))
-    #     ds_out = ds.x.annualize(months=months)
-    #     ds_out.attrs['comp'] = comp
-    #     ds_out.attrs['grid'] = grid
-    #     if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
-    #     return ds_out
-
-    def get_ts(self, vn, comp, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1):
-        '''Open and return a Dataset for `vn` on `comp`.
-
-        Applies optional slicing and regridding before returning the
-        Dataset; does not cache the result.
+        Args:
+            vn (str): variable name
+            comp (str): component; inferred from `vn` when it is unambiguous
+            hstr (str): history-stream tag; inferred from `vn` when it is unambiguous
+            timespan (tuple): (start, end), as either ints or 'YYYY-MM'-style strings
+            slicing (bool): additionally `.sel` the time axis to `timespan`
+            regrid (bool): regrid to a regular `dlat` x `dlon` grid
         '''
-        adjust_month = True if self.cesm_ver == 1 else False
+        shift_time = True if self.cesm_ver == 1 else False
 
-        grid = self.grid_dict[comp]
-        paths = self.get_paths(vn, comp=comp, timespan=timespan)
-        ds = core.open_mfdataset(paths, adjust_month=adjust_month)
+        if comp is None or hstr is None:
+            found_comp_hstr = self.get_comp_hstr(vn)
+            if len(found_comp_hstr) == 0:
+                raise ValueError(f'The input variable name `{vn}` is unknown.')
+            elif len(found_comp_hstr) > 1:
+                raise ValueError(
+                    f'The input variable name belongs to multiple (comp, hstr) pairs: '
+                    f'{found_comp_hstr}. Please specify via the argument `comp` and `hstr`.'
+                )
+            comp, hstr = found_comp_hstr[0]
 
-        if slicing: ds = ds.sel(time=slice(timespan[0], timespan[1]))
+        timespan = utils.normalize_timespan(timespan)
 
-        ds_out = ds
-        ds_out.attrs['comp'] = comp
-        ds_out.attrs['grid'] = grid
-        if regrid: ds_out = ds_out.x.regrid(dlat=dlat, dlon=dlon)
-        return ds_out
+        paths = self.get_paths(comp, hstr, vn, timespan=timespan)
+        if len(paths) == 0:
+            raise ValueError(
+                f'No timeseries files found for variable `{vn}` in component `{comp}` '
+                f'with hstr `{hstr}` within the timespan `{timespan}`.'
+            )
 
-    def save_means(self, vn, comp, output_dirpath, timespan, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
+        # `comp`/`grid` go through `open_mfdataset` so that `update_ds` also attaches
+        # `gw`/`lat`/`lon`; setting them on `.attrs` afterwards would leave the accessors
+        # without a weight
+        ds = core.open_mfdataset(
+            paths, vn=vn, shift_time=shift_time,
+            comp=comp, hstr=hstr, grid=self.grid_dict[comp],
+        )
+
+        if slicing:
+            if timespan is None:
+                raise ValueError('`slicing=True` requires a `timespan`.')
+            ds = ds.sel(time=slice(timespan[0], timespan[1]))
+
+        if regrid: ds = ds.x.regrid(dlat=dlat, dlon=dlon)
+        return ds
+
+    def save_means(self, vn, comp=None, output_dirpath=None, timespan=None, hstr=None,
+                   slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False):
         '''Save seasonal and annual mean files for `vn` into `output_dirpath`.
 
         Writes files for ANN, DJF, MAM, JJA and SON for the given
         `timespan` and optionally regrids results.
         '''
+        if output_dirpath is None: raise ValueError('Please specify `output_dirpath`.')
+        if timespan is None: raise ValueError('Please specify `timespan`.')
+
         output_dirpath = pathlib.Path(output_dirpath)
-        adjust_month = True if self.cesm_ver == 1 else False
 
         if not output_dirpath.exists():
             output_dirpath.mkdir(parents=True, exist_ok=True)
             utils.p_success(f'>>> output directory created at: {output_dirpath}')
 
-        ds = self.get_ts(vn, comp, timespan=timespan, adjust_month=adjust_month, slicing=slicing, regrid=False)
+        ds = self.get_ts(vn, comp=comp, hstr=hstr, timespan=timespan, slicing=slicing, regrid=False)
 
         sn_dict = {
             'ANN': list(range(1, 13)),
             'DJF': [12, 1, 2],
-            'MAM': [1, 2, 3],
+            'MAM': [3, 4, 5],
             'JJA': [6, 7, 8],
             'SON': [9, 10, 11],
         }
@@ -1345,92 +1116,17 @@ class Timeseries:
                 # )
                 ds_ann = ds.x.annualize(months=months)
                 if regrid: ds_ann = ds_ann.x.regrid(dlat=dlat, dlon=dlon)
-                ds_ann.to_netcdf(out_path)
+                # `.x.to_netcdf`, not `.to_netcdf`: `annualize` carries the grid attrs
+                # (`gw`/`lat`/`lon`/`dz`) over, and those are not serializable
+                ds_ann.x.to_netcdf(out_path)
                 ds_ann.close()
 
-    # def gen_means(self, output_dirpath, comp=None, vns=None, timespan=None, slicing=False, regrid=False, dlat=1, dlon=1, overwrite=False, nproc=1):
-    #     adjust_month = True if self.cesm_ver == 1 else False
-
-    #     if comp is None:
-    #         raise ValueError('Please specify component via the argument `comp`.')
-
-    #     if vns is None:
-    #         vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
-
-    #     utils.p_header(f'>>> Generating seaonal means for {len(vns)} variables:')
-    #     for i in range(len(vns)//10+1):
-    #         print(vns[10*i:10*i+10])
-
-    #     if nproc == 1:
-    #         for vn in vns:
-    #             self.save_means(
-    #                 vn, comp, output_dirpath, timespan, adjust_month=adjust_month, slicing=slicing,
-    #                 regrid=regrid, dlat=dlat, dlon=dlon, overwrite=overwrite, 
-    #             )
-    #     else:
-    #         utils.p_hint(f'>>> nproc: {nproc}')
-    #         with mp.Pool(processes=nproc) as p:
-    #             arg_list = [(vn, comp, output_dirpath, timespan, adjust_month, slicing, regrid, dlat, dlon, overwrite) for vn in vns]
-    #             p.starmap(self.save_means, tqdm(arg_list, total=len(vns), desc=f'Generating seasonal mean files'))
-
-    # def check_timespan(self, comp, vns=None, timespan=None):
-    #     if vns is None:
-    #         vns = [k[0] for k, v in self.vars_info.items() if v[0]==comp]
-    #     elif type(vns) is str:
-    #         vns = [vns]
-
-    #     paths = self.get_paths(vns[0], comp=comp, timespan=timespan)
-    #     if timespan is None:
-    #         syr = int(paths[0].split('.')[-2].split('-')[0][:4])
-    #         eyr = int(paths[-1].split('.')[-2].split('-')[1][:4])
-    #     else:
-    #         syr, eyr = timespan
-
-    #     step_s = int(paths[0].split('.')[-2].split('-')[0][:4])
-    #     step_e = int(paths[0].split('.')[-2].split('-')[1][:4])
-    #     step = step_e - step_s + 1
-
-    #     full_list = []
-    #     for y in range(syr, eyr, step):
-    #         full_list.append(f'{y:04d}01-{y+step-1:04d}12')
-
-    #     df = pd.DataFrame(index=vns, columns=range(1, len(full_list)+1))
-
-    #     for irow, vn in enumerate(vns):
-    #         paths = self.get_paths(vn, comp=comp, timespan=timespan)
-    #         # print(vn, paths)
-
-    #         for icol, timestamp in enumerate(full_list):
-    #             path_elements = paths[icol].split('.')
-    #             path_elements[-2] = timestamp
-    #             path = '.'.join(path_elements)
-    #             if os.path.exists(path):
-    #                 df.iloc[irow, icol] = timestamp
-    #             else:
-    #                 print(path)
-    #                 df.iloc[irow, icol] = f'{timestamp}!'
-
-    #     df = df.fillna('!')
-        
-    #     def style_missing(v, props=''):
-    #         return props if '!' in v else None
-        
-    #     def remove_mark(v):
-    #         if '!' in v:
-    #             v = v.split('!')[0]
-    #         return v
-
-    #     df = df.style.map(style_missing, props='background-color:red;color:white').format(remove_mark)
-    #     return df
 
     def clear_ds(self, vn=None):
         ''' Clear the existing `.ds` property
         '''
         if vn is not None:
-            try:
-                self.ds.pop(vn)
-            except:
-                pass
+            self.ds.pop(vn, None)
         else:
             self.ds = {}
         
@@ -1438,373 +1134,6 @@ class Timeseries:
         '''Return a deep copy of this Timeseries instance.'''
         return deepcopy(self)
 
-    # @dask.delayed
-    # def save_spell(self, spell:str, vn:str, output_path:str, timespan=None, overwrite=True, long_name=None, **kws):
-    #     case = self.copy()
-    #     if overwrite or not os.path.exists(output_path):
-    #         case.calc(spell, timespan=timespan)
-    #         case.diags[spell].name = vn
-    #         da = case.diags[spell]
-    #         if long_name is not None: da.attrs['long_name'] = long_name
-    #         if os.path.exists(output_path): os.remove(output_path)
-    #         da.x.to_netcdf(output_path, **kws)
-
-    # def gen_ts_spell(self, spell:str, vn:str, comp:str, output_dirpath:str, long_name=None, timespan=None, timestep=50, overwrite=True):
-    #     ''' Generate timeseries based on a spell
-    #     '''
-    #     _mdl_hstr_dict = {
-    #         'atm': ('cam', 'h0'),
-    #         'ocn': ('pop', 'h'),
-    #         'lnd': ('clm2', 'h0'),
-    #         'ice': ('cice', 'h'),
-    #         'rof': ('rtm', 'h0'),
-    #     }
-    #     mdl, hstr = _mdl_hstr_dict[comp]
-    #     path_tmp = 'comp/proc/tseries/month_1/'.replace('comp', comp)
-    #     output_path = os.path.join(output_dirpath, path_tmp)
-    #     output_dir = pathlib.Path(os.path.dirname(output_path))
-    #     output_dir.mkdir(parents=True, exist_ok=True)
-
-    #     if timespan is None: raise ValueError('Please specify `timespan`.')
-
-    #     syr = timespan[0]
-    #     nt = (timespan[-1] - timespan[0] + 1) // timestep
-    #     timespan_list = []
-    #     for i in range(nt):
-    #         timespan_list.append((syr, syr+timestep-1))
-    #         syr += timestep 
-
-    #     tasks = []
-    #     for timespan_tmp in timespan_list:
-    #         utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
-    #         filename = 'casename.mdl.h_str.vn.timespan.nc'.replace('casename', self.casename).replace('mdl', mdl).replace('h_str', hstr).replace('vn', vn).replace('timespan', f'{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12')
-    #         output_path = os.path.join(output_dir, filename)
-    #         tasks.append(self.save_spell(spell, vn, timespan=timespan_tmp, long_name=long_name, output_path=output_path, overwrite=overwrite))
-
-    #     dask.compute(*tasks)
-
-        
-    
-    # def gen_ts_spell(self, spell:str, vn:str, comp:str, output_dirpath:str, long_name=None, timespan=None, timestep=50, overwrite=True, nproc=1):
-    #     ''' Generate timeseries based on a spell
-    #     '''
-    #     _mdl_hstr_dict = {
-    #         'atm': ('cam', 'h0'),
-    #         'ocn': ('pop', 'h'),
-    #         'lnd': ('clm2', 'h0'),
-    #         'ice': ('cice', 'h'),
-    #         'rof': ('rtm', 'h0'),
-    #     }
-    #     mdl, hstr = _mdl_hstr_dict[comp]
-    #     path_tmp = 'comp/proc/tseries/month_1/'.replace('comp', comp)
-    #     output_path = os.path.join(output_dirpath, path_tmp)
-    #     output_dir = pathlib.Path(os.path.dirname(output_path))
-    #     output_dir.mkdir(parents=True, exist_ok=True)
-
-    #     if timespan is None: raise ValueError('Please specify `timespan`.')
-
-    #     syr = timespan[0]
-    #     nt = (timespan[-1] - timespan[0] + 1) // timestep
-    #     timespan_list = []
-    #     for i in range(nt):
-    #         timespan_list.append((syr, syr+timestep-1))
-    #         syr += timestep 
-
-    #     # generate timeseries files for each sub-timespan
-    #     if nproc == 1:
-    #         for timespan_tmp in timespan_list:
-    #             utils.p_header(f'>>> Processing timespan: {timespan_tmp}')
-    #             filename = 'casename.mdl.h_str.vn.timespan.nc'.replace('casename', self.casename).replace('mdl', mdl).replace('h_str', hstr).replace('vn', vn).replace('timespan', f'{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12')
-    #             output_path = os.path.join(output_dir, filename)
-    #             self.save_spell(spell, vn, timespan=timespan_tmp, long_name=long_name, output_path=output_path, overwrite=overwrite)
-    #     else:
-    #         utils.p_hint(f'>>> nproc: {nproc}')
-    #         with mp.Pool(processes=nproc) as p:
-    #             arg_list = []
-    #             for timespan_tmp in timespan_list:
-    #                 filename = 'casename.mdl.h_str.vn.timespan.nc'.replace('casename', self.casename).replace('mdl', mdl).replace('h_str', hstr).replace('vn', vn).replace('timespan', f'{timespan_tmp[0]:04d}01-{timespan_tmp[1]:04d}12')
-    #                 output_path = os.path.join(output_dir, filename)
-    #                 arg_list.append((spell, vn, output_path, timespan_tmp,  overwrite, long_name))
-    #             p.starmap(self.save_spell, tqdm(arg_list, total=len(arg_list), desc=f'Saving "{spell}" to files'))
-
-# class Climo:
-#     def __init__(self, root_dir, casename):
-#         self.root_dir = root_dir
-#         self.casename = casename
-#         utils.p_header(f'>>> case.root_dir: {self.root_dir}')
-#         utils.p_header(f'>>> case.casename: {self.casename}')
-
-#     def gen_MONS_climo(self, output_dirpath, climo_period=None):
-#         output_dirpath = pathlib.Path(output_dirpath)
-#         if not output_dirpath.exists():
-#             output_dirpath.mkdir(parents=True, exist_ok=True)
-#             utils.p_header(f'>>> output directory created at: {output_dirpath}')
-
-#         paths = sorted(glob.glob(os.path.join(self.root_dir, '*_climo.nc')))
-#         ds = core.open_mfdataset(paths)
-#         if climo_period is None:
-#             try:
-#                 climo_period = ds.attrs['climo_period']
-#             except:
-#                 pass
-
-#         if climo_period is not None:
-#             fname = f'{self.casename}_{climo_period[0]}_{climo_period[1]}_MONS_climo.nc'
-#         else:
-#             fname = f'{self.casename}_MONS_climo.nc'
-
-#         output_fpath = os.path.join(output_dirpath, fname)
-#         ds.to_netcdf(output_fpath)
-#         utils.p_header(f'>>> MONS_climo generated at: {output_fpath}')
-#         self.MONS_climo_path = output_fpath
-#         utils.p_success(f'>>> case.MONS_climo_path created')
-
-#     def gen_seasons_climo(self, MONS_climo_path=None):
-#         if MONS_climo_path is None:
-#             MONS_climo_path = self.MONS_climo_path
-
-#         ds = xr.open_dataset(MONS_climo_path)
-
-#         sn_dict = {
-#             'ANN': list(range(1, 13)),
-#             'DJF': [12, 1, 2],
-#             'MAM': [1, 2, 3],
-#             'JJA': [6, 7, 8],
-#             'SON': [9, 10, 11],
-#         }
-
-#         for sn, months in sn_dict.items():
-#             output_fpath = MONS_climo_path.replace('MONS', sn)
-#             if os.path.exists(output_fpath):
-#                 os.remove(output_fpath)
-
-#             ds_mean = ds.sel(time=months).mean('time').expand_dims('time')
-#             ds_mean = ds_mean.assign_coords(time=[ds.coords['time'][0]])
-#             ds_mean.to_netcdf(output_fpath, unlimited_dims={'time':True})
-#             utils.p_header(f'>>> {sn}_climo generated at: {output_fpath}')
-
-# class Means:
-#     def __init__(self, root_dir):
-#         self.root_dir = root_dir
-#         utils.p_header(f'>>> case.root_dir: {self.root_dir}')
-
-#     def merge_means(self, sn, output_dirpath, overwrite=False, casetag=None):
-#         utils.p_header(f'>>> Processing season {sn}')
-#         paths = glob.glob(os.path.join(self.root_dir, sn, f'*_{sn}_means.nc'))
-#         if casetag is None:
-#             fname = f'{sn}_means.nc'
-#         else:
-#             fname = f'{casetag}_{sn}_means.nc'
-#         out_path = os.path.join(output_dirpath, fname)
-#         if overwrite or not os.path.exists(out_path):
-#             # if chunk_nt is not None:
-#             #     ds = xr.open_mfdataset(paths, compat='override', coords='minimal', data_vars='minimal', chunks={'time': chunk_nt})
-#             # else:
-#             #     ds = xr.open_mfdataset(paths, compat='override', coords='minimal', data_vars='minimal')
-
-#             ds_list = []
-#             for path in paths:
-#                 ds_tmp = core.open_dataset(path)
-#                 for k, v in ds_tmp.coords.items():
-#                     try:
-#                         if any(np.isnan(v.values)):
-#                             ds_tmp = ds_tmp.drop_vars(k)
-#                     except:
-#                         pass
-#                 ds_list.append(ds_tmp)
-
-#             # ds = xr.open_dataset(paths[0])
-#             # for path in tqdm(paths[1:]):
-#             #     ds_tmp = core.open_dataset(path)
-#             #     ds = xr.merge([ds, ds_tmp])
-            
-#             utils.p_header(f'>>> Merging files')
-#             ds = xr.merge(ds_list)
-#             ds.to_netcdf(out_path)
-#             utils.p_header(f'>>> Merged mean file saved at: {out_path}')
-#         else:
-#             utils.p_warning(f'>>> The result already exists. Skipping ...')
-
-#     def merge_means_nproc(self, output_dirpath, sns=['ANN', 'DJF', 'MAM', 'JJA', 'SON'], overwrite=False, casetag=None, nproc=1):
-#         if nproc == 1:
-#             for sn in sns:
-#                 self.merge_means(sn, output_dirpath, overwrite=overwrite, casetag=casetag)
-#         else:
-#             utils.p_hint(f'>>> nproc: {nproc}')
-#             with mp.Pool(processes=nproc) as p:
-#                 arg_list = [(sn, output_dirpath, overwrite, casetag) for sn in sns]
-#                 p.starmap(self.merge_means, tqdm(arg_list, total=len(sns), desc=f'Merging mean files'))
-
-
-    # def load(self, vn, adjust_month=True, load_idx=-1, regrid=False):
-    #     ''' Load a specific variable
-        
-    #     Args:
-    #         vn (str or list): a variable name, or a list of variable names
-    #         adjust_month (bool): adjust the month of the `xarray.Dataset` (the default CESM output has a month shift)
-    #         load_idx (int or slice): -1 means to load the last file
-    #         regrid (bool): if True, will regrid to regular lat/lon grid
-    #     '''
-    #     if not isinstance(vn, (list, tuple)):
-    #         vn = [vn]
-
-    #     for v in vn:
-    #         # if v in ['KMT', 'z_t', 'z_w', 'dz', 'dzw']:
-    #         #     vn_tmp = 'SSH'
-    #         #     comp, mdl, h_str = self.vars_info[vn_tmp]
-    #         #     paths = sorted(glob.glob(
-    #         #         os.path.join(
-    #         #             self.root_dir,
-    #         #             self.path_pattern \
-    #         #                 .replace('comp', comp) \
-    #         #                 .replace('casename', '*') \
-    #         #                 .replace('mdl', mdl) \
-    #         #                 .replace('h_str', h_str) \
-    #         #                 .replace('vn', vn_tmp) \
-    #         #                 .replace('timespan', '*'),
-    #         #         )
-    #         #     ))
-    #         #     with xr.load_dataset(paths[-1], decode_cf=False) as ds:
-    #         #         self.ds[v] = ds.x[v]
-
-    #         if v in self.vars_info:
-    #             comp, mdl, h_str = self.vars_info[v]
-    #             paths = sorted(glob.glob(
-    #                 os.path.join(
-    #                     self.root_dir,
-    #                     self.path_pattern \
-    #                         .replace('comp', comp) \
-    #                         .replace('casename', '*') \
-    #                         .replace('mdl', mdl) \
-    #                         .replace('h_str', h_str) \
-    #                         .replace('vn', v) \
-    #                         .replace('timespan', '*'),
-    #                 )
-    #             ))
-
-    #             # remove loaded object
-    #             if v in self.ds:
-    #                 if (regrid and 'regridded' not in self.ds[v].attrs) or (not regrid and 'regridded' in self.ds[v].attrs):
-    #                     self.clear_ds(v)
-    #                     utils.p_warning(f'>>> case.ds["{v}"] already loaded but will be reloaded due to a different regrid status')
-
-    #             if v in self.ds:
-    #                 if (load_idx is not None) and (paths[load_idx] != self.ds[v].attrs['path']):
-    #                     self.clear_ds(v)
-    #                     utils.p_warning(f'>>> case.ds["{v}"] already loaded but will be reloaded due to a different `load_idx`')
-                
-    #             # new load
-    #             if v not in self.ds:
-    #                 if load_idx is not None:
-    #                     # ds =  core.load_dataset(paths[load_idx], vn=v, adjust_month=adjust_month, comp=comp, grid=self.grid_dict[comp])
-    #                     ds =  core.open_dataset(paths[load_idx], vn=v, adjust_month=adjust_month, comp=comp, grid=self.grid_dict[comp])
-    #                 else:
-    #                     ds =  core.open_mfdataset(paths, vn=v, adjust_month=adjust_month, comp=comp, grid=self.grid_dict[comp])
-
-    #                 if regrid:
-    #                     self.ds[v] = ds.x.regrid()
-    #                     self.ds[v].attrs.update({'regridded': True})
-    #                 else:
-    #                     self.ds[v] = ds
-
-    #                 self.ds[v].attrs['vn'] = v
-    #                 utils.p_success(f'>>> case.ds["{v}"] created')
-
-    #             elif v in self.ds:
-    #                 utils.p_warning(f'>>> case.ds["{v}"] already loaded; to reload, run case.clear_ds("{v}") before case.load("{v}")')
-
-    #         else:
-    #             utils.p_warning(f'>>> Variable {v} not existed')
-
-        
-    # def calc(self, spell, load_idx=-1, adjust_month=True, **kws):
-    #     ''' Calculate a diagnostic spell
-
-    #     Args:
-    #         spell (str): The diagnostic spell in the format of `plot_type:diag_name:ann_method[:sm_method]`, where
-    #             The `plot_type` supports:
-                
-    #                 * `ts`: timeseries plots
-    #                 * `map`: 2D horizonal spatial plots
-    #                 * `zm`: zonal mean plots
-    #                 * `yz`: 2D lat-depth spatial plots
-            
-    #             The `plot_type:diag_name` combination supports:
-
-    #                 * `ts:GMST`: the global mean surface temperature (GMST) timeseries
-    #                 * `ts:MOC`: the meridional ocean circulation (MOC) timeseries
-    #                 * `map:TS`: the surface temperature (TS) 2D map
-    #                 * `map:LST`: the land surface temperature (LST) 2D map
-    #                 * `map:SST`: the sea surface temperature (SST) 2D map
-    #                 * `map:MLD`: the mixed layer depth (MLD) 2D map
-    #                 * `zm:LST`: the LST 2D map
-    #                 * `zm:SST`: the SST 2D map
-    #                 * `yz:MOC`: the lat-depth MOC 2D map
-
-    #             The `ann_method` supports:
-                
-    #                 * `ann`: calendar year annual mean
-    #                 * `<m>`: a number in [..., -11, -12, 1, 2, ..., 12] representing a month
-    #                 * `<m1>,<m2>,...`: a list of months sepearted by commmas
-                    
-    #             The `sm_method` supports:
-                
-    #                 * `gm`: global mean
-    #                 * `nhm`: NH mean
-    #                 * `shm`: SH mean
-
-    #             For example,
-                
-    #                 * `ts:GMST:ann`: annual mean GMST timeseries
-    #                 * `ts:SHH:ann:shm`: annual mean SH mean SHH timeseries
-    #                 * `map:TS:-12,1,2`: DJF mean TS 2D map
-    #                 * `map:MLD:3`: March MLD 2D map
-    #                 * `zm:LST:6,7,8,9`: JJAS LST zonal mean
-
-    #     '''
-    #     spell_elements = spell.split(':')
-    #     if len(spell_elements) == 3:
-    #         plot_type, diag_name, ann_method = spell_elements
-    #     elif len(spell_elements) == 4:
-    #         plot_type, diag_name, ann_method, sm_method = spell_elements
-    #     else:
-    #         raise ValueError('Wrong diagnostic spell.')
-
-    #     func_name = f'calc_{plot_type}_{diag_name}'
-    #     if func_name in diags.DiagCalc.__dict__:
-    #         self.diags[spell] = diags.DiagCalc.__dict__[func_name](
-    #             self, load_idx=load_idx,
-    #             adjust_month=adjust_month,
-    #             ann_method=ann_method, **kws,
-    #         )
-    #     else:
-    #         func_name = f'calc_{plot_type}'
-    #         if 'sm_method' in locals(): kws.update({'sm_method': sm_method})
-
-    #         self.diags[spell] = diags.DiagCalc.__dict__[func_name](
-    #             self, vn=diag_name, load_idx=load_idx,
-    #             adjust_month=adjust_month,
-    #             ann_method=ann_method, **kws,
-    #         )
-
-    #     utils.p_success(f'>>> case.diags["{spell}"] created')
-
-    # def plot(self, spell, **kws):
-    #     ''' Plot a diagnostic spell
-
-    #     Args:
-    #         spell (str): The diagnostic variable name in the format of `plot_type:diag_name:ann_method[:sm_method]`, see :func:`x4c.case.Timeseries.calc`
-    #     '''
-    #     spell_elements = spell.split(':')
-    #     if len(spell_elements) == 3:
-    #         plot_type, diag_name, ann_method = spell_elements
-    #     elif len(spell_elements) == 4:
-    #         plot_type, diag_name, ann_method, sm_method = spell_elements
-    #     else:
-    #         raise ValueError('Wrong diagnostic spell.')
-
-    #     if 'sm_method' in locals(): kws.update({'sm_method': sm_method})
-    #     return diags.DiagPlot.__dict__[f'plot_{plot_type}'](self, diag_name, ann_method=ann_method, **kws)
 
 class Logs:
     '''Manage CESM log files for a case and extract time series variables.
@@ -1831,6 +1160,12 @@ class Logs:
                 self.paths = self.paths[:load_num]
 
         utils.p_header(f'>>> Logs.dirpath: {self.dirpath}')
+        if len(self.paths) == 0:
+            # otherwise this surfaced as a bare IndexError on the next line
+            raise FileNotFoundError(
+                f'No `{comp}.log.*.gz` files found in {dirpath}'
+            )
+
         utils.p_header(f'>>> {len(self.paths)} Logs.paths:')
         print(f'Start: {os.path.basename(self.paths[0])}')
         print(f'End: {os.path.basename(self.paths[-1])}')
@@ -1864,27 +1199,51 @@ class Logs:
         nf = len(self.paths)
         df_list = []
         for idx_file in range(nf):
-            vars = {}
+            # initialize up front: folding this into the scan loop with an `elif`
+            # meant the first line of every file was never tested for a match
+            vars = {v: [] for v in vn}
             with gzip.open(self.paths[idx_file], mode='rt') as fp:
                 lines = fp.readlines()
 
-                # find 1st timestamp
-                for line in lines:
-                    i = lines.index(line)
-                    if line.find('This run        started from') != -1 and lines[i+1].find('date(month-day-year):') != -1:
+                # find 1st timestamp. `enumerate`, not `lines.index(line)`: that
+                # returned the index of the *first* equal line (wrong whenever a line
+                # repeats, which log files do constantly) and made the scan O(n^2)
+                # over a multi-MB decompressed log.
+                start_date = None
+                for i, line in enumerate(lines[:-1]):
+                    if 'This run        started from' in line and 'date(month-day-year):' in lines[i+1]:
                         start_date = lines[i+1].split(':')[-1].strip()
                         break
+
+                if start_date is None:
+                    raise ValueError(
+                        f'Could not find the run start date in {self.paths[idx_file]}: '
+                        'expected a "This run        started from" line followed by '
+                        '"date(month-day-year):". Is this a POP (ocn) log?'
+                    )
 
                 mm, dd, yyyy = start_date.split('-')
 
                 # find variable values
                 for line in lines:
+                    stripped = line.strip()
                     for v in vn:
-                        if v not in vars:
-                            vars[v] = []
-                        elif line.strip().startswith(f'{v}:'):
-                            val = float(line.strip().split(':')[-1])
-                            vars[v].append(val)
+                        if stripped.startswith(f'{v}:'):
+                            vars[v].append(float(stripped.split(':')[-1]))
+                            break
+
+            # a variable absent from this log leaves an empty list, and pandas refuses
+            # to build a frame from unequal-length columns; drop them with a note
+            # rather than failing on the (large) default `vn` list
+            missing = [v for v, vals in vars.items() if len(vals) == 0]
+            if missing:
+                if idx_file == 0:
+                    utils.p_warning(
+                        f'>>> {len(missing)} requested variable(s) not found in the logs '
+                        f'and skipped: {missing[:8]}{" ..." if len(missing) > 8 else ""}'
+                    )
+                for v in missing:
+                    del vars[v]
 
             df_tmp = pd.DataFrame(vars)
             dates = xr.date_range(start=f'{yyyy}-{mm}-{dd}', freq='MS', periods=len(df_tmp), calendar='noleap')

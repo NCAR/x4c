@@ -1,20 +1,30 @@
 import xarray as xr
+
+# NOTE: this is a PROCESS-WIDE side effect of importing x4c -- it changes xarray's
+# behavior for all of the caller's code, not just x4c's.
+#
+# It is load-bearing rather than incidental: the whole accessor design carries the
+# grid metadata (`gw`, `lat`, `lon`, `dz`) in `.attrs`, and with xarray's default
+# `keep_attrs=False` those are dropped by ordinary arithmetic, so `da.x.gm` would
+# stop working after something as simple as `da - 273.15`.
+#
+# Scoping it to individual operations (`with xr.set_options(keep_attrs=True):`)
+# would be the polite fix, but the propagation happens across essentially every
+# arithmetic and reduction path in the package plus user code in between, so a
+# partial conversion would silently drop weights rather than fail loudly. Left
+# global and documented deliberately; see review finding 3.7.
 xr.set_options(keep_attrs=True)
 
-import xesmf as xe
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap, BoundaryNorm, LogNorm
+from matplotlib.colors import BoundaryNorm, LogNorm
 from matplotlib.ticker import MultipleLocator
 
 import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-import geocat.comp as gc
 from eofs.xarray import Eof
 
 from . import utils, visual
 import os
-dirpath = os.path.dirname(__file__)
 
 def load_dataset(path, shift_time=False, comp=None, hstr=None, grid=None, vn=None, **kws):
     ''' Load a netCDF file and form a `xarray.Dataset`
@@ -63,10 +73,8 @@ def open_mfdataset(paths, shift_time=False, comp=None, hstr=None, grid=None, vn=
     '''
     ds0 = xr.open_dataset(paths[0], decode_cf=False)
     dims_other_than_time = list(ds0.dims)
-    try:
+    if 'time' in dims_other_than_time:
         dims_other_than_time.remove('time')
-    except:
-        pass
 
     chunk_dict = {k: -1 for k in dims_other_than_time}
 
@@ -110,6 +118,7 @@ class XDataset:
         '''
         comp = self.ds.attrs['comp']
         grid = self.ds.attrs['grid']
+        xe = utils.import_xesmf()
 
         if weight_file is not None:
             # using a user-provided weight file for any unsupported regridding
@@ -122,12 +131,7 @@ class XDataset:
                     if comp == 'lnd':
                         ds = ds.rename_dims({'lndgrid': 'ncol'})
 
-                    wgt_fpath = os.path.join(dirpath, f'./regrid_wgts/map_{grid}_TO_{dlon}x{dlat}d_aave.nc.gz')
-                    if not os.path.exists(wgt_fpath):
-                        url = f'https://github.com/fzhu2e/x4c-regrid-wgts/raw/main/data/map_{grid}_TO_{dlon}x{dlat}d_aave.nc.gz'
-                        utils.p_header(f'Downloading the weight file from: {url}')
-                        utils.download(url, wgt_fpath)
-
+                    wgt_fpath = utils.fetch_wgt_file(f'map_{grid}_TO_{dlon}x{dlat}d_aave.nc.gz')
                     ds_rgd = utils.regrid_cam_se(ds, weight_file=wgt_fpath)
                 else:
                     raise ValueError('The specified `grid` is not supported. Please specify a `weight_file`.')
@@ -172,15 +176,33 @@ class XDataset:
             else:
                 raise ValueError(f'grid [{grid}] is not supported; please provide a corresponding `weight_file`.')
 
-        try:
-            ds_rgd = ds_rgd.drop_vars('latitude_longitude')
-        except:
-            pass
+        # xESMF adds this CF grid-mapping stub; harmless but noisy
+        ds_rgd = ds_rgd.drop_vars('latitude_longitude', errors='ignore')
 
         ds_rgd.attrs = dict(self.ds.attrs)
         # utils.p_success(f'Dataset regridded to regular grid: [dlon: {dlon} x dlat: {dlat}]')
-        if 'lat' in ds_rgd.attrs: del(ds_rgd.attrs['lat'])
-        if 'lon' in ds_rgd.attrs: del(ds_rgd.attrs['lon'])
+
+        # The output lives on a regular lat/lon grid, so the source grid's `gw`/`lat`/`lon`
+        # no longer describe it and must be re-derived. Carrying the source `gw` over would
+        # leave a weight whose dims (`ncol`, `nlat`/`nlon`) are absent from the output, and
+        # a subsequent weighted mean would then *broadcast* instead of reducing -- silently
+        # turning a global mean into a full outer product.
+        # Note the remapped `area`/`TAREA` variable is not a valid target-grid weight
+        # either: interpolating a source area field does not give the destination cell
+        # areas. Hence cos(lat), matching the convention in `utils.update_ds`.
+        if 'lat' in ds_rgd.variables:
+            ds_rgd.attrs['gw'] = utils.coslat_weight(ds_rgd)
+        elif 'gw' in ds_rgd.attrs:
+            # no target lat to weight by: drop it, since an absent weight fails loudly
+            # while a stale one fails silently
+            del(ds_rgd.attrs['gw'])
+
+        for v in ['lat', 'lon']:
+            if v in ds_rgd.variables:
+                ds_rgd.attrs[v] = ds_rgd[v]
+            elif v in ds_rgd.attrs:
+                del(ds_rgd.attrs[v])
+
         return ds_rgd
 
     def get_plev(self, ps, vn=None, lev_mode='hybrid', **kws):
@@ -248,6 +270,7 @@ class XDataset:
 
         # perform interpolation for the supported vertical-mode
         if lev_mode == 'hybrid':
+            gc = utils.import_geocat_comp()
             da_plev = gc.interpolation.interp_hybrid_to_pressure(da, ps_da, **_kws)
         else:
             raise ValueError('`lev_mode` unknown')
@@ -425,29 +448,19 @@ class XDataset:
         return ds
 
     def to_netcdf(self, path, **kws):
-        for v in ['gw', 'lat', 'lon', 'dz']:
-            if v in self.ds.attrs: del(self.ds.attrs[v])
+        ''' Write to netCDF, dropping the non-serializable x4c grid attrs
 
-        return self.ds.to_netcdf(path, **kws)
-        
+        The grid attrs (`gw`/`lat`/`lon`/`dz`) are stripped from a copy, so this
+        `Dataset` keeps them and stays usable by the accessors afterwards.
+        '''
+        return utils.drop_grid_attrs(self.ds).to_netcdf(path, **kws)
+
 
 @xr.register_dataarray_accessor('x')
 class XDataArray:
     def __init__(self, da=None):
         self.da = da
 
-    # def nearest2d(self, lat, lon, lat_name='lat', lon_name='lon', new_dim='sites', extra_dim=None, r=1):
-    #     if extra_dim is None:
-    #         da_res = utils.find_nearest2d(self.da, lat, lon, lat_name=lat_name, lon_name=lon_name, new_dim=new_dim, r=r)
-    #     else:
-    #         da_res_extra_list = []
-    #         for i in range(self.da.sizes[extra_dim]):
-    #             da_sub = self.da.isel({extra_dim: i})
-    #             da_sub_res = utils.find_nearest2d(da_sub, lat, lon, lat_name=lat_name, lon_name=lon_name, new_dim=new_dim, r=r)
-    #             da_res_extra_list.append(da_sub_res)
-    #         da_res = xr.concat(da_res_extra_list, dim=extra_dim).squeeze()
-
-    #     return da_res
 
     def annualize(self, months=None, days_weighted=False):
         ''' Annualize/seasonalize a `xarray.DataArray`
@@ -480,9 +493,10 @@ class XDataArray:
         da = ds_rgd.x.da
         da.name = self.da.name
 
-        # remove dataset-level lat/lon attrs if present
-        if 'lat' in da.attrs: del(da.attrs['lat'])
-        if 'lon' in da.attrs: del(da.attrs['lon'])
+        # `gw`/`lat`/`lon` are deliberately kept: they were re-derived on the target grid
+        # by `XDataset.regrid`, and the hemispheric means (`nhm`/`shm`/`nhs`/`shs`) read
+        # `attrs['lat']`. Dropping them here would make this path diverge from
+        # `ds.x.regrid().x.da`, which is meant to be equivalent.
         return da
 
     def get_plev(self, **kws):
@@ -491,6 +505,7 @@ class XDataArray:
         '''
         _kws = {'lev_dim': 'lev'}
         _kws.update(kws)
+        gc = utils.import_geocat_comp()
         da = gc.interpolation.interp_hybrid_to_pressure(self.da, **_kws)
         da.name = self.da.name
         return da
@@ -515,10 +530,12 @@ class XDataArray:
         return da_zavg
 
     def to_netcdf(self, path, **kws):
-        for v in ['gw', 'lat', 'lon', 'dz']:
-            if v in self.da.attrs: del(self.da.attrs[v])
+        ''' Write to netCDF, dropping the non-serializable x4c grid attrs
 
-        return self.da.to_netcdf(path, **kws)
+        The grid attrs (`gw`/`lat`/`lon`/`dz`) are stripped from a copy, so this
+        `DataArray` keeps them and stays usable by the accessors afterwards.
+        '''
+        return utils.drop_grid_attrs(self.da).to_netcdf(path, **kws)
 
     def nearest2d(self, lat=None, lon=None, lat_coord='lat', lon_coord='lon', lat_dim='lat', lon_dim='lon'):
         '''
@@ -544,20 +561,33 @@ class XDataArray:
         lats = self.da.coords[lat_coord].values
         lons = self.da.coords[lon_coord].values
         if lats.ndim == 2 and lons.ndim == 2:
-            lats2d = self.da.coords[lat_coord].values
-            lons2d = self.da.coords[lon_coord].values
+            lats2d = lats
+            lons2d = lons
         elif lats.ndim == 1 and lons.ndim == 1:
-            lats1d = self.da.coords[lat_coord].values
-            lons1d = self.da.coords[lon_coord].values
-            lons2d, lats2d = np.meshgrid(lons1d, lats1d)
+            lons2d, lats2d = np.meshgrid(lons, lats)
+        else:
+            # previously fell through leaving lats2d/lons2d unbound, for an
+            # `UnboundLocalError` a few lines later
+            raise ValueError(
+                f'`{lat_coord}` and `{lon_coord}` must both be 1-D or both 2-D; '
+                f'got {lats.ndim}-D and {lons.ndim}-D.'
+            )
 
-        # other_dims = set(self.da.dims) - set([lat_dim, lon_dim])
-        # isel_indexer = {dim: 0 for dim in other_dims}
-        # da_latlon = self.da.isel(**isel_indexer)
-        # mask = ~np.isnan(da_latlon.values)
-        # mask grid cells that contain NaNs along the non-spatial dimensions
-        reduce_dims = list(set(self.da.dims) - set([lat_dim, lon_dim]))
-        mask = ~self.da.isnull().any(dim=reduce_dims).values
+        # mask grid cells that contain NaNs along the non-spatial dimensions.
+        # `.transpose` matters: `.values` follows the DataArray's own dim order, so
+        # without it a (time, lon, lat) array yields a mask whose axes are swapped
+        # relative to lats2d/lons2d, and the (iy, ix) pair below indexes the wrong cell.
+        reduce_dims = [d for d in self.da.dims if d not in (lat_dim, lon_dim)]
+        valid = ~self.da.isnull().any(dim=reduce_dims) if reduce_dims else ~self.da.isnull()
+        mask = valid.transpose(lat_dim, lon_dim).values
+
+        if mask.shape != lats2d.shape:
+            raise ValueError(
+                f'coordinate grid {lats2d.shape} does not match the data grid '
+                f'{mask.shape} over ({lat_dim}, {lon_dim}).'
+            )
+        if not mask.any():
+            raise ValueError('No valid (non-NaN) grid cells to select from.')
 
         valid_lats = lats2d[mask]
         valid_lons = lons2d[mask]
@@ -647,12 +677,27 @@ class XDataArray:
         return xr.concat(sel_list, dim='site').assign_coords(site=np.arange(len(sel_list)))
 
     def eof(self, n=4, weight=True):
-        ''' Perform EOF analysis '''
+        ''' Perform EOF analysis
+
+        Args:
+            n (int): number of modes to return
+            weight (bool): weight the field by sqrt(cos(lat)) before solving, so
+                that the modes are area-fair. Requires a `lat` coordinate or attr.
+        '''
         if weight:
             if 'lat' in self.da.coords:
                 coslat = np.cos(np.deg2rad(self.da.coords['lat']))
             elif 'lat' in self.da.attrs:
                 coslat = np.cos(np.deg2rad(self.da.attrs['lat']))
+            else:
+                # previously left `coslat` unbound, for a `NameError` on the next line
+                raise ValueError(
+                    'EOF weighting needs a latitude: none found in `da.coords["lat"]` '
+                    'or `da.attrs["lat"]`. Pass `weight=False` for an unweighted solve.'
+                )
+
+            if 'time' not in self.da.dims:
+                raise ValueError(f'EOF analysis needs a `time` dimension; got {self.da.dims}.')
 
             wgts = np.sqrt(coslat).broadcast_like(self.da.isel(time=0))  # (lat, lon)
             solver = Eof(self.da, weights=wgts)
@@ -679,11 +724,36 @@ class XDataArray:
         ds_tmp.attrs['vn'] = self.da.name
         return ds_tmp
 
+    def _spatial_dims(self, gw):
+        ''' The dims to reduce over for an area-weighted reduction
+
+        Reduce over exactly the dims the weight spans (horizontal); this keeps the
+        vertical (e.g. `z_t`) intact.
+
+        The weight lives in `.attrs`, where xarray cannot validate it against the
+        data, so any operation that changes the horizontal grid can leave a stale
+        weight attached. A stale weight whose dims are absent from the data would
+        *broadcast* rather than reduce -- silently turning a global mean into a full
+        outer product -- so refuse it explicitly instead.
+        '''
+        missing = [d for d in gw.dims if d not in self.da.dims]
+        if len(gw.dims) == 0 or len(missing) > 0:
+            raise ValueError(
+                f'The area weight `gw` spans dims {tuple(gw.dims)}, which are not all '
+                f'present in the data dims {tuple(self.da.dims)}'
+                + (f' (missing: {missing})' if missing else '')
+                + '. The weight is stale or mismatched, so a weighted reduction would '
+                'broadcast instead of reduce. Re-attach a weight for the current grid '
+                '(e.g. via `x4c.utils.update_ds`).'
+            )
+
+        return [d for d in self.da.dims if d in gw.dims]
+
     @property
     def gm(self):
         ''' the global area-weighted mean '''
         gw = self.da.attrs['gw']
-        spatial_dims = [d for d in self.da.dims if d in gw.dims] # reduce over exactly the dims the weight spans (horizontal); keeps the vertical (e.g. z_t) intact
+        spatial_dims = self._spatial_dims(gw)
         da = self.da.weighted(gw).mean(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'Global Mean {da.attrs["long_name"]}'
@@ -694,7 +764,7 @@ class XDataArray:
         ''' the NH area-weighted mean '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        spatial_dims = [d for d in self.da.dims if d in gw.dims] # reduce over exactly the dims the weight spans (horizontal); keeps the vertical (e.g. z_t) intact
+        spatial_dims = self._spatial_dims(gw)
         da = self.da.where(lat>0).weighted(gw).mean(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'NH Mean {da.attrs["long_name"]}'
@@ -705,7 +775,7 @@ class XDataArray:
         ''' the SH area-weighted mean '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        spatial_dims = [d for d in self.da.dims if d in gw.dims] # reduce over exactly the dims the weight spans (horizontal); keeps the vertical (e.g. z_t) intact
+        spatial_dims = self._spatial_dims(gw)
         da = self.da.where(lat<0).weighted(gw).mean(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'SH Mean {da.attrs["long_name"]}'
@@ -715,7 +785,7 @@ class XDataArray:
     def gs(self):
         ''' the global area-weighted sum '''
         gw = self.da.attrs['gw']
-        spatial_dims = [d for d in self.da.dims if d in gw.dims] # reduce over exactly the dims the weight spans (horizontal); keeps the vertical (e.g. z_t) intact
+        spatial_dims = self._spatial_dims(gw)
         da = self.da.weighted(gw).sum(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'Global Sum {da.attrs["long_name"]}'
@@ -726,7 +796,7 @@ class XDataArray:
         ''' the NH area-weighted sum '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        spatial_dims = [d for d in self.da.dims if d in gw.dims] # reduce over exactly the dims the weight spans (horizontal); keeps the vertical (e.g. z_t) intact
+        spatial_dims = self._spatial_dims(gw)
         da = self.da.where(lat>0).weighted(gw).sum(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'NH Sum {da.attrs["long_name"]}'
@@ -737,7 +807,7 @@ class XDataArray:
         ''' the SH area-weighted sum '''
         gw = self.da.attrs['gw']
         lat = self.da.attrs['lat']
-        spatial_dims = [d for d in self.da.dims if d in gw.dims] # reduce over exactly the dims the weight spans (horizontal); keeps the vertical (e.g. z_t) intact
+        spatial_dims = self._spatial_dims(gw)
         da = self.da.where(lat<0).weighted(gw).sum(spatial_dims)
         da = utils.update_attrs(da, self.da)
         if 'long_name' in da.attrs: da.attrs['long_name'] = f'SH Sum {da.attrs["long_name"]}'
@@ -890,7 +960,14 @@ class XDataArray:
 
         '''
         da = self.da.squeeze()
-        if 'regrid' in kws and kws['regrid'] is True:
+
+        # x4c-only options must be POPPED, not merely read: `update_dict` below copies
+        # everything left in `kws` into the matplotlib call, where an unknown kwarg
+        # either warns ("kwargs were not used by contour") or raises.
+        do_regrid = kws.pop('regrid', False)
+        add_colorbar = kws.pop('add_colorbar', True)
+        cyclic = kws.pop('cyclic', False)
+        if do_regrid:
             da = da.x.regrid(gs=gs)
 
         ndim = len(da.dims)
@@ -921,7 +998,7 @@ class XDataArray:
                 },
             }
             _plt_kws = utils.update_dict(_plt_kws, kws)
-            if 'add_colorbar' in kws and kws['add_colorbar'] is False:
+            if not add_colorbar:
                 del(_plt_kws['cbar_kwargs'])
 
             if latlon_range is not None:
@@ -932,12 +1009,6 @@ class XDataArray:
                 gl = ax.gridlines(linestyle=gridline_style, draw_labels=gridline_labels)
                 gl.top_labels = False
                 gl.right_labels = False
-
-            if 'cyclic' in kws:
-                cyclic = kws['cyclic']
-                cyclic = _plt_kws.pop('cyclic')
-            else:
-                cyclic = False
 
             # add coastlines
             if ssv is not None:
@@ -953,7 +1024,15 @@ class XDataArray:
                 # use the modern coastlines from Cartopy
                 ax.coastlines(zorder=coastline_zorder, linewidth=coastline_width)
 
-            if log: _plt_kws.update({'norm': LogNorm(vmin=vmin, vmax=vmax)})
+            if log:
+                if 'levels' in _plt_kws:
+                    raise ValueError(
+                        '`log=True` and `levels` cannot be combined: a LogNorm and '
+                        'explicit contour levels fight over the same scale (matplotlib '
+                        'then raises "upper_level must be larger than lower_level"). '
+                        'Pass log-spaced `levels` instead, e.g. np.logspace(0, 3, 28).'
+                    )
+                _plt_kws.update({'norm': LogNorm(vmin=vmin, vmax=vmax)})
 
             if self.is_cam_se():
                # CAM-SE grid without regridding
@@ -978,29 +1057,33 @@ class XDataArray:
                     # using UXarray for CAM-SE grid
                     try:
                         import uxarray as ux
-                    except:
-                        raise ImportError('UXarray is required for this method. Please install it via `conda install -c conda-forge uxarray`.')
+                    except ImportError as e:
+                        # `except ImportError`, not a bare `except`: a bare one also
+                        # swallowed failures from *inside* a successfully-found uxarray
+                        # and reported them as "not installed"
+                        raise ImportError(
+                            'UXarray is required for this method. Please install it via '
+                            '`conda install -c conda-forge uxarray`.'
+                        ) from e
 
                     grid = da.attrs['grid']
-                    wgt_fpath = os.path.join(dirpath, f'./regrid_wgts/scrip_{grid}.nc.gz')
-                    if not os.path.exists(wgt_fpath):
-                        url = f'https://github.com/fzhu2e/x4c-regrid-wgts/raw/main/data/scrip_{grid}.nc.gz'
-                        utils.p_header(f'Downloading the weight file from: {url}')
-                        utils.download(url, wgt_fpath)
-
+                    wgt_fpath = utils.fetch_wgt_file(f'scrip_{grid}.nc.gz')
                     uxgrid = ux.open_grid(wgt_fpath)
                     uxda = ux.UxDataArray(da, uxgrid=uxgrid).rename({'ncol': 'n_face'})
 
-                    pc = uxda.to_polycollection(projection=_projection)
+                    # take the projection off the axes rather than the local built above:
+                    # a caller-supplied `ax` (e.g. from `visual.subplots`) never binds that
+                    # local, and this path would then raise `NameError`
+                    if not hasattr(ax, 'projection'):
+                        raise ValueError('`ux=True` requires a Cartopy GeoAxes; got a plain `matplotlib` axes.')
+                    pc = uxda.to_polycollection(projection=ax.projection)
                     pc.set_cmap(cmap)
                     pc.set_norm(norm)
                     pc.set_antialiased(False)
                     im = ax.add_collection(pc)
 
                 if latlon_range is None: ax.set_global()
-                if 'add_colorbar' in kws and kws['add_colorbar'] is False:
-                    pass
-                else:
+                if add_colorbar:
                     cbar = plt.colorbar(im, ax=ax, extend=_plt_kws['extend'], **_plt_kws['cbar_kwargs'])
                     cbar.ax.minorticks_on()
                     cbar.ax.yaxis.set_minor_locator(MultipleLocator(2))
@@ -1022,9 +1105,7 @@ class XDataArray:
                 im = ax.tricontourf(lon_valid, lat_valid, z_valid,  **__plt_kws)
 
                 if latlon_range is None: ax.set_global()
-                if 'add_colorbar' in kws and kws['add_colorbar'] is False:
-                    pass
-                else:
+                if add_colorbar:
                     cbar = plt.colorbar(im, ax=ax, extend=_plt_kws['extend'], **_plt_kws['cbar_kwargs'])
                     cbar.ax.minorticks_on()
                     cbar.ax.yaxis.set_minor_locator(MultipleLocator(2))
@@ -1037,7 +1118,7 @@ class XDataArray:
                     da.name = da_original.name
                     da.attrs = da_original.attrs
 
-                im = da.plot.contourf(ax=ax, **_plt_kws)
+                im = da.plot.contourf(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
 
             if df_sites is not None:
                 # plot scatter points for sites
@@ -1120,7 +1201,7 @@ class XDataArray:
                 'extend': 'both',
                 'cmap': visual.infer_cmap(da),
                 'cbar_kwargs': {
-                    'label': f'{da.name} [{da.units}]',
+                    'label': f'{da.name} [{da.units}]' if 'units' in da.attrs else f'{da.name}',
                     'aspect': 10,
                 },
             }
@@ -1129,17 +1210,11 @@ class XDataArray:
             if bad_color is not None:
                 ax.set_facecolor(bad_color)
 
-            if 'add_colorbar' in kws and kws['add_colorbar'] is False:
+            if not add_colorbar:
                 del(_plt_kws['cbar_kwargs'])
 
-            im = da.plot.contourf(ax=ax, **_plt_kws)
+            im = da.plot.contourf(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
             if add_clabels:
-                # _contour_kws = {
-                #     'levels': _plt_kws['levels'],
-                #     'zorder': 99,
-                #     'colors': 'k',
-                # }
-                # im = da.plot.contour(ax=ax, **_contour_kws)
                 clabel_kwargs = {} if clabel_kwargs is None else clabel_kwargs
                 _clabel_kwargs = {
                     'fontsize': 12,

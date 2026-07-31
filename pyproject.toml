@@ -19,18 +19,56 @@ classifiers = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "netCDF4",
+    # core data stack
+    "numpy",
+    "pandas",
     "xarray",
+    "netCDF4",
     "dask",
+    "cftime",
     "nc-time-axis",
+    "python-dateutil",
+    # plotting
+    "matplotlib",
+    "cartopy",
+    # analysis
+    "eofs",
+    # I/O and CLI niceties
+    "requests",
     "colorama",
     "tqdm",
-    "mpi4py",
-    "eofs",
 ]
+
+[project.optional-dependencies]
+# The heavy geoscience stack (xesmf, geocat-comp, cartopy, esmpy) is conda-only
+# and is provided by ci/environment.yml, so it is deliberately absent here.
+test = ["pytest>=7"]
+
+# Regridding (`.x.regrid`, `.x.get_plev`) and the MPI timeseries pipeline
+# (`History.bigbang`/`bigcrunch`/`gen_ts`) need packages that are conda-only or
+# awkward to build from PyPI, so they are extras rather than hard requirements:
+#
+#     conda install -c conda-forge xesmf esmpy geocat-comp mpi4py
+#
+# The corresponding imports are lazy, so the rest of the package works without them.
+regrid = ["xesmf", "esmpy"]
+plev = ["geocat-comp"]
+mpi = ["mpi4py"]
+ux = ["uxarray"]
+all = ["x4c[test,regrid,plev,mpi,ux]"]
 
 [project.urls]
 Homepage = "https://github.com/NCAR/x4c"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# `conftest.py` helpers are imported directly by the test modules
+pythonpath = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
 
 [tool.setuptools.packages.find]
 include = ["x4c*"]
