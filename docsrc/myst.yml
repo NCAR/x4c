@@ -9,7 +9,8 @@ version: 1
 
 project:
   id: a362796d-3ef7-40b1-8a13-7f9b8dd95630
-  title: x4c
+  # Drives the browser tab / <title> metadata for the site.
+  title: "x4c: Xarray for CESM"
   description: >-
     Xarray for CESM: postprocessing, analysis, and visualization of CESM output.
   github: https://github.com/NCAR/x4c
@@ -62,10 +63,22 @@ project:
 
 site:
   template: book-theme
+
+  # Site-wide footer: copyright + the NSF sponsorship statement carried over from
+  # docsrc_bak/conf.py (`copyright` and html_theme_options.extra_footer).
+  parts:
+    footer: footer.md
+    # Overrides the theme's default "Made with MyST" sidebar footer.
+    primary_sidebar_footer: sidebar-footer.md
+
   options:
     logo: x4c-logo.png
     logo_dark: x4c-logo.png
     favicon: x4c-logo.png
-    logo_text: x4c
+    logo_alt: "x4c: Xarray for CESM"
+    # logo_text is set for accessibility but hidden visually in style.css, so the
+    # header shows the logo alone. Leaving it unset is NOT equivalent: the theme
+    # then falls back to an sr-only "Made with MyST" as the home link's label.
+    logo_text: "x4c: Xarray for CESM"
     style: ./style.css
     outline_maxdepth: 3
