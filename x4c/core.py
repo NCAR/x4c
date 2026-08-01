@@ -278,6 +278,16 @@ class XDataset:
         # return a dataset copy with the variable replaced by the pressure-level field
         ds_plev = self.ds.copy()
         del(ds_plev[vn])
+
+        # On an unstructured grid `lat`/`lon` are *data variables* of the Dataset, but
+        # `XDataset.__getitem__` promotes them to *coords* on the extracted DataArray.
+        # Assigning that DataArray straight back in leaves xarray unable to decide
+        # which they are ("unable to determine if these variables should be
+        # coordinates or not"), so demote them first.
+        conflicting = [c for c in da_plev.coords if c in ds_plev.data_vars]
+        if conflicting:
+            da_plev = da_plev.reset_coords(conflicting, drop=True)
+
         ds_plev[vn] = da_plev
         return ds_plev
 
@@ -474,9 +484,14 @@ class XDataArray:
         da = utils.update_attrs(da, self.da)
         return da
 
-    def regrid(self, **kws):
+    def regrid(self, *args, **kws):
         '''
         Regrid this DataArray by delegating to the parent Dataset regrid.
+
+        Positional arguments are forwarded too, so `da.x.regrid(1, 1)` works the same
+        as `ds.x.regrid(1, 1)`. Keyword-only used to be the signature here, which made
+        the documented spell form `|regrid(1,1)` fail on the DataArray path -- the one
+        `Timeseries.calc` actually uses.
 
         This wraps `XDataset.regrid` by converting the `DataArray` to a
         temporary `Dataset`, calling the dataset-level regrid helper, then
@@ -489,7 +504,7 @@ class XDataArray:
         '''
 
         # delegate to the Dataset regrid and extract the regridded DataArray
-        ds_rgd = self.ds.x.regrid(**kws)
+        ds_rgd = self.ds.x.regrid(*args, **kws)
         da = ds_rgd.x.da
         da.name = self.da.name
 
@@ -672,6 +687,11 @@ class XDataArray:
             v = np.abs(z_km - depth0 * 1e-3)               # (depth_dim,), km
             dist = np.sqrt(h ** 2 + v ** 2).where(mask)    # (depth, lat, lon)
             idx = dist.argmin(dim=[depth_dim, lat_dim, lon_dim])
+            # cast to plain ints: `argmin` hands back 0-d DataArrays, and indexing a
+            # float32 dimension coordinate (POP's `z_t`) with one of those trips an
+            # assertion inside pandas' Index constructor. `nearest2d` already passes
+            # ints for the same reason.
+            idx = {k: int(v) for k, v in idx.items()}
             sel_list.append(da.isel(idx))
 
         return xr.concat(sel_list, dim='site').assign_coords(site=np.arange(len(sel_list)))
@@ -999,7 +1019,7 @@ class XDataArray:
             }
             _plt_kws = utils.update_dict(_plt_kws, kws)
             if not add_colorbar:
-                del(_plt_kws['cbar_kwargs'])
+                _plt_kws.pop('cbar_kwargs', None)
 
             if latlon_range is not None:
                 lat_min, lat_max, lon_min, lon_max = latlon_range
@@ -1050,7 +1070,9 @@ class XDataArray:
                 if ux is False:
                     # using tricontourf for CAM-SE grid
                     __plt_kws = _plt_kws.copy()
-                    del(__plt_kws['cbar_kwargs'])
+                    # pop, not del: `cbar_kwargs` is already gone when the caller
+                    # passed add_colorbar=False, and this branch used to KeyError
+                    __plt_kws.pop('cbar_kwargs', None)
                     del(__plt_kws['cmap'])
                     im = ax.tricontourf(da.lon, da.lat, da, cmap=cmap, norm=norm, **__plt_kws)
                 else:
@@ -1091,7 +1113,7 @@ class XDataArray:
             elif self.is_pop():
                 # POP grid without regridding
                 __plt_kws = _plt_kws.copy()
-                del(__plt_kws['cbar_kwargs'])
+                __plt_kws.pop('cbar_kwargs', None)
                 if gs=='T':
                     lat_flat, lon_flat = da.TLAT.values.ravel(), da.TLONG.values.ravel()
                 elif gs=='U':
@@ -1211,7 +1233,7 @@ class XDataArray:
                 ax.set_facecolor(bad_color)
 
             if not add_colorbar:
-                del(_plt_kws['cbar_kwargs'])
+                _plt_kws.pop('cbar_kwargs', None)
 
             im = da.plot.contourf(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
             if add_clabels:

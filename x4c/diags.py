@@ -85,6 +85,9 @@ class DiagCalc:
         case.load('PRECC', **kws)
         case.load('PRECL', **kws)
         da = case.ds['PRECC'].x.da + case.ds['PRECL'].x.da
+        # arithmetic between two DataArrays drops the DataArray-valued attrs, so the
+        # grid metadata has to be put back or `.x.gm` fails
+        utils.copy_grid_attrs(da, case.ds['PRECC'].x.da)
         da.name = 'PRECT'
         da.attrs['long_name'] = 'Total precipitation rate (convective + large-scale; liq + ice)'
         return da
@@ -108,6 +111,7 @@ class DiagCalc:
         hdo = hdo.where(hdo > 1e-18, 1e-18)
 
         dDp = (hdo / h2o - 1)*1000
+        utils.copy_grid_attrs(dDp, case.ds['PRECRC_H2Or'].x.da)
         dDp.name = 'dDp'
         dDp.attrs['long_name'] = 'Precipitation dD'
         dDp.attrs['units'] = 'permil'
@@ -143,6 +147,7 @@ class DiagCalc:
         p18O = p18O.where(p18O > 1e-18, 1e-18)
 
         d18Op = (p18O/p16O - 1)*1e3
+        utils.copy_grid_attrs(d18Op, case.ds['PRECRC_H216Or'].x.da)
         d18Op.name = 'd18Op'
         d18Op.attrs['long_name'] = 'Precipitation d18O'
         d18Op.attrs['units'] = 'permil'
@@ -183,6 +188,7 @@ class DiagCalc:
 
         d18Osw_PDB = d18Osw - 0.27         #VSMOW to VPDB conversion
         d18Oc = (-0.245*T + 0.0011*T*T + 3.58) + d18Osw_PDB
+        utils.copy_grid_attrs(d18Oc, T)
         d18Oc.name = 'd18Oc'
         d18Oc.attrs['long_name'] = 'Calcite d18O'
         d18Oc.attrs['units'] = 'permil'
@@ -196,8 +202,8 @@ class DiagCalc:
         case.load('FLNT', **kws)
 
         RESTOM = case.ds['FSNT'].x.da - case.ds['FLNT'].x.da
+        utils.copy_grid_attrs(RESTOM, case.ds['FSNT'].x.da)
         RESTOM.name = 'RESTOM'
-        RESTOM.attrs['gw'] = case.ds['FSNT'].attrs['gw']
         RESTOM.attrs['long_name'] = 'Net Radiation Flux'
         RESTOM.attrs['units'] = 'W/m$^2$'
         return RESTOM
@@ -211,6 +217,7 @@ class DiagCalc:
         da_pressure = case.ds[vn]['hyai']*case.ds[vn]['P0'] + case.ds[vn]['hybi']*case.ds[vn][vn]
         da = da_pressure.diff('ilev').rename({'ilev': 'lev'})
         da['lev'] = case.ds[vn]['lev']
+        utils.copy_grid_attrs(da, case.ds[vn].x.da)
         da.name = 'DP'
         da.attrs['long_name'] = 'Pressure Thickness'
         da.attrs['units'] = 'Pa'

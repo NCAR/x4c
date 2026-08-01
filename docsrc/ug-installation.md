@@ -1,4 +1,6 @@
-# Installation
+---
+title: Installation
+---
 
 ## Install the Conda environment
 

@@ -487,6 +487,38 @@ def set_style(style='journal', font_scale=1.0):
         mpl.rcParams.update(d)
 
 def infer_cmap(da):
+    ''' Guess a sensible colormap from a DataArray's `long_name`
+
+    Matches keywords against `da.attrs['long_name']`, lowercased, and returns the
+    colormap for the first keyword that matches -- so the order below is a precedence
+    order, e.g. "sea ice temperature" resolves to the temperature map, not the ice one.
+    Diverging maps are used for fields that are naturally read about a center value
+    (temperature, pressure, precipitation, correlation) and sequential ones otherwise.
+
+    ============= ==========
+    keyword       colormap
+    ============= ==========
+    temperature   `RdBu_r`
+    pressure      `bwr_r`
+    precipitation `BrBG`
+    correlation   `RdBu_r`
+    r2            `Reds`
+    salinity      `PiYG`
+    circulation   `RdBu_r`
+    depth         `GnBu`
+    height        `PiYG`
+    kmt           `BrBG`
+    ice           `Blues`
+    ============= ==========
+
+    Args:
+        da (xarray.DataArray): the field to pick a colormap for; only its
+            `long_name` attribute is inspected, never the values
+
+    Returns:
+        str: a Matplotlib colormap name, or `'viridis'` if `long_name` is absent or
+        matches no keyword
+    '''
     if 'long_name' in da.attrs:
         ln_lower = da.attrs['long_name'].lower()
         if 'temperature' in ln_lower:
@@ -497,7 +529,7 @@ def infer_cmap(da):
             cmap = 'BrBG'
         elif 'correlation' in ln_lower:
             cmap = 'RdBu_r'
-        elif 'R2' in ln_lower:
+        elif 'r2' in ln_lower:
             cmap = 'Reds'
         elif 'salinity' in ln_lower:
             cmap = 'PiYG'
@@ -520,7 +552,47 @@ def infer_cmap(da):
 
 def subplots(nrow:int, ncol:int, ax_loc:dict, projs=None, projs_kws=None, figsize=None, wspace=None, hspace=None,
              annotation=False, annotation_kws=None, annotation_separate=False, annotation_skip=None):
+    ''' Create a named grid of axes, with optional Cartopy projections
 
+    A thin wrapper over :class:`matplotlib.gridspec.GridSpec` that returns the axes in a
+    dict keyed by name instead of an array, so that a subplot can be referred to as
+    `ax['ts']` rather than by position. Any subset of the axes can be given a Cartopy
+    projection, which makes mixed layouts (maps next to timeseries) straightforward.
+
+    Args:
+        nrow (int): number of rows in the grid
+        ncol (int): number of columns in the grid
+        ax_loc (dict): maps an axes name to its slot in the grid, e.g.
+            `{'map': (0, slice(0, 2)), 'ts': (1, 0)}`. Each value is anything
+            `GridSpec.__getitem__` accepts -- an int, a `(row, col)` tuple, or tuples
+            containing `slice` objects for axes spanning several cells.
+        projs (dict): maps an axes name to a :mod:`cartopy.crs` class name, e.g.
+            `{'map': 'Robinson'}`. Names absent from this dict get a plain
+            (non-geographic) axes. `None` means no projections at all.
+        projs_kws (dict): maps an axes name to the keyword arguments passed to its
+            projection class, e.g. `{'map': {'central_longitude': 180}}`
+        figsize (tuple): figure size in inches, passed to :func:`matplotlib.pyplot.figure`
+        wspace (float): width of the padding between subplots, in units of the average
+            axes width; passed to `GridSpec.update`
+        hspace (float): height of the padding between subplots, in units of the average
+            axes height; passed to `GridSpec.update`
+        annotation (bool): if True, label the axes with (a), (b), ... via
+            :func:`add_annotation`
+        annotation_kws (dict): keyword arguments for :func:`add_annotation`. When
+            `annotation_separate` is False, this is a single dict applied to all axes.
+            When it is True, this must be a dict of dicts keyed by axes name, e.g.
+            `{'map': {'loc_x': -0.1}, 'ts': {}}` -- every labeled axes needs an entry.
+            `style` defaults to `')'` in both cases.
+        annotation_separate (bool): if True, call :func:`add_annotation` once per axes so
+            that each label can be positioned individually; if False, one call labels
+            them all together
+        annotation_skip (list): axes names to leave unlabeled; only honored when
+            `annotation_separate` is True. Note that the letters still advance over the
+            skipped axes, since they are assigned by position in `ax_loc`.
+
+    Returns:
+        (fig, ax) the Matplotlib figure and a dict of axes keyed by the names in `ax_loc`.
+    '''
     fig = plt.figure(figsize=figsize)
     gs = GridSpec(nrow, ncol)
     gs.update(wspace=wspace, hspace=hspace)
@@ -551,12 +623,34 @@ def subplots(nrow:int, ncol:int, ax_loc:dict, projs=None, projs_kws=None, figsiz
     return fig, ax
 
 def add_annotation(ax, fs=20, loc_x=-0.15, loc_y=1.03, start=0, style=None):
-    if type(ax) is dict:
-        ax = ax.values()
-    else:
-        ax = [ax]
+    ''' Label axes with (a), (b), ... in order
 
-    if type(fs) is not list:
+    Args:
+        ax: a single axes, a dict of axes (as returned by :func:`subplots`), or any
+            list/tuple/array of axes -- including the 2-D array `plt.subplots` returns
+        fs (float or list): font size, per-axes if a list
+        loc_x, loc_y (float): label position in axes coordinates
+        start (int): index into the alphabet to start from
+        style (str): None for a bare letter, `')'` for `a)`, `'()'` for `(a)`
+    '''
+    if isinstance(ax, dict):
+        axes = list(ax.values())
+    elif hasattr(ax, 'text'):
+        axes = [ax]                       # a single Axes
+    else:
+        # a list/tuple/ndarray, possibly 2-D as from plt.subplots(nrow, ncol).
+        # Previously anything that was not a dict was wrapped as `[ax]`, so passing a
+        # list gave a list-of-lists and failed with "'list' object has no attribute
+        # 'text'" -- i.e. the most natural input was the one that did not work.
+        axes = []
+        for item in ax:
+            if hasattr(item, 'text'):
+                axes.append(item)
+            else:
+                axes.extend(item)         # flatten one nested level
+
+    ax = axes
+    if not isinstance(fs, list):
         fs = [fs] * len(ax)
 
     for i, v in enumerate(ax):

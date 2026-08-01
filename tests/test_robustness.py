@@ -241,7 +241,9 @@ def test_fetch_wgt_file_downloads_into_cache(monkeypatch, tmp_path):
     def fake_download(url, fname, **k):
         calls['url'], calls['fname'] = url, fname
         os.makedirs(os.path.dirname(fname), exist_ok=True)
-        open(fname, 'wb').write(b'x')
+        # must be real gzip: `fetch_wgt_file` rejects anything else, so that GitHub's
+        # 200-plus-HTML answer to a missing /raw/ path cannot end up cached
+        open(fname, 'wb').write(gzip.compress(b'x'))
 
     monkeypatch.setattr(utils, 'download', fake_download)
     out = utils.fetch_wgt_file('map_new.nc.gz', verbose=False)

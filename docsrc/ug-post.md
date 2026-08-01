@@ -1,10 +1,7 @@
-# CESM Postprocessing
+---
+title: CESM Postprocessing
+---
 
 This section illustrates the postprocessing of CESM output using `x4c`.
 
-:::{toctree}
-:maxdepth: 1
-
-notebooks/post-gen_ts
-notebooks/post-pbs
-:::
+- [History files to timeseries](notebooks/post-gen_ts.ipynb) — splitting and merging with `ncks`/`ncrcat` via `History.gen_ts()`

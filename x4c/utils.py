@@ -2,6 +2,8 @@ import os
 import glob
 import re
 import itertools
+import hashlib
+import tarfile
 import numpy as np
 import xarray as xr
 import colorama as ca
@@ -262,6 +264,30 @@ def drop_grid_attrs(obj):
             var.attrs = {k: v for k, v in var.attrs.items() if k not in GRID_ATTRS}
 
     return out
+
+def copy_grid_attrs(dst, src):
+    ''' Copy the x4c grid attrs from `src` onto `dst`, in place
+
+    Needed after arithmetic between two DataArrays. Even with
+    ``xr.set_options(keep_attrs=True)``, a binary operation keeps only the attrs
+    that are *identical* in both operands: plain strings like ``comp`` and ``units``
+    survive, but ``gw``/``lat``/``lon``/``dz`` are `DataArray`s, compare as
+    conflicting, and get dropped. A derived variable built as ``a + b`` therefore
+    loses its area weight, and the next ``.x.gm`` fails with ``KeyError: 'gw'``.
+
+    Args:
+        dst (`xarray.DataArray`): the result of the arithmetic
+        src (`xarray.DataArray` or `xarray.Dataset`): an operand to take the grid
+            metadata from
+
+    Returns:
+        `xarray.DataArray`: `dst`, for chaining
+    '''
+    for k in GRID_ATTRS:
+        if k in src.attrs and k not in dst.attrs:
+            dst.attrs[k] = src.attrs[k]
+    return dst
+
 
 def coslat_weight(ds, lat_name='lat', lon_name='lon'):
     ''' The cos(lat) area weight for a regular lat/lon grid
@@ -751,8 +777,12 @@ def datetime_truncate(dt: datetime.datetime, precision: str = 'day') -> datetime
     else:
         raise ValueError(f"Unsupported precision '{precision}'. Choose from 'year', 'month', 'day', 'hour'.")
 
+#: repository holding x4c's downloadable data: the regrid weights live in its tree,
+#: the sample datasets are attached to its Releases
+DATA_REPO = 'fzhu2e/x4c-data'
+
 #: base URL for the on-demand regrid weight / SCRIP files
-WGTS_URL = 'https://github.com/fzhu2e/x4c-regrid-wgts/raw/main/data'
+WGTS_URL = f'https://github.com/{DATA_REPO}/raw/main/regrid_wgts'
 
 
 def cache_dir():
@@ -800,8 +830,188 @@ def fetch_wgt_file(fname, verbose=True):
     url = f'{WGTS_URL}/{fname}'
     if verbose: p_header(f'Downloading the weight file from: {url}')
     download(url, cached)
+    _require_gzip(cached, url)
     if verbose: p_success(f'>>> cached at: {cached}')
     return cached
+
+
+def _require_gzip(path, url):
+    ''' Delete and complain if `path` is not gzip, as everything x4c downloads is
+
+    `download` raises on an HTTP error status, which is not enough: GitHub answers a
+    *missing* path under ``/raw/`` with **200 and an HTML page**, so a wrong or
+    not-yet-pushed URL would otherwise leave that page in the cache under a
+    ``.nc.gz`` name, and the failure would surface much later as an unintelligible
+    error from inside `xr.open_dataset`.
+    '''
+    with open(path, 'rb') as f:
+        magic = f.read(2)
+    if magic != b'\x1f\x8b':
+        head = open(path, 'rb').read(200)
+        os.remove(path)
+        raise RuntimeError(
+            f'{url} did not return a gzip file (it starts with {head[:40]!r}). '
+            'A GitHub HTML page usually means the URL is wrong or the file has not '
+            'been pushed yet. The download was removed rather than cached.'
+        )
+
+
+#: the sample CESM data the tutorial notebooks run against, keyed by the short case
+#: name passed to :func:`fetch_sample_data`. Each is published as a Release asset on
+#: :data:`DATA_REPO` rather than committed -- half a gigabyte of netCDF has no business
+#: in a git history, and a Release asset does not weigh on `git clone`. One entry per
+#: case, versioned by its own tag, so a second one can be added without touching the
+#: fetching code:
+#:
+#: - ``dataset``: its directory in the data repository, reused for the cache
+#: - ``case``: the case directory the archive extracts to
+#: - ``tag``: the Release tag carrying the asset
+#: - ``archive``: the asset filename
+#: - ``sha256``: expected checksum of the asset, or `None` to skip verification
+SAMPLE_DATA = {
+    'cesm1': {
+        'dataset': 'cesm1_sample_data',
+        'case': 'b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005',
+        'tag': 'cesm1_sample_data-v1',
+        'archive': 'cesm1_sample_data-v1.tar.gz',
+        'sha256': '93a087a7bce6ac121d1fd79408fbcbfe13bdba551b904b11e134db0fa76a455f',
+    },
+}
+
+#: the case :func:`fetch_sample_data` returns when none is given
+DEFAULT_SAMPLE_CASE = 'cesm1'
+
+
+def sample_data_info(case=DEFAULT_SAMPLE_CASE):
+    ''' The :data:`SAMPLE_DATA` entry for `case`, with a listing on a bad key '''
+    try:
+        return SAMPLE_DATA[case]
+    except KeyError:
+        raise KeyError(
+            f'Unknown sample case {case!r}. Available: '
+            f'{", ".join(sorted(SAMPLE_DATA))}.'
+        ) from None
+
+
+def sample_data_url(case=DEFAULT_SAMPLE_CASE):
+    ''' The Release-asset download URL of the sample data for `case` '''
+    info = sample_data_info(case)
+    return (
+        f'https://github.com/{DATA_REPO}/releases/download/'
+        f'{info["tag"]}/{info["archive"]}'
+    )
+
+
+def fetch_sample_data(case=DEFAULT_SAMPLE_CASE, url=None, sha256=None,
+                      verbose=True, force=False):
+    ''' Return a local path to a tutorial sample case, downloading it if needed
+
+    The tutorial notebooks run against a reduced copy of a real CESM case. It lives in
+    the cache directory (see :func:`cache_dir`), not in the repository.
+
+    Resolution order:
+
+    1. ``$X4C_SAMPLE_DIR``, if set and it contains the case -- use this to point at a
+       copy you already have, e.g. on a shared filesystem.
+    2. the cache directory, if the case is already extracted there
+    3. otherwise download the archive and extract it
+
+    Args:
+        case (str): which sample case to fetch; a key of :data:`SAMPLE_DATA`
+        url (str): override the download location. Defaults to
+            :func:`sample_data_url`, or ``$X4C_SAMPLE_URL`` if that is set.
+        sha256 (str): expected checksum of the archive. Defaults to the case's
+            registered checksum; `None` skips verification.
+        verbose (bool): report what is being used or fetched
+        force (bool): re-download even if the case is already present
+
+    Returns:
+        str: path to the case directory, ready to hand to :class:`x4c.Timeseries`
+
+    Examples:
+        >>> import x4c
+        >>> case_dir = x4c.fetch_sample_data(case='cesm1')
+    '''
+    info = sample_data_info(case)
+    casename = info['case']
+    archive_name = info['archive']
+
+    # 1. an explicit local copy
+    env_dir = os.environ.get('X4C_SAMPLE_DIR')
+    if env_dir and not force:
+        candidate = env_dir if os.path.basename(env_dir.rstrip('/')) == casename \
+            else os.path.join(env_dir, casename)
+        if os.path.isdir(candidate):
+            if verbose: p_hint(f'>>> using the sample case from $X4C_SAMPLE_DIR: {candidate}')
+            return candidate
+        raise FileNotFoundError(
+            f'$X4C_SAMPLE_DIR is set to {env_dir!r} but no `{casename}` was found '
+            'there. Unset it to download the sample instead.'
+        )
+
+    # 2. already extracted in the cache, laid out as in the data repository
+    dest = os.path.join(cache_dir(), 'sample_data', info['dataset'])
+    case_dir = os.path.join(dest, casename)
+    if os.path.isdir(case_dir) and not force:
+        if verbose: p_hint(f'>>> using the cached sample case: {case_dir}')
+        return case_dir
+
+    # 3. download and extract
+    url = url or os.environ.get('X4C_SAMPLE_URL') or sample_data_url(case)
+    sha256 = sha256 if sha256 is not None else info['sha256']
+
+    os.makedirs(dest, exist_ok=True)
+    archive = os.path.join(dest, archive_name)
+
+    if not os.path.exists(archive) or force:
+        if verbose: p_header(f'>>> Downloading the sample case ({url})')
+        try:
+            download(url, archive)
+        except requests.HTTPError as e:
+            raise RuntimeError(
+                f'Could not download the sample case from {url} ({e}).\n'
+                'If the Release asset has not been published yet, point x4c at a local '
+                f'copy instead:\n    export X4C_SAMPLE_DIR=/path/containing/{casename}\n'
+                'or pass an explicit `url=`.'
+            ) from e
+        _require_gzip(archive, url)
+
+    if sha256:
+        actual = _sha256(archive)
+        if actual != sha256:
+            os.remove(archive)
+            raise ValueError(
+                f'Checksum mismatch for {archive_name}: expected {sha256}, got '
+                f'{actual}. The download was removed; retry, or pass sha256=None to '
+                'skip verification.'
+            )
+        if verbose: p_success(f'>>> checksum verified ({sha256[:16]}...)')
+
+    if verbose: p_header(f'>>> Extracting into {dest}')
+    with tarfile.open(archive, 'r:gz') as tf:
+        # refuse absolute paths and `..` escapes rather than trusting the archive
+        for m in tf.getmembers():
+            if m.name.startswith('/') or '..' in m.name.split('/'):
+                raise ValueError(f'Refusing unsafe path in archive: {m.name!r}')
+        tf.extractall(dest)
+
+    if not os.path.isdir(case_dir):
+        raise RuntimeError(
+            f'{archive_name} did not contain a `{casename}` directory.'
+        )
+
+    os.remove(archive)   # the extracted tree is what matters; drop the tarball
+    if verbose: p_success(f'>>> sample case ready: {case_dir}')
+    return case_dir
+
+
+def _sha256(path, chunk_size=1 << 20):
+    ''' SHA-256 of a file, read in chunks so a multi-hundred-MB archive is fine '''
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for block in iter(lambda: f.read(chunk_size), b''):
+            h.update(block)
+    return h.hexdigest()
 
 
 def download(url: str, fname: str, chunk_size=1024, show_bar=True, timeout=60):
