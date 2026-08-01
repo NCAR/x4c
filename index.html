@@ -1,551 +1,121 @@
+<!DOCTYPE html><html lang="en" class="" style="scroll-padding:60px"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>x4c: Xarray for CESM - x4c</title><meta property="og:title" content="x4c: Xarray for CESM - x4c"/><meta name="generator" content="mystmd"/><meta name="description" content="Xarray for CESM: postprocessing, analysis, and visualization of CESM output."/><meta property="og:description" content="Xarray for CESM: postprocessing, analysis, and visualization of CESM output."/><meta name="keywords" content="xarray, CESM, climate, visualization, NCAR"/><meta name="image" content="/x4c/build/hero-sst-djf-a99e21c5043b6770fb1818007d68e95e.png"/><meta property="og:image" content="/x4c/build/hero-sst-djf-a99e21c5043b6770fb1818007d68e95e.png"/><link rel="stylesheet" href="/x4c/build/_assets/app-TIOB6ZNY.css"/><link rel="stylesheet" href="/x4c/build/_assets/thebe-core-VKVHG5VY.css"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jupyter-matplotlib@0.11.3/css/mpl_widget.css"/><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous"/><link rel="icon" href="/x4c/favicon.ico"/><link rel="stylesheet" href="/x4c/myst-theme.css"/><script>
+  const savedTheme = localStorage.getItem("myst:theme");
+  const theme = window.matchMedia("(prefers-color-scheme: light)").matches ? 'light' : 'dark';
+  const classes = document.documentElement.classList;
+  const hasAnyTheme = classes.contains('light') || classes.contains('dark');
+  if (!hasAnyTheme) classes.add(savedTheme ?? theme);
+</script><script>(function(){var p=window.location.pathname;if(p.endsWith('/index.html'))window.location.replace((p.slice(0,-10)||'/')+window.location.search+window.location.hash);})();</script></head><body class="m-0 bg-white dark:bg-stone-900"><div class="myst-skip-to-article fixed top-1 left-1 h-[0px] w-[0px] focus-within:z-40 focus-within:h-auto focus-within:w-auto bg-white overflow-hidden focus-within:p-2 focus-within:ring-1" aria-label="skip to content options"><a href="#skip-to-frontmatter" class="myst-skip-to-link block px-2 py-1 text-black underline">Skip to article frontmatter</a><a href="#skip-to-article" class="myst-skip-to-link block px-2 py-1 text-black underline">Skip to article content</a></div><dialog id="myst-no-css" style="position:fixed;left:0px;top:0px;width:100%;height:100vh;font-size:4rem;padding:1rem;color:black;background:white"><strong>Site not loading correctly?</strong><p>This may be due to an incorrect <code>BASE_URL</code> configuration. See<!-- --> <a href="https://mystmd.org/guide/deployment#deploy-base-url">the MyST Documentation</a> <!-- -->for reference.</p><script>
+    (() => {
+            // Test for has-styling variable set by the MyST stylesheet
+            const node = document.currentScript.parentNode;
+            const hasCSS = window.getComputedStyle(node).getPropertyValue("--has-styling");
+            if (hasCSS === ""){
+                    node.showModal();
+            }
 
-<!DOCTYPE html>
+    })()
+</script></dialog><div class="myst-top-nav bg-white/80 backdrop-blur dark:bg-stone-900/80 shadow dark:shadow-stone-700 p-3 md:px-8 sticky w-full top-0 z-30 min-h-[60px]"><nav class="myst-top-nav-bar flex items-center justify-between flex-nowrap max-w-[1440px] mx-auto"><div class="flex flex-row xl:min-w-[19.5rem] mr-2 sm:mr-7 justify-start items-center shrink-0"><div class="block xl:hidden"><button class="myst-top-nav-menu-button flex items-center justify-center border-stone-400 text-stone-800 hover:text-stone-900 dark:text-stone-200 hover:dark:text-stone-100 w-10 h-10"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" width="1.5rem" height="1.5rem"><path fill-rule="evenodd" d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75ZM3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12Zm0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd"></path></svg><span class="sr-only">Open Menu</span></button></div><a class="myst-home-link flex items-center ml-3 dark:text-white w-fit md:ml-5 xl:ml-7" href="/x4c/"><div class="myst-home-link-logo mr-3 flex items-center"><img src="/x4c/build/x4c-logo-780ed7d865c85e52340fe464fa82b5c0.png" class="h-9 dark:hidden" alt="x4c" height="2.25rem"/><img src="/x4c/build/x4c-logo-780ed7d865c85e52340fe464fa82b5c0.png" class="hidden h-9 dark:block" alt="x4c" height="2.25rem"/></div><span class="text-md sm:text-xl tracking-tight sm:mr-5">x4c</span></a></div><div class="flex items-center flex-grow w-auto"><div class="flex-grow hidden text-md lg:block"></div><div class="flex-grow block"></div><button type="button" aria-haspopup="dialog" aria-expanded="false" data-state="closed" class="myst-search-bar flex items-center h-10 aspect-square sm:w-64 text-left text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 myst-search-bar-disabled hover:ring-blue-500 dark:hover:ring-blue-500 hover:border-blue-500 dark:hover:border-blue-500"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="p-2.5 h-10 w-10 aspect-square"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd"></path></svg><span class="myst-search-text-placeholder hidden sm:block grow">Search</span><div aria-hidden="true" class="myst-search-shortcut items-center hidden mx-1 font-mono text-sm text-gray-600 dark:text-gray-300 sm:flex gap-x-1"><kbd class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:shadow-none hide-mac">CTRL</kbd><kbd class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:shadow-none show-mac">⌘</kbd><kbd class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:shadow-none ">K</kbd><script>
+;(() => {
+const script = document.currentScript;
+const root = script.parentElement;
 
+const isMac = /mac/i.test(
+      window.navigator.userAgentData?.platform ?? window.navigator.userAgent,
+    );
+root.querySelectorAll(".hide-mac").forEach(node => {node.classList.add(isMac ? "hidden" : "block")});
+root.querySelectorAll(".show-mac").forEach(node => {node.classList.add(!isMac ? "hidden" : "block")});
+})()</script></div></button><button class="myst-theme-button theme shrink-0 rounded-full border border-stone-700 dark:border-white hover:bg-neutral-100 border-solid overflow-hidden text-stone-700 dark:text-white hover:text-stone-500 dark:hover:text-neutral-800 w-8 h-8 ml-3" title="Toggle theme between light and dark mode" aria-label="Toggle theme between light and dark mode"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="myst-theme-moon-icon h-full w-full p-[18%] hidden dark:block"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clip-rule="evenodd"></path></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="myst-theme-sun-icon h-full w-full p-[18%] dark:hidden"><path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"></path></svg></button><div class="block sm:hidden"></div><div class="hidden sm:block"></div></div></nav></div><div class="myst-primary-sidebar fixed xl:article-grid grid-gap xl:w-full xl:pointer-events-none overflow-auto max-xl:w-[75vw] max-xl:max-w-[350px] max-xl:!top-0 max-xl:h-screen hidden z-10" style="top:60px"><div class="myst-primary-sidebar-pointer pointer-events-auto xl:col-margin-left flex-col overflow-hidden max-xl:h-full hidden xl:flex"><div class="myst-primary-sidebar-nav flex-grow py-6 overflow-y-auto primary-scrollbar"><nav aria-label="Navigation" class="myst-primary-sidebar-topnav overflow-y-hidden transition-opacity lg:hidden ml-3 xl:ml-0 mr-3 max-w-[350px]"><div class="w-full px-1 dark:text-white font-medium"></div></nav><div class="my-3 border-b-2 lg:hidden"></div><nav aria-label="Table of Contents" class="myst-primary-sidebar-toc flex-grow overflow-y-hidden transition-opacity ml-3 xl:ml-0 mr-3 max-w-[350px]"><div class="myst-toc w-full px-1 dark:text-white"><a title="x4c" class="block break-words focus:outline outline-blue-200 outline-2 rounded myst-toc-item p-2 my-1 rounded-lg hover:bg-slate-300/30 font-bold" href="/x4c/">x4c</a><a title="Installation" class="block break-words focus:outline outline-blue-200 outline-2 rounded myst-toc-item p-2 my-1 rounded-lg hover:bg-slate-300/30" href="/x4c/ug-installation">Installation</a><div data-state="closed" class="w-full"><div class="myst-toc-item flex flex-row w-full gap-2 pl-2 my-1 text-left rounded-lg outline-none hover:bg-slate-300/30"><a title="Core Features" class="block break-words focus:outline outline-blue-200 outline-2 rounded py-2 grow" href="/x4c/ug-core">Core Features</a><button class="self-stretch flex items-center flex-none px-1 rounded-l-md group hover:bg-slate-300/30 focus-visible:outline outline-blue-200 outline-2" aria-label="Open Folder" type="button" aria-controls="radix-:R1opsp:" aria-expanded="false" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="transition-transform duration-300 group-data-[state=open]:rotate-90 text-text-slate-700 dark:text-slate-100" height="1.5rem" width="1.5rem"><path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd"></path></svg></button></div><div data-state="closed" id="radix-:R1opsp:" hidden="" class="pl-3 pr-[2px] collapsible-content"></div></div><div data-state="closed" class="w-full"><div class="myst-toc-item flex flex-row w-full gap-2 pl-2 my-1 text-left rounded-lg outline-none hover:bg-slate-300/30"><a title="CESM Postprocessing" class="block break-words focus:outline outline-blue-200 outline-2 rounded py-2 grow" href="/x4c/ug-post">CESM Postprocessing</a><button class="self-stretch flex items-center flex-none px-1 rounded-l-md group hover:bg-slate-300/30 focus-visible:outline outline-blue-200 outline-2" aria-label="Open Folder" type="button" aria-controls="radix-:R28psp:" aria-expanded="false" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="transition-transform duration-300 group-data-[state=open]:rotate-90 text-text-slate-700 dark:text-slate-100" height="1.5rem" width="1.5rem"><path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd"></path></svg></button></div><div data-state="closed" id="radix-:R28psp:" hidden="" class="pl-3 pr-[2px] collapsible-content"></div></div><div data-state="closed" class="w-full"><div class="myst-toc-item flex flex-row w-full gap-2 pl-2 my-1 text-left rounded-lg outline-none hover:bg-slate-300/30"><a title="CESM Diagnostics" class="block break-words focus:outline outline-blue-200 outline-2 rounded py-2 grow" href="/x4c/ug-diags">CESM Diagnostics</a><button class="self-stretch flex items-center flex-none px-1 rounded-l-md group hover:bg-slate-300/30 focus-visible:outline outline-blue-200 outline-2" aria-label="Open Folder" type="button" aria-controls="radix-:R2opsp:" aria-expanded="false" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="transition-transform duration-300 group-data-[state=open]:rotate-90 text-text-slate-700 dark:text-slate-100" height="1.5rem" width="1.5rem"><path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd"></path></svg></button></div><div data-state="closed" id="radix-:R2opsp:" hidden="" class="pl-3 pr-[2px] collapsible-content"></div></div></div></nav></div><div class="myst-primary-sidebar-footer flex-none py-6 transition-all duration-700 translate-y-6 opacity-0 ml-3 xl:ml-0 mr-3 max-w-[350px]"><a class="myst-made-with-myst flex mx-auto text-gray-700 w-fit hover:text-blue-700 dark:text-gray-200 dark:hover:text-blue-400" href="https://mystmd.org/made-with-myst" target="_blank" rel="noreferrer"><svg style="width:24px;height:24px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" stroke="none"><g id="icon"><path fill="currentColor" d="M23.8,54.8v-3.6l4.7-0.8V17.5l-4.7-0.8V13H36l13.4,31.7h0.2l13-31.7h12.6v3.6l-4.7,0.8v32.9l4.7,0.8v3.6h-15
+          v-3.6l4.9-0.8V20.8H65L51.4,53.3h-3.8l-14-32.5h-0.1l0.2,17.4v12.1l5,0.8v3.6H23.8z"></path><path fill="#F37726" d="M47,86.9c0-5.9-3.4-8.8-10.1-8.8h-8.4c-5.2,0-9.4-1.3-12.5-3.8c-3.1-2.5-5.4-6.2-6.8-11l4.8-1.6
+          c1.8,5.6,6.4,8.6,13.8,8.8h9.2c6.4,0,10.8,2.5,13.1,7.5c2.3-5,6.7-7.5,13.1-7.5h8.4c7.8,0,12.7-2.9,14.6-8.7l4.8,1.6
+          c-1.4,4.9-3.6,8.6-6.8,11.1c-3.1,2.5-7.3,3.7-12.4,3.8H63c-6.7,0-10,2.9-10,8.8"></path></g></svg><span class="self-center ml-2 text-sm">Made with MyST</span></a></div></div></div><main class="article-grid grid-gap"><article class="article-grid subgrid-gap col-screen article content"><div class="hidden"></div><div id="skip-to-frontmatter" aria-label="article frontmatter" class="myst-fm-block mb-8 pt-9"><div class="myst-fm-block-header flex items-center mb-5 h-6 text-sm font-light"><div class="flex-grow"></div><div class="myst-fm-block-badges"><a href="https://github.com/NCAR/x4c" title="GitHub Repository: NCAR/x4c" target="_blank" rel="noopener noreferrer" class="myst-fm-github-link text-inherit hover:text-inherit"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="1.25rem" height="1.25rem" class="myst-fm-github-icon inline-block mr-1 opacity-60 hover:opacity-100"><path d="M12 2.5c-5.4 0-9.8 4.4-9.8 9.7 0 4.3 2.8 8 6.7 9.2.5.1.7-.2.7-.5v-1.8c-2.4.5-3.1-.6-3.3-1.1-.1-.3-.6-1.1-1-1.4-.3-.2-.8-.6 0-.6s1.3.7 1.5 1c.9 1.5 2.3 1.1 2.8.8.1-.6.3-1.1.6-1.3-2.2-.2-4.4-1.1-4.4-4.8 0-1.1.4-1.9 1-2.6-.1-.2-.4-1.2.1-2.6 0 0 .8-.3 2.7 1 .8-.2 1.6-.3 2.4-.3.8 0 1.7.1 2.4.3 1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.6.7 1 1.5 1 2.6 0 3.7-2.3 4.6-4.4 4.8.4.3.7.9.7 1.8V21c0 .3.2.6.7.5 3.9-1.3 6.6-4.9 6.6-9.2 0-5.4-4.4-9.8-9.8-9.8z"></path></svg></a></div><a href="https://github.com/NCAR/x4c/edit/main/docsrc/index.md" title="Edit This Page" target="_blank" rel="noopener noreferrer" class="myst-fm-edit-link text-inherit hover:text-inherit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" width="1.25rem" height="1.25rem" class="myst-fm-edit-icon inline-block mr-1 opacity-60 hover:opacity-100"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg></a><div class="myst-fm-downloads-dropdown relative flex inline-block mx-1 grow-0" data-headlessui-state=""><button class="myst-fm-downloads-button relative ml-2 -mr-1" id="headlessui-menu-button-:Rs8ucp:" type="button" aria-haspopup="menu" aria-expanded="false" data-headlessui-state=""><span class="sr-only">Downloads</span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" width="1.25rem" height="1.25rem" class="myst-fm-downloads-icon"><title>Download</title><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg></button></div></div><h1 class="myst-fm-block-title mb-0">x4c: Xarray for CESM</h1></div><div class="block my-10 lg:sticky lg:z-10 lg:h-0 lg:pt-0 lg:my-0 lg:ml-10 lg:col-margin-right" style="top:60px"><nav></nav></div><div id="skip-to-article"></div><div class="x4c-hero"><h2 id="x4c" class="relative group"><span class="heading-text">x4c</span><a class="no-underline text-inherit hover:text-inherit inline-block w-0 px-0 translate-x-[10px] font-normal select-none transition-opacity opacity-0 focus:opacity-100 group-hover:opacity-70" href="#x4c" title="Link to this Section" aria-label="Link to this Section">¶</a></h2><p>An Xarray extension for CESM output. <strong>One line of code, one publication-ready climate map</strong> — plus postprocessing, regridding, and diagnostics that already know what a CESM grid is.</p><div class="x4c-install"><span class="x4c-prompt">$</span> <span class="">pip install x4c</span> copy</div><div class="x4c-cta"><a class="link x4c-btn-primary" href="/x4c/ug-installation">Get started</a> <a target="_blank" rel="noreferrer" href="https://github.com/NCAR/x4c" class="link whitespace-nowrap x4c-btn-ghost"><span class="link-text whitespace-normal">View on GitHub</span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="link-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path></svg></a></div><div class="x4c-hero-shot"><img id="cdXNhxDeIV" style="margin-left:auto;margin-right:auto" src="/x4c/build/hero-sst-djf-a99e21c5043b6770fb1818007d68e95e.png" alt="Global sea surface temperature for December-January-February on a Robinson projection" data-canonical-url="assets/hero-sst-djf.png" class=""/><div class="x4c-hero-code"><code>case.plot(&quot;SST:-12,1,2&quot;)</code></div></div></div><div class="x4c-section"><h3 id="made-with-x-plot" class="relative group"><span class="heading-text">Made with <code>.x.plot()</code></span><a class="no-underline text-inherit hover:text-inherit inline-block w-0 px-0 translate-x-[10px] font-normal select-none transition-opacity opacity-0 focus:opacity-100 group-hover:opacity-70" href="#made-with-x-plot" title="Link to this Section" aria-label="Link to this Section">¶</a></h3><p>Every figure below comes from a notebook in this documentation, and every one is reachable in a line or two. Click any to open the notebook that produced it.</p><div class="x4c-gallery"><div class="relative myst-code group not-prose my-5 text-sm shadow hover:shadow-md dark:shadow-2xl dark:shadow-neutral-900 bg-stone-200/10"><div aria-label="code block content" class="block overflow-auto p-3 myst-code-body hljs"><pre style="background-color:#fff;padding:0;margin:0;background:transparent"><code class="language-text" style="white-space:pre">&lt;a class=&quot;x4c-shot&quot; href=&quot;diags-variables&quot;&gt;
+  &lt;img src=&quot;assets/gallery-isotopes.png&quot; alt=&quot;Four water-isotope maps&quot;&gt;
+  &lt;div class=&quot;x4c-shot-meta&quot;&gt;
+    &lt;div class=&quot;x4c-shot-title&quot;&gt;Water isotopes, annual mean&lt;/div&gt;
+    &lt;div class=&quot;x4c-shot-code&quot;&gt;da.x.regrid(2,2).x.annualize().mean(&#x27;time&#x27;).x.plot(…)&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/a&gt;
 
-<html lang="en" data-content_root="./" data-theme="light">
+&lt;a class=&quot;x4c-shot&quot; href=&quot;core-analysis&quot;&gt;
+  &lt;img src=&quot;assets/gallery-eof.png&quot; alt=&quot;First two EOFs of sea surface height&quot;&gt;
+  &lt;div class=&quot;x4c-shot-meta&quot;&gt;
+    &lt;div class=&quot;x4c-shot-title&quot;&gt;EOFs of sea-surface height&lt;/div&gt;
+    &lt;div class=&quot;x4c-shot-code&quot;&gt;m.x.plot(ax=axd[k], ssv=ssv, cmap=&#x27;RdBu_r&#x27;, …)&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/a&gt;
 
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+&lt;a class=&quot;x4c-shot&quot; href=&quot;diags-variables&quot;&gt;
+  &lt;img src=&quot;assets/gallery-ocean-land.png&quot; alt=&quot;SST, SSS, mixed layer depth and land surface temperature&quot;&gt;
+  &lt;div class=&quot;x4c-shot-meta&quot;&gt;
+    &lt;div class=&quot;x4c-shot-title&quot;&gt;Ocean and land state&lt;/div&gt;
+    &lt;div class=&quot;x4c-shot-code&quot;&gt;ocean[&#x27;SST&#x27;].x.regrid(2,2).mean(&#x27;time&#x27;).x.plot(…)&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/a&gt;
 
-    <title>x4c: Xarray for CESM &#8212; x4c  documentation</title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
-  </script>
-  
-  <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+&lt;a class=&quot;x4c-shot&quot; href=&quot;diags-quickview&quot;&gt;
+  &lt;img src=&quot;assets/gallery-quickview.png&quot; alt=&quot;Multi-panel diagnostics dashboard&quot;&gt;
+  &lt;div class=&quot;x4c-shot-meta&quot;&gt;
+    &lt;div class=&quot;x4c-shot-title&quot;&gt;A whole diagnostics dashboard&lt;/div&gt;
+    &lt;div class=&quot;x4c-shot-code&quot;&gt;case.quickview(timespan=(1, 10))&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/a&gt;
 
-  
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+&lt;a class=&quot;x4c-shot&quot; href=&quot;core-regridding&quot;&gt;
+  &lt;img src=&quot;assets/gallery-regrid.png&quot; alt=&quot;Native spectral element grid beside regridded output&quot;&gt;
+  &lt;div class=&quot;x4c-shot-meta&quot;&gt;
+    &lt;div class=&quot;x4c-shot-title&quot;&gt;Native grid to regular lat/lon&lt;/div&gt;
+    &lt;div class=&quot;x4c-shot-code&quot;&gt;ds.x.da.isel(time=0).x.regrid().x.plot(…)&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/a&gt;
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=db61ab07" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
-    <link rel="stylesheet" type="text/css" href="_static/style.css?v=fca5bd30" />
-  
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+&lt;a class=&quot;x4c-shot&quot; href=&quot;diags-new-vars&quot;&gt;
+  &lt;img src=&quot;assets/gallery-precip.png&quot; alt=&quot;Annual mean precipitation&quot;&gt;
+  &lt;div class=&quot;x4c-shot-meta&quot;&gt;
+    &lt;div class=&quot;x4c-shot-title&quot;&gt;A variable you defined yourself&lt;/div&gt;
+    &lt;div class=&quot;x4c-shot-code&quot;&gt;case.calc(&#x27;PRECT_MM|regrid(2,2):ann&#x27;)&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/a&gt;
 
-    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="_static/copybutton.js?v=f281be69"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="_static/design-tabs.js?v=f930bc37"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
-    <link rel="icon" href="_static/x4c-logo.png"/>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="ug-installation.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+&lt;a class=&quot;x4c-shot&quot; href=&quot;core-visualization&quot;&gt;
+  &lt;img src=&quot;assets/gallery-moc.png&quot; alt=&quot;Global meridional overturning circulation section&quot;&gt;
+  &lt;div class=&quot;x4c-shot-meta&quot;&gt;
+    &lt;div class=&quot;x4c-shot-title&quot;&gt;Vertical sections, same call&lt;/div&gt;
+    &lt;div class=&quot;x4c-shot-code&quot;&gt;moc.x.plot(levels=np.linspace(-20, 20, 21))&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/a&gt;
 
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+&lt;a class=&quot;x4c-shot&quot; href=&quot;core-visualization&quot;&gt;
+  &lt;img src=&quot;assets/gallery-styles.png&quot; alt=&quot;Global mean surface temperature in a journal style&quot;&gt;
+  &lt;div class=&quot;x4c-shot-meta&quot;&gt;
+    &lt;div class=&quot;x4c-shot-title&quot;&gt;Publication styles, built in&lt;/div&gt;
+    &lt;div class=&quot;x4c-shot-code&quot;&gt;x4c.set_style(&#x27;journal&#x27;)&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/a&gt;</code></pre></div><button title="Copy to Clipboard" class="inline-flex items-center opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 active:opacity-100 cursor-pointer ml-2 transition-color duration-200 ease-in-out text-blue-400 hover:text-blue-500 absolute right-1 myst-code-copy-icon top-1" aria-pressed="false" aria-label="Copy code to clipboard"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"></path></svg></button></div></div></div><div class="x4c-section"><h3 id="what-it-does" class="relative group"><span class="heading-text">What it does</span><a class="no-underline text-inherit hover:text-inherit inline-block w-0 px-0 translate-x-[10px] font-normal select-none transition-opacity opacity-0 focus:opacity-100 group-hover:opacity-70" href="#what-it-does" title="Link to this Section" aria-label="Link to this Section">¶</a></h3><div class="x4c-cards"><div class="relative myst-code group not-prose my-5 text-sm shadow hover:shadow-md dark:shadow-2xl dark:shadow-neutral-900 bg-stone-200/10"><div aria-label="code block content" class="block overflow-auto p-3 myst-code-body hljs"><pre style="background-color:#fff;padding:0;margin:0;background:transparent"><code class="language-text" style="white-space:pre">&lt;a class=&quot;x4c-card&quot; href=&quot;ug-core&quot;&gt;
+  &lt;div class=&quot;x4c-card-icon&quot;&gt;◈&lt;/div&gt;
+  &lt;h3&gt;Core features&lt;/h3&gt;
+  &lt;p&gt;The &lt;code&gt;.x&lt;/code&gt; accessor knows where grid-cell areas live, how to find
+  lat/lon on an unstructured grid, and how the vertical coordinate is spaced.&lt;/p&gt;
+&lt;/a&gt;
 
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
-<form class="bd-search d-flex align-items-center"
-      action="search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         id="search-input"
-         placeholder="Search..."
-         aria-label="Search..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+&lt;a class=&quot;x4c-card&quot; href=&quot;ug-post&quot;&gt;
+  &lt;div class=&quot;x4c-card-icon&quot;&gt;⇄&lt;/div&gt;
+  &lt;h3&gt;Postprocessing&lt;/h3&gt;
+  &lt;p&gt;Turn history files into timeseries with &lt;code&gt;History.gen_ts()&lt;/code&gt; —
+  MPI-parallel splitting and merging over NCO.&lt;/p&gt;
+&lt;/a&gt;
 
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
+&lt;a class=&quot;x4c-card&quot; href=&quot;ug-diags&quot;&gt;
+  &lt;div class=&quot;x4c-card-icon&quot;&gt;◍&lt;/div&gt;
+  &lt;h3&gt;Diagnostics&lt;/h3&gt;
+  &lt;p&gt;Index a whole case with &lt;code&gt;Timeseries&lt;/code&gt;, compute derived variables
+  on demand, and compress a processing chain into a single spell string.&lt;/p&gt;
+&lt;/a&gt;</code></pre></div><button title="Copy to Clipboard" class="inline-flex items-center opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 active:opacity-100 cursor-pointer ml-2 transition-color duration-200 ease-in-out text-blue-400 hover:text-blue-500 absolute right-1 myst-code-copy-icon top-1" aria-pressed="false" aria-label="Copy code to clipboard"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"></path></svg></button></div></div></div><h3 id="getting-started" class="relative group"><span class="heading-text">Getting started</span><a class="no-underline text-inherit hover:text-inherit inline-block w-0 px-0 translate-x-[10px] font-normal select-none transition-opacity opacity-0 focus:opacity-100 group-hover:opacity-70" href="#getting-started" title="Link to this Section" aria-label="Link to this Section">¶</a></h3><p><code>x4c</code> installs from PyPI. The regridding and pressure-level features additionally
+need a few conda-only packages — see <a class="link" href="/x4c/ug-installation">Installation</a> for the
+full environment.</p><div class="relative myst-code group not-prose my-5 text-sm shadow hover:shadow-md dark:shadow-2xl dark:shadow-neutral-900 bg-stone-200/10"><div aria-label="code block content" class="block overflow-auto p-3 myst-code-body hljs"><pre style="background-color:#fff;padding:0;margin:0;background:transparent"><code class="language-bash" style="white-space:pre">pip install x4c</code></pre></div><button title="Copy to Clipboard" class="inline-flex items-center opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 active:opacity-100 cursor-pointer ml-2 transition-color duration-200 ease-in-out text-blue-400 hover:text-blue-500 absolute right-1 myst-code-copy-icon top-1" aria-pressed="false" aria-label="Copy code to clipboard"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"></path></svg></button></div><div class="relative myst-code group not-prose my-5 text-sm shadow hover:shadow-md dark:shadow-2xl dark:shadow-neutral-900 bg-stone-200/10"><div aria-label="code block content" class="block overflow-auto p-3 myst-code-body hljs"><pre style="background-color:#fff;padding:0;margin:0;background:transparent"><code class="language-python" style="white-space:pre">import x4c
 
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-    </header>
-  
+ds = x4c.load_dataset(&#x27;b.e13.TS.nc&#x27;)
+ds.x.da.isel(time=0).x.plot(title=&#x27;Surface temperature, month 1&#x27;)</code></pre></div><button title="Copy to Clipboard" class="inline-flex items-center opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 active:opacity-100 cursor-pointer ml-2 transition-color duration-200 ease-in-out text-blue-400 hover:text-blue-500 absolute right-1 myst-code-copy-icon top-1" aria-pressed="false" aria-label="Copy code to clipboard"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"></path></svg></button></div><div class="myst-backmatter-parts"></div><div class="myst-footer-links flex pt-10 mb-10 space-x-4"><a class="myst-footer-link flex-1 block p-4 font-normal text-gray-600 no-underline border border-gray-200 rounded shadow-sm group hover:border-blue-600 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 dark:text-gray-100 dark:border-gray-500 hover:shadow-lg dark:shadow-neutral-700 myst-footer-link-next" aria-label="Next: Installation" href="/x4c/ug-installation"><div class="flex h-full align-middle"><div class="flex-grow"><div class="myst-footer-link-group text-xs text-gray-500 dark:text-gray-400">x4c</div>Installation</div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" width="1.5rem" height="1.5rem" class="myst-footer-link-icon self-center transition-transform group-hover:translate-x-1 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></div></a></div></article></main><script>((a,l)=>{if(!window.history.state||!window.history.state.key){let u=Math.random().toString(32).slice(2);window.history.replaceState({key:u},"")}try{let d=JSON.parse(sessionStorage.getItem(a)||"{}")[l||window.history.state.key];typeof d=="number"&&window.scrollTo(0,d)}catch(u){console.error(u),sessionStorage.removeItem(a)}})("positions", null)</script><link rel="modulepreload" href="/x4c/build/entry.client-PCJPW7TK.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-AQ2CODAG.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-JJXTQVMA.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-OZE3FFNP.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-RUUCG5OS.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-C4DFGG5C.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-J7TUH54J.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-FZ2S7OYD.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-JEM6JXYA.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-34XIY2DH.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-KQM5FBHR.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-OCWQY3HK.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-7HNKBP4B.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-CUKUDK3R.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-3EBOCCHJ.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-O4VQNZ62.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-4OEDG4JQ.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-GUCIBHGO.js"/><link rel="modulepreload" href="/x4c/build/root-3VHQT63W.js"/><link rel="modulepreload" href="/x4c/build/_shared/chunk-SHVDI3JB.js"/><link rel="modulepreload" href="/x4c/build/routes/$-O2KOSX5W.js"/><script>window.__remixContext = {"url":"/index","state":{"loaderData":{"root":{"config":{"version":3,"myst":"1.10.1","options":{"outline_maxdepth":3,"favicon":"/x4c/build/x4c-logo-780ed7d865c85e52340fe464fa82b5c0.png","logo":"/x4c/build/x4c-logo-780ed7d865c85e52340fe464fa82b5c0.png","logo_dark":"/x4c/build/x4c-logo-780ed7d865c85e52340fe464fa82b5c0.png","logo_text":"x4c","style":"/x4c/build/style-5087f881a25afb860e7bde932e6461a2.css"},"nav":[],"actions":[],"projects":[{"title":"x4c","description":"Xarray for CESM: postprocessing, analysis, and visualization of CESM output.","github":"https://github.com/NCAR/x4c","keywords":["xarray","CESM","climate","visualization","NCAR"],"id":"a362796d-3ef7-40b1-8a13-7f9b8dd95630","static_files":["assets"],"toc":[{"file":"index.md"},{"file":"ug-installation.md","title":"Installation"},{"children":[{"file":"notebooks/core-overview.ipynb"},{"file":"notebooks/core-annualization.ipynb"},{"file":"notebooks/core-geo_mean.ipynb"},{"file":"notebooks/core-regridding.ipynb"},{"file":"notebooks/core-visualization.ipynb"},{"file":"notebooks/core-analysis.ipynb"}],"file":"ug-core.md","title":"Core Features"},{"children":[{"file":"notebooks/post-gen_ts.ipynb"}],"file":"ug-post.md","title":"CESM Postprocessing"},{"children":[{"file":"notebooks/diags-overview.ipynb"},{"file":"notebooks/diags-load_variables.ipynb"},{"file":"notebooks/diags-variables.ipynb"},{"file":"notebooks/diags-spell.ipynb"},{"file":"notebooks/diags-new_vars.ipynb"},{"file":"notebooks/diags-quickview.ipynb"},{"file":"notebooks/diags-logs.ipynb"}],"file":"ug-diags.md","title":"CESM Diagnostics"}],"thumbnail":"/x4c/build/hero-sst-djf-a99e21c5043b6770fb1818007d68e95e.png","exports":[],"bibliography":[],"index":"index","pages":[{"slug":"ug-installation","title":"Installation","short_title":"Installation","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"ug-core","title":"Core Features","short_title":"Core Features","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"core-overview","title":"Overview","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-annualization","title":"Annualization and seasonalization","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-geo-mean","title":"Spatial means and climate indices","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-regridding","title":"Regridding","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-visualization","title":"Visualization","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-analysis","title":"Analysis: EOFs, site extraction, saving","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"ug-post","title":"CESM Postprocessing","short_title":"CESM Postprocessing","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"post-gen-ts","title":"Postprocessing: history files to timeseries","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"ug-diags","title":"CESM Diagnostics","short_title":"CESM Diagnostics","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"diags-overview","title":"The Timeseries case object","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-load-variables","title":"Loading variables","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-variables","title":"The derived-variable registry","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-spell","title":"The spell mini-language","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-new-vars","title":"Adding a derived variable","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-quickview","title":"quickview: a diagnostics dashboard in one call","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-logs","title":"Reading CESM logs","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2}]}]},"CONTENT_CDN_PORT":"3100","MODE":"static","BASE_URL":"/x4c"},"routes/$":{"config":{"version":3,"myst":"1.10.1","options":{"outline_maxdepth":3,"favicon":"/x4c/build/x4c-logo-780ed7d865c85e52340fe464fa82b5c0.png","logo":"/x4c/build/x4c-logo-780ed7d865c85e52340fe464fa82b5c0.png","logo_dark":"/x4c/build/x4c-logo-780ed7d865c85e52340fe464fa82b5c0.png","logo_text":"x4c","style":"/x4c/build/style-5087f881a25afb860e7bde932e6461a2.css"},"nav":[],"actions":[],"projects":[{"title":"x4c","description":"Xarray for CESM: postprocessing, analysis, and visualization of CESM output.","github":"https://github.com/NCAR/x4c","keywords":["xarray","CESM","climate","visualization","NCAR"],"id":"a362796d-3ef7-40b1-8a13-7f9b8dd95630","static_files":["assets"],"toc":[{"file":"index.md"},{"file":"ug-installation.md","title":"Installation"},{"children":[{"file":"notebooks/core-overview.ipynb"},{"file":"notebooks/core-annualization.ipynb"},{"file":"notebooks/core-geo_mean.ipynb"},{"file":"notebooks/core-regridding.ipynb"},{"file":"notebooks/core-visualization.ipynb"},{"file":"notebooks/core-analysis.ipynb"}],"file":"ug-core.md","title":"Core Features"},{"children":[{"file":"notebooks/post-gen_ts.ipynb"}],"file":"ug-post.md","title":"CESM Postprocessing"},{"children":[{"file":"notebooks/diags-overview.ipynb"},{"file":"notebooks/diags-load_variables.ipynb"},{"file":"notebooks/diags-variables.ipynb"},{"file":"notebooks/diags-spell.ipynb"},{"file":"notebooks/diags-new_vars.ipynb"},{"file":"notebooks/diags-quickview.ipynb"},{"file":"notebooks/diags-logs.ipynb"}],"file":"ug-diags.md","title":"CESM Diagnostics"}],"thumbnail":"/x4c/build/hero-sst-djf-a99e21c5043b6770fb1818007d68e95e.png","exports":[],"bibliography":[],"index":"index","pages":[{"slug":"ug-installation","title":"Installation","short_title":"Installation","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"ug-core","title":"Core Features","short_title":"Core Features","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"core-overview","title":"Overview","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-annualization","title":"Annualization and seasonalization","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-geo-mean","title":"Spatial means and climate indices","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-regridding","title":"Regridding","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-visualization","title":"Visualization","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-analysis","title":"Analysis: EOFs, site extraction, saving","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"ug-post","title":"CESM Postprocessing","short_title":"CESM Postprocessing","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"post-gen-ts","title":"Postprocessing: history files to timeseries","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"ug-diags","title":"CESM Diagnostics","short_title":"CESM Diagnostics","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"diags-overview","title":"The Timeseries case object","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-load-variables","title":"Loading variables","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-variables","title":"The derived-variable registry","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-spell","title":"The spell mini-language","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-new-vars","title":"Adding a derived variable","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-quickview","title":"quickview: a diagnostics dashboard in one call","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-logs","title":"Reading CESM logs","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2}]}]},"page":{"version":3,"kind":"Article","sha256":"32690da671d9ccfec5b50aec398ed1dff2fa0806af5b380e5f6777bd34cf32a8","slug":"index","location":"/index.md","dependencies":[],"frontmatter":{"title":"x4c: Xarray for CESM","github":"https://github.com/NCAR/x4c","keywords":["xarray","CESM","climate","visualization","NCAR"],"source_url":"https://github.com/NCAR/x4c/blob/main/docsrc/index.md","edit_url":"https://github.com/NCAR/x4c/edit/main/docsrc/index.md","thumbnail":"/x4c/build/hero-sst-djf-a99e21c5043b6770fb1818007d68e95e.png","exports":[{"format":"md","filename":"index.md","url":"/x4c/build/index-696057a892e95b1a0ecad5cca3213a79.md"}]},"mdast":{"type":"root","children":[{"type":"block","children":[{"type":"div","class":"x4c-hero","children":[{"type":"heading","depth":2,"children":[{"type":"text","value":"x4c","key":"REpib2omWR"}],"identifier":"x4c","label":"x4c","html_id":"x4c","implicit":true,"key":"ZUJcWKsdP2"},{"type":"paragraph","children":[{"type":"text","value":"An Xarray extension for CESM output. ","key":"qQMh8MwXM9"},{"type":"strong","children":[{"type":"text","value":"One line of code, one publication-ready climate map","key":"t0CciyCSrp"}],"key":"FlCdhgvES4"},{"type":"text","value":" — plus postprocessing, regridding, and diagnostics that already know what a CESM grid is.","key":"eooYbhczAN"}],"key":"FfRdQ7igPc"},{"type":"div","class":"x4c-install","children":[{"type":"span","class":"x4c-prompt","children":[{"type":"text","value":"$","key":"sxWHJln1ar"}],"key":"dOkOmB2g7u"},{"type":"text","value":" ","key":"H8pmTzB97K"},{"type":"span","children":[{"type":"text","value":"pip install x4c","key":"lCUWnhGDMS"}],"key":"DkNCkuisq3"},{"type":"text","value":" copy","key":"uiRdb6Sj9G"}],"key":"GL0bAlbplA"},{"type":"div","class":"x4c-cta","children":[{"type":"link","class":"x4c-btn-primary","url":"/ug-installation","children":[{"type":"text","value":"Get started","key":"HKJbh3M3mn"}],"urlSource":"ug-installation","dataUrl":"/ug-installation.json","internal":true,"protocol":"file","key":"dn5bk4KnKA"},{"type":"text","value":" ","key":"Ru204A22Va"},{"type":"link","class":"x4c-btn-ghost","url":"https://github.com/NCAR/x4c","children":[{"type":"text","value":"View on GitHub","key":"UXMdPKjGv2"}],"urlSource":"https://github.com/NCAR/x4c","error":true,"key":"IrZgmMGsb1"}],"key":"bEmMzInWCF"},{"type":"div","class":"x4c-hero-shot","children":[{"type":"image","url":"/x4c/build/hero-sst-djf-a99e21c5043b6770fb1818007d68e95e.png","alt":"Global sea surface temperature for December-January-February on a Robinson projection","key":"cdXNhxDeIV","urlSource":"assets/hero-sst-djf.png"},{"type":"div","class":"x4c-hero-code","children":[{"type":"inlineCode","value":"case.plot(\"SST:-12,1,2\")","key":"Zx3E1iwo7I"}],"key":"zjAsGRPxzO"}],"key":"Hyspbii5n6"}],"key":"tMCoGjvJtm"},{"type":"div","class":"x4c-section","children":[{"type":"heading","depth":3,"children":[{"type":"text","value":"Made with ","key":"TXY97VH9tY"},{"type":"inlineCode","value":".x.plot()","key":"kRijWq8eHp"}],"identifier":"made-with-x-plot","label":"Made with .x.plot()","html_id":"made-with-x-plot","implicit":true,"key":"Oqx9olBlQQ"},{"type":"paragraph","children":[{"type":"text","value":"Every figure below comes from a notebook in this documentation, and every one is reachable in a line or two. Click any to open the notebook that produced it.","key":"oEmMeqUXtX"}],"key":"LYXuIbjCmc"},{"type":"div","class":"x4c-gallery","children":[{"type":"code","lang":null,"meta":null,"value":"\u003ca class=\"x4c-shot\" href=\"diags-variables\"\u003e\n  \u003cimg src=\"assets/gallery-isotopes.png\" alt=\"Four water-isotope maps\"\u003e\n  \u003cdiv class=\"x4c-shot-meta\"\u003e\n    \u003cdiv class=\"x4c-shot-title\"\u003eWater isotopes, annual mean\u003c/div\u003e\n    \u003cdiv class=\"x4c-shot-code\"\u003eda.x.regrid(2,2).x.annualize().mean('time').x.plot(…)\u003c/div\u003e\n  \u003c/div\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-shot\" href=\"core-analysis\"\u003e\n  \u003cimg src=\"assets/gallery-eof.png\" alt=\"First two EOFs of sea surface height\"\u003e\n  \u003cdiv class=\"x4c-shot-meta\"\u003e\n    \u003cdiv class=\"x4c-shot-title\"\u003eEOFs of sea-surface height\u003c/div\u003e\n    \u003cdiv class=\"x4c-shot-code\"\u003em.x.plot(ax=axd[k], ssv=ssv, cmap='RdBu_r', …)\u003c/div\u003e\n  \u003c/div\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-shot\" href=\"diags-variables\"\u003e\n  \u003cimg src=\"assets/gallery-ocean-land.png\" alt=\"SST, SSS, mixed layer depth and land surface temperature\"\u003e\n  \u003cdiv class=\"x4c-shot-meta\"\u003e\n    \u003cdiv class=\"x4c-shot-title\"\u003eOcean and land state\u003c/div\u003e\n    \u003cdiv class=\"x4c-shot-code\"\u003eocean['SST'].x.regrid(2,2).mean('time').x.plot(…)\u003c/div\u003e\n  \u003c/div\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-shot\" href=\"diags-quickview\"\u003e\n  \u003cimg src=\"assets/gallery-quickview.png\" alt=\"Multi-panel diagnostics dashboard\"\u003e\n  \u003cdiv class=\"x4c-shot-meta\"\u003e\n    \u003cdiv class=\"x4c-shot-title\"\u003eA whole diagnostics dashboard\u003c/div\u003e\n    \u003cdiv class=\"x4c-shot-code\"\u003ecase.quickview(timespan=(1, 10))\u003c/div\u003e\n  \u003c/div\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-shot\" href=\"core-regridding\"\u003e\n  \u003cimg src=\"assets/gallery-regrid.png\" alt=\"Native spectral element grid beside regridded output\"\u003e\n  \u003cdiv class=\"x4c-shot-meta\"\u003e\n    \u003cdiv class=\"x4c-shot-title\"\u003eNative grid to regular lat/lon\u003c/div\u003e\n    \u003cdiv class=\"x4c-shot-code\"\u003eds.x.da.isel(time=0).x.regrid().x.plot(…)\u003c/div\u003e\n  \u003c/div\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-shot\" href=\"diags-new-vars\"\u003e\n  \u003cimg src=\"assets/gallery-precip.png\" alt=\"Annual mean precipitation\"\u003e\n  \u003cdiv class=\"x4c-shot-meta\"\u003e\n    \u003cdiv class=\"x4c-shot-title\"\u003eA variable you defined yourself\u003c/div\u003e\n    \u003cdiv class=\"x4c-shot-code\"\u003ecase.calc('PRECT_MM|regrid(2,2):ann')\u003c/div\u003e\n  \u003c/div\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-shot\" href=\"core-visualization\"\u003e\n  \u003cimg src=\"assets/gallery-moc.png\" alt=\"Global meridional overturning circulation section\"\u003e\n  \u003cdiv class=\"x4c-shot-meta\"\u003e\n    \u003cdiv class=\"x4c-shot-title\"\u003eVertical sections, same call\u003c/div\u003e\n    \u003cdiv class=\"x4c-shot-code\"\u003emoc.x.plot(levels=np.linspace(-20, 20, 21))\u003c/div\u003e\n  \u003c/div\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-shot\" href=\"core-visualization\"\u003e\n  \u003cimg src=\"assets/gallery-styles.png\" alt=\"Global mean surface temperature in a journal style\"\u003e\n  \u003cdiv class=\"x4c-shot-meta\"\u003e\n    \u003cdiv class=\"x4c-shot-title\"\u003ePublication styles, built in\u003c/div\u003e\n    \u003cdiv class=\"x4c-shot-code\"\u003ex4c.set_style('journal')\u003c/div\u003e\n  \u003c/div\u003e\n\u003c/a\u003e","key":"TRVhzhpYdj"}],"key":"p354HB9XVh"}],"key":"Mtai1r5jdv"},{"type":"div","class":"x4c-section","children":[{"type":"heading","depth":3,"children":[{"type":"text","value":"What it does","key":"HDpharihbf"}],"identifier":"what-it-does","label":"What it does","html_id":"what-it-does","implicit":true,"key":"lVpNo2iGKP"},{"type":"div","class":"x4c-cards","children":[{"type":"code","lang":null,"meta":null,"value":"\u003ca class=\"x4c-card\" href=\"ug-core\"\u003e\n  \u003cdiv class=\"x4c-card-icon\"\u003e◈\u003c/div\u003e\n  \u003ch3\u003eCore features\u003c/h3\u003e\n  \u003cp\u003eThe \u003ccode\u003e.x\u003c/code\u003e accessor knows where grid-cell areas live, how to find\n  lat/lon on an unstructured grid, and how the vertical coordinate is spaced.\u003c/p\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-card\" href=\"ug-post\"\u003e\n  \u003cdiv class=\"x4c-card-icon\"\u003e⇄\u003c/div\u003e\n  \u003ch3\u003ePostprocessing\u003c/h3\u003e\n  \u003cp\u003eTurn history files into timeseries with \u003ccode\u003eHistory.gen_ts()\u003c/code\u003e —\n  MPI-parallel splitting and merging over NCO.\u003c/p\u003e\n\u003c/a\u003e\n\n\u003ca class=\"x4c-card\" href=\"ug-diags\"\u003e\n  \u003cdiv class=\"x4c-card-icon\"\u003e◍\u003c/div\u003e\n  \u003ch3\u003eDiagnostics\u003c/h3\u003e\n  \u003cp\u003eIndex a whole case with \u003ccode\u003eTimeseries\u003c/code\u003e, compute derived variables\n  on demand, and compress a processing chain into a single spell string.\u003c/p\u003e\n\u003c/a\u003e","key":"p7cTG8FYEM"}],"key":"apkOjshaes"}],"key":"jSszBTG3W9"},{"type":"heading","depth":3,"position":{"start":{"line":141,"column":1},"end":{"line":141,"column":1}},"children":[{"type":"text","value":"Getting started","position":{"start":{"line":141,"column":1},"end":{"line":141,"column":1}},"key":"b9mNoxDtwI"}],"identifier":"getting-started","label":"Getting started","html_id":"getting-started","implicit":true,"key":"sTkHG1uhLZ"},{"type":"paragraph","position":{"start":{"line":143,"column":1},"end":{"line":145,"column":1}},"children":[{"type":"inlineCode","value":"x4c","position":{"start":{"line":143,"column":1},"end":{"line":143,"column":1}},"key":"cNH0RtHvRV"},{"type":"text","value":" installs from PyPI. The regridding and pressure-level features additionally\nneed a few conda-only packages — see ","position":{"start":{"line":143,"column":1},"end":{"line":143,"column":1}},"key":"uLOvX6sx73"},{"type":"link","url":"/ug-installation","position":{"start":{"line":143,"column":1},"end":{"line":143,"column":1}},"children":[{"type":"text","value":"Installation","position":{"start":{"line":143,"column":1},"end":{"line":143,"column":1}},"key":"n6rrprGiBb"}],"urlSource":"ug-installation.md","dataUrl":"/ug-installation.json","internal":true,"protocol":"file","key":"C4NCmx9pcR"},{"type":"text","value":" for the\nfull environment.","position":{"start":{"line":143,"column":1},"end":{"line":143,"column":1}},"key":"ivzHL2sHqx"}],"key":"hMBjpguGId"},{"type":"code","lang":"bash","value":"pip install x4c","position":{"start":{"line":147,"column":1},"end":{"line":149,"column":1}},"key":"sNiRS5j1w1"},{"type":"code","lang":"python","value":"import x4c\n\nds = x4c.load_dataset('b.e13.TS.nc')\nds.x.da.isel(time=0).x.plot(title='Surface temperature, month 1')","position":{"start":{"line":151,"column":1},"end":{"line":156,"column":1}},"key":"KSbiBV1s4j"}],"key":"VcprWcVA9O"}],"key":"Ke7f0olpTK"},"references":{"cite":{"order":[],"data":{}}},"footer":{"navigation":{"next":{"title":"Installation","short_title":"Installation","url":"/ug-installation","group":"x4c"}}},"domain":"http://localhost:3000"},"project":{"title":"x4c","description":"Xarray for CESM: postprocessing, analysis, and visualization of CESM output.","github":"https://github.com/NCAR/x4c","keywords":["xarray","CESM","climate","visualization","NCAR"],"id":"a362796d-3ef7-40b1-8a13-7f9b8dd95630","static_files":["assets"],"toc":[{"file":"index.md"},{"file":"ug-installation.md","title":"Installation"},{"children":[{"file":"notebooks/core-overview.ipynb"},{"file":"notebooks/core-annualization.ipynb"},{"file":"notebooks/core-geo_mean.ipynb"},{"file":"notebooks/core-regridding.ipynb"},{"file":"notebooks/core-visualization.ipynb"},{"file":"notebooks/core-analysis.ipynb"}],"file":"ug-core.md","title":"Core Features"},{"children":[{"file":"notebooks/post-gen_ts.ipynb"}],"file":"ug-post.md","title":"CESM Postprocessing"},{"children":[{"file":"notebooks/diags-overview.ipynb"},{"file":"notebooks/diags-load_variables.ipynb"},{"file":"notebooks/diags-variables.ipynb"},{"file":"notebooks/diags-spell.ipynb"},{"file":"notebooks/diags-new_vars.ipynb"},{"file":"notebooks/diags-quickview.ipynb"},{"file":"notebooks/diags-logs.ipynb"}],"file":"ug-diags.md","title":"CESM Diagnostics"}],"thumbnail":"/x4c/build/hero-sst-djf-a99e21c5043b6770fb1818007d68e95e.png","exports":[],"bibliography":[],"index":"index","pages":[{"slug":"ug-installation","title":"Installation","short_title":"Installation","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"ug-core","title":"Core Features","short_title":"Core Features","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"core-overview","title":"Overview","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-annualization","title":"Annualization and seasonalization","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-geo-mean","title":"Spatial means and climate indices","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-regridding","title":"Regridding","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-visualization","title":"Visualization","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"core-analysis","title":"Analysis: EOFs, site extraction, saving","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"ug-post","title":"CESM Postprocessing","short_title":"CESM Postprocessing","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"post-gen-ts","title":"Postprocessing: history files to timeseries","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"ug-diags","title":"CESM Diagnostics","short_title":"CESM Diagnostics","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":1},{"slug":"diags-overview","title":"The Timeseries case object","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-load-variables","title":"Loading variables","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-variables","title":"The derived-variable registry","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-spell","title":"The spell mini-language","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-new-vars","title":"Adding a derived variable","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-quickview","title":"quickview: a diagnostics dashboard in one call","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2},{"slug":"diags-logs","title":"Reading CESM logs","description":"","date":"","thumbnail":"","thumbnailOptimized":"","banner":"","bannerOptimized":"","tags":[],"level":2}]}}},"actionData":null,"errors":null},"future":{"unstable_dev":false,"unstable_postcss":false,"unstable_tailwind":false,"v2_errorBoundary":true,"v2_headers":true,"v2_meta":true,"v2_normalizeFormMethod":true,"v2_routeConvention":true}};</script><script type="module" async="">import "/x4c/build/manifest-C732C875.js";
+import * as route0 from "/x4c/build/root-3VHQT63W.js";
+import * as route1 from "/x4c/build/routes/$-O2KOSX5W.js";
+window.__remixRouteModules = {"root":route0,"routes/$":route1};
 
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-        
-      
-      <div class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-    
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-
-  
-    
-  
-
-<a class="navbar-brand logo" href="#">
-  
-  
-  
-  
-  
-    
-    
-    
-    <img src="_static/x4c-logo.png" class="logo__image only-light" alt="x4c  documentation - Home"/>
-    <script>document.write(`<img src="_static/x4c-logo.png" class="logo__image only-dark" alt="x4c  documentation - Home"/>`);</script>
-  
-  
-</a></div>
-        <div class="sidebar-primary-item">
-
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
-        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item navbar-nav active">
-        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="ug-installation.html">Installation</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="ug-core.html">Core Features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/core-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/core-annualization.html">Annualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/core-geo_mean.html">Geospatial Averaging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/core-regridding.html">Regridding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/core-visualization.html">Visualization</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="ug-post.html">CESM Postprocessing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/post-gen_ts.html">Timeseries Generation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/post-pbs.html">PBS Scripts</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="ug-diags.html">CESM Diagnostics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-overview.html">Overview: <code class="docutils literal notranslate"><span class="pre">x4c</span></code> as a CESM Diagnostic System</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-case.html">The <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> case system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-load_variables.html">Loading Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-spell.html">A “spell” system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-new_vars.html">Adding New Diagnostic Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/diags-logs.html">Visualizing Logs</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1"><a class="reference internal" href="ug-api.html">API Reference</a></li>
-</ul>
-
-    </div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-  </div>
-  
-  <div id="rtd-footer-container"></div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-
-<div class="sbt-scroll-pixel-helper"></div>
-
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <span class="fa-solid fa-bars"></span>
-</button></div>
-      
-    </div>
-  
-  
-    <div class="header-article-items__end">
-      
-        <div class="header-article-item">
-
-<div class="article-header-buttons">
-
-
-
-
-
-<div class="dropdown dropdown-source-buttons">
-  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
-    <i class="fab fa-github"></i>
-  </button>
-  <ul class="dropdown-menu">
-      
-      
-      
-      <li><a href="https://github.com/NCAR/x4c" target="_blank"
-   class="btn btn-sm btn-source-repository-button dropdown-item"
-   title="Source repository"
-   data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fab fa-github"></i>
-  </span>
-<span class="btn__text-container">Repository</span>
-</a>
-</li>
-      
-      
-      
-      
-      <li><a href="https://github.com/NCAR/x4c/edit/main/index.md" target="_blank"
-   class="btn btn-sm btn-source-edit-button dropdown-item"
-   title="Suggest edit"
-   data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-pencil-alt"></i>
-  </span>
-<span class="btn__text-container">Suggest edit</span>
-</a>
-</li>
-      
-      
-      
-      
-      <li><a href="https://github.com/NCAR/x4c/issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here." target="_blank"
-   class="btn btn-sm btn-source-issues-button dropdown-item"
-   title="Open an issue"
-   data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-lightbulb"></i>
-  </span>
-<span class="btn__text-container">Open issue</span>
-</a>
-</li>
-      
-  </ul>
-</div>
-
-
-
-
-
-
-<div class="dropdown dropdown-download-buttons">
-  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
-    <i class="fas fa-download"></i>
-  </button>
-  <ul class="dropdown-menu">
-      
-      
-      
-      <li><a href="_sources/index.md" target="_blank"
-   class="btn btn-sm btn-download-source-button dropdown-item"
-   title="Download source file"
-   data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="btn__text-container">.md</span>
-</a>
-</li>
-      
-      
-      
-      
-      <li>
-<button onclick="window.print()"
-  class="btn btn-sm btn-download-pdf-button dropdown-item"
-  title="Print to PDF"
-  data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="btn__text-container">.pdf</span>
-</button>
-</li>
-      
-  </ul>
-</div>
-
-
-
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
-
-
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-
-</div></div>
-      
-    </div>
-  
-</div>
-</div>
-              
-              
-
-<div id="jb-print-docs-body" class="onlyprint">
-    <h1>x4c: Xarray for CESM</h1>
-    <!-- Table of contents -->
-    <div id="print-main-content">
-        <div id="jb-print-toc">
-            
-        </div>
-    </div>
-</div>
-
-              
-                
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
-  <section id="x4c-xarray-for-cesm">
-<h1>x4c: Xarray for CESM<a class="headerlink" href="#x4c-xarray-for-cesm" title="Link to this heading">#</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">x4c</span></code> is an Xarray extension that aims to support efficient and intuitive CESM output postprocessing, analysis, and visualization:</p>
-<ul class="simple">
-<li><p><strong>Postprocessing</strong> features: time series generation, seasonal cycle climatology generation, etc.</p></li>
-<li><p><strong>Analysis</strong> features: regrid, various of mean calculation, annualization/seasonalization, etc.</p></li>
-<li><p><strong>Visualization</strong> features: timeseries plots, zonal mean plots, horizontal and vertical 2D spatial plots, etc.</p></li>
-</ul>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This package is still in its early stage and under active development, and its API could be changed frequently.</p>
-</div>
-<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
-<div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-1 sd-row-cols-md-2 sd-row-cols-lg-2 sd-g-2 sd-g-xs-2 sd-g-sm-2 sd-g-md-2 sd-g-lg-2 docutils">
-<div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
-<img alt="" class="sd-card-img-top" src="_images/installation.png" />
-<div class="sd-card-body custom-body docutils">
-<div class="sd-card-title sd-font-weight-bold custom-title docutils">
-Installation</div>
-<p class="sd-card-text">Installation instructions.</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference internal" href="ug-installation.html"><span class="doc">Installation</span></a></div>
-</div>
-<div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
-<img alt="" class="sd-card-img-top" src="_images/setup.png" />
-<div class="sd-card-body custom-body docutils">
-<div class="sd-card-title sd-font-weight-bold custom-title docutils">
-Core Features</div>
-<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">x4c</span></code> as an Xarray extension.</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference internal" href="ug-core.html"><span class="doc">Core Features</span></a></div>
-</div>
-<div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
-<img alt="" class="sd-card-img-top" src="_images/postprocessing.png" />
-<div class="sd-card-body custom-body docutils">
-<div class="sd-card-title sd-font-weight-bold custom-title docutils">
-CESM Postprocessing</div>
-<p class="sd-card-text">Timeseries generation using the <code class="docutils literal notranslate"><span class="pre">History</span></code> class.</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference internal" href="ug-post.html"><span class="doc">CESM Postprocessing</span></a></div>
-</div>
-<div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
-<img alt="" class="sd-card-img-top" src="_images/diags.png" />
-<div class="sd-card-body custom-body docutils">
-<div class="sd-card-title sd-font-weight-bold custom-title docutils">
-CESM Diagnostics</div>
-<p class="sd-card-text">Diagnostics using the <code class="docutils literal notranslate"><span class="pre">Timeseries</span></code> class and the <code class="docutils literal notranslate"><span class="pre">spell</span></code> magics.</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference internal" href="ug-diags.html"><span class="doc">CESM Diagnostics</span></a></div>
-</div>
-<div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
-<img alt="" class="sd-card-img-top" src="_images/api.png" />
-<div class="sd-card-body custom-body docutils">
-<div class="sd-card-title sd-font-weight-bold custom-title docutils">
-API</div>
-<p class="sd-card-text">The essential API.</p>
-</div>
-<a class="sd-stretched-link sd-hide-link-text reference internal" href="ug-api.html"><span class="doc">API Reference</span></a></div>
-</div>
-</div>
-</div>
-<!-- Commented out:
-:::{grid-item-card} Paleoclimate Applications
-:class-title: custom-title
-:class-body: custom-body
-:img-top: _static/paleo.png
-:link: ug-paleo
-:link-type: doc
-
-Examples on paleoclimate applications.
-:::
--->
-<div class="toctree-wrapper compound">
-</div>
-</section>
-
-
-                </article>
-              
-
-              
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="right-next"
-       href="ug-installation.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
-</div>
-                </footer>
-              
-            </div>
-            
-            
-              
-            
-          </div>
-          <footer class="bd-footer-content">
-            
-<div class="bd-footer-content__inner container">
-  
-  <div class="footer-item">
-    
-<p class="component-author">
-By NSF NCAR (Feng Zhu, Michael Levy, Brian Dobins)
-</p>
-
-  </div>
-  
-  <div class="footer-item">
-    
-
-  <p class="copyright">
-    
-      © Copyright 2026, University Corporation for Atmospheric Research.
-      <br/>
-    
-  </p>
-
-  </div>
-  
-  <div class="footer-item">
-    
-  </div>
-  
-  <div class="footer-item">
-    
-<div class="extra_footer">
-  <em>The National Center for Atmospheric Research is sponsored by the National Science Foundation. Any opinions, findings and conclusions or recommendations expressed in this material do not necessarily reflect the views of the National Science Foundation.</em>
-</div>
-  </div>
-  
-</div>
-          </footer>
-        
-
-      </main>
-    </div>
-  </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
-
-  <footer class="bd-footer">
-  </footer>
-  </body>
-</html>
+import("/x4c/build/entry.client-PCJPW7TK.js");</script></body></html>
