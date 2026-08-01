@@ -40,6 +40,68 @@ html.dark {
 }
 
 /* --------------------------------------------------------------------------
+   Header: bigger logo, standing in for the site title.
+
+   book-theme renders the logo at Tailwind `h-9` (2.25rem) with an inline
+   height attribute, so the override needs !important. The adjacent title span
+   is hidden visually but kept in the accessibility tree -- it is the home
+   link's only label, and unsetting logo_text makes the theme fall back to
+   announcing "Made with MyST".
+   -------------------------------------------------------------------------- */
+.myst-home-link-logo img {
+  height: 3.25rem !important;
+  max-height: none;
+  width: auto;
+}
+
+.myst-home-link > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Site footer (site.parts.footer -> footer.md)
+   -------------------------------------------------------------------------- */
+.myst-site-footer,
+footer .myst-content {
+  font-size: .85rem;
+  line-height: 1.55;
+  color: var(--x4c-muted);
+}
+
+/* --------------------------------------------------------------------------
+   MyST integration.
+
+   MyST rewrites the raw HTML on its way out: it appends its own `link` class to
+   anchors and injects `style="margin-left:auto;margin-right:auto"` plus an id on
+   every <img>. Neutralise those here so the card layouts do not depend on the
+   theme's link and image defaults.
+
+   NOTE for editing index.md: keep raw HTML indented by at most 2 spaces. A blank
+   line ends an HTML block, and any following line indented 4+ spaces becomes an
+   indented CODE block -- which silently rendered the whole gallery as escaped
+   source inside <pre> until it was fixed.
+   -------------------------------------------------------------------------- */
+.x4c-shot.link,
+.x4c-navcard.link {
+  text-decoration: none;
+  color: inherit;
+}
+.x4c-shot img,
+.x4c-navcard img,
+.x4c-hero-shot img {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
    Figure plates.
    Every figure in this corpus is an opaque-white matplotlib PNG. On a dark page
    they glare as bright rectangles, so pin them to white in BOTH themes and give
@@ -229,18 +291,19 @@ html.dark .x4c-shot img {
   aspect-ratio: 16 / 9;
   object-fit: contain;
   display: block;
-  padding: .5rem;
+  /* deeper bottom pad so the figure is not crowded against the dividing rule */
+  padding: .6rem .6rem .9rem;
   margin: 0;
 }
 .x4c-shot-meta {
-  padding: .75rem 1rem .95rem;
+  padding: .9rem 1rem 1rem;
   border-top: 1px solid var(--x4c-border);
 }
 .x4c-shot-title {
   font-weight: 600;
   font-size: .94rem;
   color: var(--x4c-text);
-  margin-bottom: .28rem;
+  margin-bottom: .35rem;
 }
 .x4c-shot-code {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -249,6 +312,82 @@ html.dark .x4c-shot img {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   User-guide nav cards -- recovers the docsrc_bak (sphinx-design) homepage look.
+
+   The original geometry, from docsrc_bak/_static/{style,theme_overrides}.css:
+     .sd-card-img-top  width 15%, absolutely positioned, vertically centred,
+                       padding-left 10px, min-width 50px
+     .custom-title     bold, left aligned
+     .custom-body      left aligned, margin-left max(45px, 15%)
+   i.e. a small icon floating at the left with the text indented past it.
+   Reproduced here 1:1, except the title colour: the original #283618 olive is
+   replaced by the blue accent.
+   ========================================================================== */
+.x4c-navgrid {
+  display: grid;
+  /* the original was `{grid} 1 1 2 2` with `:gutter: 2` */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: .75rem;
+  margin: 1.5rem 0 0;
+}
+
+.x4c-navcard {
+  /* The icon is absolutely positioned, so the text offset must be derived from
+     the icon's own width -- not an independently-written percentage. The original
+     used `width: 15%` against `margin-left: max(45px, 15%)`, which overlapped by
+     ~3px at every card width because the two percentages resolve against
+     different boxes (padding box vs content box). */
+  --x4c-icon-w: max(52px, 15%);
+  --x4c-icon-left: 10px;
+  --x4c-icon-gap: 1rem;
+
+  position: relative;
+  display: block;
+  padding: 1.15rem 1.15rem 1.15rem 0;
+  min-height: 96px;
+  background: var(--x4c-surface);
+  border: 1px solid var(--x4c-border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+.x4c-navcard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--x4c-shadow-lift);
+  border-color: var(--x4c-accent);
+  text-decoration: none;
+}
+
+.x4c-navcard img {
+  width: var(--x4c-icon-w);
+  height: auto;
+  position: absolute;
+  left: var(--x4c-icon-left);
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+/* Both text rows clear the icon by exactly --x4c-icon-gap. */
+.x4c-navcard-title,
+.x4c-navcard-body {
+  text-align: left;
+  margin-left: calc(var(--x4c-icon-left) + var(--x4c-icon-w) + var(--x4c-icon-gap));
+}
+
+.x4c-navcard-title {
+  font-weight: bold;
+  color: var(--x4c-accent);
+  margin-bottom: .3rem;
+}
+
+.x4c-navcard-body {
+  color: var(--x4c-muted);
+  font-size: .92rem;
+  line-height: 1.5;
 }
 
 /* ==========================================================================
