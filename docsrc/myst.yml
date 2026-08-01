@@ -1,0 +1,71 @@
+# Jupyter Book 2 / MyST. See https://mystmd.org/guide/frontmatter
+#
+# Build:    cd docsrc && jupyter-book build --html
+# Preview:  cd docsrc && jupyter-book start
+#
+# The gallery figures referenced by index.md are produced by
+# `python docsrc/scripts/extract_figs.py` -- rerun that after re-executing notebooks.
+version: 1
+
+project:
+  id: a362796d-3ef7-40b1-8a13-7f9b8dd95630
+  title: x4c
+  description: >-
+    Xarray for CESM: postprocessing, analysis, and visualization of CESM output.
+  github: https://github.com/NCAR/x4c
+  keywords: [xarray, CESM, climate, visualization, NCAR]
+
+  # The bundled sample case is 472 MB and gitignored; keep it out of the build.
+  exclude:
+    - notebooks/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005/**
+
+  # MyST only processes images it parses itself, so the gallery <img> tags inside
+  # index.md's raw-HTML block are invisible to its asset pipeline. static_files
+  # copies the folder verbatim to _build/html/assets/.
+  static_files:
+    - assets
+
+  toc:
+    - file: index.md
+
+    - title: Installation
+      file: ug-installation.md
+
+    - title: Core Features
+      file: ug-core.md
+      children:
+        - file: notebooks/core-overview.ipynb
+        - file: notebooks/core-annualization.ipynb
+        - file: notebooks/core-geo_mean.ipynb
+        - file: notebooks/core-regridding.ipynb
+        - file: notebooks/core-visualization.ipynb
+        # orphaned under the old Sphinx toctree -- surfaced here
+        - file: notebooks/core-analysis.ipynb
+
+    - title: CESM Postprocessing
+      file: ug-post.md
+      children:
+        - file: notebooks/post-gen_ts.ipynb
+
+    - title: CESM Diagnostics
+      file: ug-diags.md
+      children:
+        - file: notebooks/diags-overview.ipynb
+        - file: notebooks/diags-load_variables.ipynb
+        # orphaned under the old Sphinx toctree
+        - file: notebooks/diags-variables.ipynb
+        - file: notebooks/diags-spell.ipynb
+        - file: notebooks/diags-new_vars.ipynb
+        # orphaned under the old Sphinx toctree
+        - file: notebooks/diags-quickview.ipynb
+        - file: notebooks/diags-logs.ipynb
+
+site:
+  template: book-theme
+  options:
+    logo: x4c-logo.png
+    logo_dark: x4c-logo.png
+    favicon: x4c-logo.png
+    logo_text: x4c
+    style: ./style.css
+    outline_maxdepth: 3
