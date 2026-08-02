@@ -2,7 +2,7 @@
 title: "x4c: Xarray for CESM"
 ---
 
-`x4c` is an Xarray extension that aims to support efficient and intuitive CESM
+**`x4c`** is an Xarray extension that aims to support efficient and intuitive CESM
 output postprocessing, analysis, and visualization:
 
 + **Postprocessing** features: time series generation, seasonal cycle climatology generation, etc.
@@ -16,28 +16,34 @@ could be changed frequently.
 
 <div class="x4c-navgrid">
 
-  <a class="x4c-navcard" href="ug-installation">
+  <a class="x4c-navcard" href="/ug-installation">
   <img src="assets/installation.png" alt="">
   <div class="x4c-navcard-title">Installation</div>
   <div class="x4c-navcard-body">Installation instructions.</div>
   </a>
 
-  <a class="x4c-navcard" href="ug-core">
+  <a class="x4c-navcard" href="/ug-core">
   <img src="assets/setup.png" alt="">
   <div class="x4c-navcard-title">Core Features</div>
   <div class="x4c-navcard-body"><code>x4c</code> as an Xarray extension.</div>
   </a>
 
-  <a class="x4c-navcard" href="ug-post">
+  <a class="x4c-navcard" href="/ug-post">
   <img src="assets/postprocessing.png" alt="">
   <div class="x4c-navcard-title">CESM Postprocessing</div>
   <div class="x4c-navcard-body">Timeseries generation using the <code>History</code> class.</div>
   </a>
 
-  <a class="x4c-navcard" href="ug-diags">
+  <a class="x4c-navcard" href="/ug-diags">
   <img src="assets/diags.png" alt="">
   <div class="x4c-navcard-title">CESM Diagnostics</div>
   <div class="x4c-navcard-body">Diagnostics using the <code>Timeseries</code> class and the <code>spell</code> magics.</div>
+  </a>
+
+  <a class="x4c-navcard" href="/api">
+  <img src="assets/api.png" alt="">
+  <div class="x4c-navcard-title">API Reference</div>
+  <div class="x4c-navcard-body">The essential API.</div>
   </a>
 
 </div>
@@ -48,7 +54,7 @@ could be changed frequently.
 
   <div class="x4c-gallery">
 
-  <a class="x4c-shot" href="diags-variables">
+  <a class="x4c-shot" href="/diags-variables">
   <img src="assets/gallery-isotopes.png" alt="Four water-isotope maps">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Water isotopes, annual mean</div>
@@ -56,7 +62,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="core-analysis">
+  <a class="x4c-shot" href="/core-analysis">
   <img src="assets/gallery-eof.png" alt="First two EOFs of sea surface height">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">EOFs of sea-surface height</div>
@@ -64,7 +70,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="diags-variables">
+  <a class="x4c-shot" href="/diags-variables">
   <img src="assets/gallery-ocean-land.png" alt="SST, SSS, mixed layer depth and land surface temperature">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Ocean and land state</div>
@@ -72,7 +78,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="diags-quickview">
+  <a class="x4c-shot" href="/diags-quickview">
   <img src="assets/gallery-quickview.png" alt="Multi-panel diagnostics dashboard">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">A whole diagnostics dashboard</div>
@@ -80,7 +86,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="core-regridding">
+  <a class="x4c-shot" href="/core-regridding">
   <img src="assets/gallery-regrid.png" alt="Native spectral element grid beside regridded output">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Native grid to regular lat/lon</div>
@@ -88,7 +94,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="diags-new-vars">
+  <a class="x4c-shot" href="/diags-new-vars">
   <img src="assets/gallery-precip.png" alt="Annual mean precipitation">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">A variable you defined yourself</div>
@@ -96,7 +102,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="core-visualization">
+  <a class="x4c-shot" href="/core-visualization">
   <img src="assets/gallery-moc.png" alt="Global meridional overturning circulation section">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Vertical sections, same call</div>
@@ -104,7 +110,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="core-visualization">
+  <a class="x4c-shot" href="/core-visualization">
   <img src="assets/gallery-styles.png" alt="Global mean surface temperature in a journal style">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Publication styles, built in</div>

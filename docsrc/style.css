@@ -38,30 +38,49 @@ html.dark {
 }
 
 /* --------------------------------------------------------------------------
-   Header: bigger logo, standing in for the site title.
+   Header: the site title as text.
 
-   book-theme renders the logo at Tailwind `h-9` (2.25rem) with an inline
-   height attribute, so the override needs !important. The adjacent title span
-   is hidden visually but kept in the accessibility tree -- it is the home
-   link's only label, and unsetting logo_text makes the theme fall back to
-   announcing "Made with MyST".
+   `logo`/`logo_dark` are unset in myst.yml so no image is rendered here; the
+   logo lives in the sidebar instead. Only the wordmark is styled.
    -------------------------------------------------------------------------- */
-.myst-home-link-logo img {
-  height: 3.25rem !important;
-  max-height: none;
-  width: auto;
+.myst-home-link > span {
+  font-weight: 600;
+  letter-spacing: -.01em;
 }
 
-.myst-home-link > span {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
+/* --------------------------------------------------------------------------
+   Sidebar header: the logo replaces the site-title link.
+
+   The first item in the sidebar table of contents is the root-page link, which
+   the theme labels with the project title. Its text is pushed out of view and
+   the logo drawn behind it at 80% of the sidebar width.
+
+   Two deliberate choices:
+   - `:first-child`, not `a[href="/"]`: on a Pages deploy BASE_URL rewrites that
+     href to "/x4c/", so an href selector would silently stop matching.
+   - a RELATIVE background url: the stylesheet lives at /build/style-*.css, so
+     ../assets/ resolves correctly both locally and under BASE_URL.
+   The logo is 2420x2416 (square), so at 100% width its height equals the
+   container width -- hence padding-bottom: 100%.
+   -------------------------------------------------------------------------- */
+.myst-primary-sidebar-toc .myst-toc > a:first-child {
+  display: block;
+  height: 0;
+  padding: 0 0 100% 0;
+  margin: .25rem 0 1.25rem;
   overflow: hidden;
-  clip-path: inset(50%);
   white-space: nowrap;
-  border: 0;
+  text-indent: -9999px;          /* hides the label, keeps it for screen readers */
+  /* 600px, 256-colour copy of x4c-logo.png: 21K vs 625K, and still 2x the
+     ~300px the sidebar renders it at. Regenerate with scripts/make_web_logo.py. */
+  background-image: url(../assets/x4c-logo-web.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 100% auto;
+  border-radius: 0;
+}
+.myst-primary-sidebar-toc .myst-toc > a:first-child:hover {
+  background-color: transparent;
 }
 
 /* --------------------------------------------------------------------------
@@ -247,12 +266,12 @@ html.dark .x4c-shot img {
 /* ==========================================================================
    Section headings
    ========================================================================== */
-.x4c-section { margin: 3.5rem 0 0; }
+.x4c-section { margin: 5.5rem 0 0; }
 .x4c-section h2 {
   font-size: clamp(1.35rem, 2.6vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -.02em;
-  margin: 0 0 .4rem;
+  margin: 1.5rem 0 .4rem;
 }
 .x4c-section p.x4c-lede {
   color: var(--x4c-muted);

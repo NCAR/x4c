@@ -99,11 +99,20 @@ build_site() {
   python "$DOCSRC/scripts/extract_figs.py" \
     || die "figure extraction failed -- have the notebooks been executed?"
 
+  info "regenerating API reference"
+  python "$DOCSRC/scripts/gen_api_docs.py" \
+    || die "API doc generation failed"
+
   # MyST does not clear stale output between builds, so hashed assets from
-  # previous runs pile up (37 MB after three builds vs 13 MB clean). Removing
-  # only _build/html keeps the 127 MB template cache in _build/templates, so
-  # this costs nothing in download time.
-  rm -rf "$BUILD_DIR"
+  # previous runs pile up (37 MB after three builds vs 13 MB clean).
+  #
+  # _build/site MUST be removed too: it caches the resolved site config, base
+  # URL included. Without this a single `deploy` build permanently poisons every
+  # later `preview` -- assets keep being emitted as /x4c/build/... which 404 on
+  # localhost and show up as broken images.
+  #
+  # _build/templates is deliberately kept: it is the 127 MB downloaded theme.
+  rm -rf "$BUILD_DIR" "$DOCSRC/_build/site"
 
   if [[ -n "$base_url" ]]; then
     info "building with BASE_URL=$base_url"

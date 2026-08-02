@@ -68,6 +68,7 @@ addopts = "-ra --strict-markers"
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::UserWarning",
+    "ignore:Engine 'gmt' loading failed:RuntimeWarning",
 ]
 
 [tool.setuptools.packages.find]

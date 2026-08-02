@@ -30,6 +30,15 @@ case the tutorial notebooks use.
 from importlib.metadata import version
 __version__ = version('x4c')
 
+import warnings
+
+# Xarray discovers all installed backend plugins (lazily, on first open/load call) and
+# emits a RuntimeWarning for any that fail to import -- including engines x4c never
+# uses. The common case is `pygmt`, pulled in as some *other* package's dependency
+# without the underlying GMT C library (`libgmt.so`) installed; x4c has no GMT
+# integration, so that failure is noise rather than a signal of anything broken here.
+warnings.filterwarnings('ignore', message=r"Engine 'gmt' loading failed", category=RuntimeWarning)
+
 from .core import load_dataset, open_dataset, open_mfdataset, XDataset, XDataArray
 from .case import History, Timeseries, Logs
 from .spell import Spell

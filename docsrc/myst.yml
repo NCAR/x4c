@@ -61,6 +61,9 @@ project:
         - file: notebooks/diags-quickview.ipynb
         - file: notebooks/diags-logs.ipynb
 
+    - title: API Reference
+      file: api.md
+
 site:
   template: book-theme
 
@@ -72,13 +75,11 @@ site:
     primary_sidebar_footer: sidebar-footer.md
 
   options:
-    logo: x4c-logo.png
-    logo_dark: x4c-logo.png
-    favicon: x4c-logo.png
-    logo_alt: "x4c: Xarray for CESM"
-    # logo_text is set for accessibility but hidden visually in style.css, so the
-    # header shows the logo alone. Leaving it unset is NOT equivalent: the theme
-    # then falls back to an sr-only "Made with MyST" as the home link's label.
+    # the 600px web copy, not the 625K original -- a favicon does not need 2420px
+    favicon: assets/x4c-logo-web.png
+    # `logo`/`logo_dark` are deliberately UNSET so the header renders logo_text
+    # alone. The logo image still appears in the sidebar, drawn by style.css from
+    # assets/x4c-logo-web.png -- that does not go through this theme option.
     logo_text: "x4c: Xarray for CESM"
     style: ./style.css
     outline_maxdepth: 3
