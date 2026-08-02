@@ -75,7 +75,7 @@ html.dark {
   text-indent: -9999px;          /* hides the label, keeps it for screen readers */
   /* 600px, 256-colour copy of x4c-logo.png: 21K vs 625K, and still 2x the
      ~300px the sidebar renders it at. Regenerate with scripts/make_web_logo.py. */
-  background-image: url(../assets/x4c-logo-web.png);
+  background-image: url(assets/x4c-logo-web.png);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 100% auto;
