@@ -47,6 +47,7 @@ project:
       file: ug-post.md
       children:
         - file: notebooks/post-gen_ts.ipynb
+        - file: notebooks/post-pbs.ipynb
 
     - title: CESM Diagnostics
       file: ug-diags.md

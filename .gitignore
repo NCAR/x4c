@@ -167,3 +167,7 @@ docsrc/notebooks/b.e13.B1850C5.ne16_g16.icesm131_d18O_fixer.Miocene.3xCO2.005/
 
 # Quarto documentation site output (built by `quarto render docsrc`)
 _site/
+
+# x4c.savefig() output from the visualization notebook's example -- illustrates the
+# API, not a docs asset (the figure is embedded inline via showfig instead).
+docsrc/notebooks/figs/

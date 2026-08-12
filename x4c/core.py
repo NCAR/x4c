@@ -146,7 +146,11 @@ class XDataset:
                     ds, xe.util.grid_global(dlon, dlat, cf=True, lon1=360),
                     method=method, periodic=periodic,
                 )
-                ds_rgd = regridder(self.ds, keep_attrs=True)
+                # See utils.ensure_contiguous: xESMF's own internal reshaping over the
+                # horizontal dims of a multi-dim Dataset commonly leaves the input
+                # non-C-contiguous, which apply_weights then has to fix up on every
+                # call ("Input array is not C_CONTIGUOUS. Will affect performance.").
+                ds_rgd = regridder(self.ds.map(utils.ensure_contiguous), keep_attrs=True)
 
             elif comp in ['ocn', 'ice']:
                 # ocn grid
@@ -171,7 +175,8 @@ class XDataset:
                     method=method, periodic=periodic,
                 )
 
-                ds_rgd = regridder(self.ds, keep_attrs=True)
+                # See utils.ensure_contiguous / the FV branch above.
+                ds_rgd = regridder(self.ds.map(utils.ensure_contiguous), keep_attrs=True)
 
             else:
                 raise ValueError(f'grid [{grid}] is not supported; please provide a corresponding `weight_file`.')

@@ -61,6 +61,29 @@ def import_geocat_comp():
         ) from e
     return gc
 
+def ensure_contiguous(da):
+    """Force a DataArray's underlying array to be C-contiguous, dask-aware.
+
+    `.transpose()` (and similar axis-reordering ops) never copy data, so they
+    commonly leave a non-C-contiguous view behind. Non-contiguous views also
+    fall out of curvilinear/unstructured regridding in general (xESMF's own
+    internal reshaping over the horizontal dims of a multi-dim Dataset).
+    Passing that into xESMF's `apply_weights` triggers a "Input array is not
+    C_CONTIGUOUS. Will affect performance." warning/reshape-copy on every
+    call. Fixing it once here (and, for dask arrays, per-block so it stays
+    lazy) is cheaper than paying for it repeatedly inside xESMF.
+    """
+    # A 0-d (scalar) array is trivially contiguous, and `np.ascontiguousarray`
+    # documents "ndim >= 1" -- it silently promotes a scalar's shape () to
+    # (1,), which then fails `da.copy(data=...)` with a shape mismatch.
+    if da.ndim == 0:
+        return da
+
+    import dask.array as dsa
+    if isinstance(da.data, dsa.Array):
+        return da.copy(data=da.data.map_blocks(np.ascontiguousarray))
+    return da.copy(data=np.ascontiguousarray(da.data))
+
 def regrid_cam_se(ds, weight_file):
     """
     Regrid CAM-SE output using an existing ESMF weights file.
@@ -100,6 +123,16 @@ def regrid_cam_se(ds, weight_file):
     # Insert dummy dimension
     vars_with_ncol = [name for name in dataset.variables if 'ncol' in dataset[name].dims]
     updated = dataset[vars_with_ncol].transpose(..., 'ncol').expand_dims('dummy', axis=-2)
+
+    # `.transpose(..., 'ncol')` above reorders axes without copying, which usually
+    # leaves the underlying array non-C-contiguous. xESMF's `apply_weights` then has
+    # to fix that up on every call (warning: "Input array is not C_CONTIGUOUS. Will
+    # affect performance."), and the `warnings.catch_warnings()` block below does
+    # NOT catch it when `updated` is dask-backed -- the reshape/warning actually
+    # fires later, inside a worker task, when the user calls `.compute()`/`.load()`
+    # well outside this function. Force contiguity once here instead, block-wise for
+    # dask arrays so it stays lazy.
+    updated = updated.map(ensure_contiguous)
 
     # construct a regridder
     # use empty variables to tell xesmf the right shape
