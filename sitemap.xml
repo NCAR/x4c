@@ -17,22 +17,61 @@
     <loc>http://localhost:3000/core-annualization</loc>
   </url>
   <url>
+    <loc>http://localhost:3000/core-annualization-seasonal</loc>
+  </url>
+  <url>
     <loc>http://localhost:3000/core-geo-mean</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/core-regridding</loc>
+    <loc>http://localhost:3000/core-regridding-atm</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/core-visualization</loc>
+    <loc>http://localhost:3000/core-regridding-ocean</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/core-analysis</loc>
+    <loc>http://localhost:3000/core-plev</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-visualization-coastlines</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-visualization-projections</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-visualization-contour</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-visualization-regional</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-visualization-vertical</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-visualization-zonal</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-visualization-timeseries</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-visualization-styles</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-analysis-eof</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-analysis-sites</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/core-analysis-saving</loc>
   </url>
   <url>
     <loc>http://localhost:3000/ug-post</loc>
   </url>
   <url>
     <loc>http://localhost:3000/post-gen-ts</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/post-pbs</loc>
   </url>
   <url>
     <loc>http://localhost:3000/ug-diags</loc>
@@ -44,7 +83,16 @@
     <loc>http://localhost:3000/diags-load-variables</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/diags-variables</loc>
+    <loc>http://localhost:3000/diags-variables-overview</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/diags-variables-ocean</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/diags-variables-isotopes</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/diags-variables-indices</loc>
   </url>
   <url>
     <loc>http://localhost:3000/diags-spell</loc>
