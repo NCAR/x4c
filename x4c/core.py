@@ -961,7 +961,8 @@ class XDataArray:
              projection='Robinson', transform='PlateCarree', central_longitude=180, proj_args=None, bad_color='dimgray',
              add_gridlines=False, gridline_labels=True, gridline_style='--', ssv=None, log=False, vmin=None, vmax=None,
              coastline_zorder=99, coastline_width=1, site_markersizes=100, df_sites=None, colname_dict=None, gs='T', ux=False,
-             site_marker_dict=None, site_color_dict=None, count_site_num=False, lgd_kws=None, legend=True, return_im=False, **kws):
+             site_marker_dict=None, site_color_dict=None, count_site_num=False, lgd_kws=None, legend=True, return_im=False,
+             mesh=False, **kws):
         ''' The plotting functionality
 
         Args:
@@ -982,6 +983,11 @@ class XDataArray:
             coastline_width (float): the width of the coastlines
             df_sites (`pandas.DataFrame`): a `pandas.DataFrame` that stores the information of a collection of sites
             colname_dict (dict): a dictionary of column names for `df_sites` in the "key:value" format "assumed name:real name"
+            mesh (bool): if True, render with `pcolormesh`/`tripcolor` (per-cell shading) instead of the
+                default `contourf`/`tricontourf` (smoothed, filled contours). Applies to the regular
+                lat-lon grid, the vertical (2D) plots, the CAM-SE grid (via `tripcolor`, `ux=False` only),
+                and the POP grid. `levels`/`extend`, which are contour-only concepts, are ignored for the
+                unstructured (CAM-SE/POP) `tripcolor` paths since `tripcolor` has no analogous option.
 
         '''
         da = self.da.squeeze()
@@ -1073,13 +1079,21 @@ class XDataArray:
                     norm = BoundaryNorm(boundaries=levels, ncolors=ncolors, extend=extend)
 
                 if ux is False:
-                    # using tricontourf for CAM-SE grid
+                    # using tricontourf (or tripcolor, if mesh=True) for CAM-SE grid
                     __plt_kws = _plt_kws.copy()
                     # pop, not del: `cbar_kwargs` is already gone when the caller
                     # passed add_colorbar=False, and this branch used to KeyError
                     __plt_kws.pop('cbar_kwargs', None)
                     del(__plt_kws['cmap'])
-                    im = ax.tricontourf(da.lon, da.lat, da, cmap=cmap, norm=norm, **__plt_kws)
+                    if mesh:
+                        # `tripcolor` has no `extend`/`levels` concept (those are
+                        # contour-only); drop them rather than let it raise on an
+                        # unexpected keyword
+                        __plt_kws.pop('extend', None)
+                        __plt_kws.pop('levels', None)
+                        im = ax.tripcolor(da.lon, da.lat, da, cmap=cmap, norm=norm, **__plt_kws)
+                    else:
+                        im = ax.tricontourf(da.lon, da.lat, da, cmap=cmap, norm=norm, **__plt_kws)
                 else:
                     # using UXarray for CAM-SE grid
                     try:
@@ -1129,7 +1143,15 @@ class XDataArray:
                 lon_valid = lon_flat[valid_mask]
                 lat_valid = lat_flat[valid_mask]
                 z_valid = z_flat[valid_mask]
-                im = ax.tricontourf(lon_valid, lat_valid, z_valid,  **__plt_kws)
+                if mesh:
+                    # `tripcolor` has no `extend`/`levels` concept (those are
+                    # contour-only); drop them rather than let it raise on an
+                    # unexpected keyword
+                    __plt_kws.pop('extend', None)
+                    __plt_kws.pop('levels', None)
+                    im = ax.tripcolor(lon_valid, lat_valid, z_valid, **__plt_kws)
+                else:
+                    im = ax.tricontourf(lon_valid, lat_valid, z_valid,  **__plt_kws)
 
                 if latlon_range is None: ax.set_global()
                 if add_colorbar:
@@ -1145,7 +1167,10 @@ class XDataArray:
                     da.name = da_original.name
                     da.attrs = da_original.attrs
 
-                im = da.plot.contourf(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
+                if mesh:
+                    im = da.plot.pcolormesh(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
+                else:
+                    im = da.plot.contourf(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
 
             if df_sites is not None:
                 # plot scatter points for sites
@@ -1222,6 +1247,8 @@ class XDataArray:
 
         elif ndim == 2:
             # vertical
+            if mesh and add_clabels:
+                raise ValueError('`add_clabels=True` requires contour lines and is incompatible with `mesh=True`.')
             if figsize is None: figsize = (6, 3)
             if ax is None: fig, ax = plt.subplots(figsize=figsize)
             _plt_kws = {
@@ -1240,7 +1267,10 @@ class XDataArray:
             if not add_colorbar:
                 _plt_kws.pop('cbar_kwargs', None)
 
-            im = da.plot.contourf(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
+            if mesh:
+                im = da.plot.pcolormesh(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
+            else:
+                im = da.plot.contourf(ax=ax, add_colorbar=add_colorbar, **_plt_kws)
             if add_clabels:
                 clabel_kwargs = {} if clabel_kwargs is None else clabel_kwargs
                 _clabel_kwargs = {

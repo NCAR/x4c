@@ -37,11 +37,22 @@ project:
       children:
         - file: notebooks/core-overview.ipynb
         - file: notebooks/core-annualization.ipynb
+        - file: notebooks/core-annualization-seasonal.ipynb
         - file: notebooks/core-geo_mean.ipynb
-        - file: notebooks/core-regridding.ipynb
-        - file: notebooks/core-visualization.ipynb
-        # orphaned under the old Sphinx toctree -- surfaced here
-        - file: notebooks/core-analysis.ipynb
+        - file: notebooks/core-regridding-atm.ipynb
+        - file: notebooks/core-regridding-ocean.ipynb
+        - file: notebooks/core-plev.ipynb
+        - file: notebooks/core-visualization-coastlines.ipynb
+        - file: notebooks/core-visualization-projections.ipynb
+        - file: notebooks/core-visualization-contour.ipynb
+        - file: notebooks/core-visualization-regional.ipynb
+        - file: notebooks/core-visualization-vertical.ipynb
+        - file: notebooks/core-visualization-zonal.ipynb
+        - file: notebooks/core-visualization-timeseries.ipynb
+        - file: notebooks/core-visualization-styles.ipynb
+        - file: notebooks/core-analysis-eof.ipynb
+        - file: notebooks/core-analysis-sites.ipynb
+        - file: notebooks/core-analysis-saving.ipynb
 
     - title: CESM Postprocessing
       file: ug-post.md
@@ -54,11 +65,12 @@ project:
       children:
         - file: notebooks/diags-overview.ipynb
         - file: notebooks/diags-load_variables.ipynb
-        # orphaned under the old Sphinx toctree
-        - file: notebooks/diags-variables.ipynb
+        - file: notebooks/diags-variables-overview.ipynb
+        - file: notebooks/diags-variables-ocean.ipynb
+        - file: notebooks/diags-variables-isotopes.ipynb
+        - file: notebooks/diags-variables-indices.ipynb
         - file: notebooks/diags-spell.ipynb
         - file: notebooks/diags-new_vars.ipynb
-        # orphaned under the old Sphinx toctree
         - file: notebooks/diags-quickview.ipynb
         - file: notebooks/diags-logs.ipynb
 

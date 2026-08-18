@@ -8,6 +8,8 @@ out to docsrc/assets/.
 
 Figures are addressed by (notebook, index of the figure in document order),
 which is stable across toolchains -- unlike a renderer's own cell numbering.
+Each gallery notebook is also kept small and single-purpose (one feature, one
+figure) precisely so that index rarely has to move.
 
 Run from the repo root:  python docsrc/scripts/extract_figs.py
 """
@@ -26,14 +28,17 @@ ASSETS = DOCSRC / "assets"
 
 # (output name, notebook, figure index in document order)
 FIGURES = [
-    ("gallery-isotopes.png",    "diags-variables",      1),
-    ("gallery-eof.png",         "core-analysis",        0),
-    ("gallery-ocean-land.png",  "diags-variables",      0),
-    ("gallery-quickview.png",   "diags-quickview",      0),
-    ("gallery-regrid.png",      "core-regridding",      0),
-    ("gallery-precip.png",      "diags-new_vars",       0),
-    ("gallery-moc.png",         "core-visualization",   3),
-    ("gallery-styles.png",      "core-visualization",   5),
+    ("gallery-isotopes.png",    "diags-variables-isotopes",     0),
+    ("gallery-eof.png",         "core-analysis-eof",            0),
+    ("gallery-ocean-land.png",  "diags-variables-ocean",        0),
+    ("gallery-quickview.png",   "diags-quickview",               0),
+    ("gallery-regrid.png",      "core-regridding-atm",          0),
+    ("gallery-precip.png",      "diags-new_vars",                0),
+    ("gallery-moc.png",         "core-visualization-vertical",  0),
+    ("gallery-styles.png",      "core-visualization-styles",    0),
+    ("gallery-seasonal.png",    "core-annualization-seasonal",  0),
+    ("gallery-projections.png", "core-visualization-projections", 0),
+    ("gallery-plev.png",        "core-plev",                     0),
 ]
 
 

@@ -54,7 +54,7 @@ could be changed frequently.
 
   <div class="x4c-gallery">
 
-  <a class="x4c-shot" href="/diags-variables">
+  <a class="x4c-shot" href="/diags-variables-isotopes">
   <img src="assets/gallery-isotopes.png" alt="Four water-isotope maps">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Water isotopes, annual mean</div>
@@ -62,7 +62,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="/core-analysis">
+  <a class="x4c-shot" href="/core-analysis-eof">
   <img src="assets/gallery-eof.png" alt="First two EOFs of sea surface height">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">EOFs of sea-surface height</div>
@@ -70,7 +70,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="/diags-variables">
+  <a class="x4c-shot" href="/diags-variables-ocean">
   <img src="assets/gallery-ocean-land.png" alt="SST, SSS, mixed layer depth and land surface temperature">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Ocean and land state</div>
@@ -86,7 +86,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="/core-regridding">
+  <a class="x4c-shot" href="/core-regridding-atm">
   <img src="assets/gallery-regrid.png" alt="Native spectral element grid beside regridded output">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Native grid to regular lat/lon</div>
@@ -102,7 +102,7 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="/core-visualization">
+  <a class="x4c-shot" href="/core-visualization-vertical">
   <img src="assets/gallery-moc.png" alt="Global meridional overturning circulation section">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Vertical sections, same call</div>
@@ -110,11 +110,35 @@ could be changed frequently.
   </div>
   </a>
 
-  <a class="x4c-shot" href="/core-visualization">
+  <a class="x4c-shot" href="/core-visualization-styles">
   <img src="assets/gallery-styles.png" alt="Global mean surface temperature in a journal style">
   <div class="x4c-shot-meta">
   <div class="x4c-shot-title">Publication styles, built in</div>
   <div class="x4c-shot-code">x4c.set_style('journal')</div>
+  </div>
+  </a>
+
+  <a class="x4c-shot" href="/core-annualization-seasonal">
+  <img src="assets/gallery-seasonal.png" alt="DJF and JJA surface temperature maps side by side">
+  <div class="x4c-shot-meta">
+  <div class="x4c-shot-title">Seasonal averaging, DJF included</div>
+  <div class="x4c-shot-code">da.x.annualize(months=[-12, 1, 2])</div>
+  </div>
+  </a>
+
+  <a class="x4c-shot" href="/core-visualization-projections">
+  <img src="assets/gallery-projections.png" alt="The same field in Mollweide, Orthographic and cropped PlateCarree projections">
+  <div class="x4c-shot-meta">
+  <div class="x4c-shot-title">Any Cartopy projection</div>
+  <div class="x4c-shot-code">x4c.subplots(1, 3, projs={...})</div>
+  </div>
+  </a>
+
+  <a class="x4c-shot" href="/core-plev">
+  <img src="assets/gallery-plev.png" alt="500 hPa temperature map interpolated from hybrid model levels">
+  <div class="x4c-shot-meta">
+  <div class="x4c-shot-title">Hybrid levels to pressure levels</div>
+  <div class="x4c-shot-code">ds.x.get_plev(ps, hyam=..., hybm=...)</div>
   </div>
   </a>
 
