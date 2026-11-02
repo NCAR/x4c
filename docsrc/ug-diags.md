@@ -16,3 +16,4 @@ compresses a processing chain into a single string.
 - [Adding a derived variable](notebooks/diags-new_vars.ipynb) — the `@F` decorator
 - [`quickview`: a diagnostics dashboard in one call](notebooks/diags-quickview.ipynb)
 - [Reading CESM logs](notebooks/diags-logs.ipynb) — `x4c.Logs`
+- [Porting to other GCMs: iHadCM3](notebooks/diags-port2hadcm3.ipynb) — `x4c.Timeseries(model=..., vn_dict=...)`

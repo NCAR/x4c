@@ -384,7 +384,7 @@ Calculate the geospatial-weighted (latitude or area) mean over a specified regio
 
 #### • `plot`
 
-`plot(title=None, figsize=None, ax=None, latlon_range=None, add_clabels=False, clevels=None, clabel_kwargs=None, projection='Robinson', transform='PlateCarree', central_longitude=180, proj_args=None, bad_color='dimgray', add_gridlines=False, gridline_labels=True, gridline_style='--', ssv=None, log=False, vmin=None, vmax=None, coastline_zorder=99, coastline_width=1, site_markersizes=100, df_sites=None, colname_dict=None, gs='T', ux=False, site_marker_dict=None, site_color_dict=None, count_site_num=False, lgd_kws=None, legend=True, return_im=False, mesh=False, **kws)`
+`plot(title=None, figsize=None, ax=None, latlon_range=None, add_clabels=False, clevels=None, clabel_kwargs=None, projection='Robinson', transform='PlateCarree', central_longitude=180, proj_args=None, bad_color='dimgray', add_gridlines=False, gridline_labels=True, gridline_labels_fontsize=12, gridline_style='--', gridline_kws=None, ssv=None, log=False, vmin=None, vmax=None, coastline_zorder=99, coastline_width=1, site_markersizes=100, df_sites=None, colname_dict=None, gs='T', ux=False, site_marker_dict=None, site_color_dict=None, count_site_num=False, lgd_kws=None, legend=True, return_im=False, mesh=False, **kws)`
 
 The plotting functionality
 
@@ -411,6 +411,12 @@ The plotting functionality
 - `gridline_labels` (`bool`): if True, the lat/lon ticklabels will appear
 
 - `gridline_style` (`str`): the gridline style, e.g., '-', '--'
+
+- `gridline_kws` (`dict`): extra keyword arguments forwarded to `cartopy`'s `GeoAxes.gridlines()`,
+  e.g., `xlocs`/`ylocs` to place the lines, `xformatter`/`yformatter` to control the
+  ticklabel text, or `color`/`linewidth`/`zorder` to override the styling taken from
+  `matplotlib`'s `grid.*` rcParams. Takes precedence over `gridline_style` and
+  `gridline_labels`.
 
 - `ssv` (``xarray.DataArray``): a sea surface variable used for plotting the coastlines
 
@@ -594,6 +600,39 @@ produced by CESM postprocessing. Provides convenience methods to
 locate paths, load raw or derived diagnostics, compute spells, and
 create plots and seasonal means.
 
+The same class reads other models' output when given a model spec
+(`x4c.models`): a registered `model` name, and/or the spec fields
+`vn_dict`, `path_pattern`, `dim_map`, ... directly. Variables are then loaded
+under their CESM-style names and work with the `.x` accessors unchanged.
+
+Examples:
+
+.. code-block:: python
+
+    # CESM, as before
+    case = x4c.Timeseries('/path/to/cesm/case')
+
+    # a built-in non-CESM spec, optionally extended
+    case = x4c.Timeseries('/path/to/iHadCM3/Data/tfdul', model='hadcm3',
+                          vn_dict={'TSICE': 'temp_mm_srf'})
+    case.load('TS', period='ann')
+
+    # a model with no built-in spec: describe it inline
+    case = x4c.Timeseries(
+        '/path/to/run1',
+        path_pattern='{case}_{vn}_{timespan}.nc',
+        vn_dict={'TREFHT': 'tas', 'PRECT': {'src': 'pr', 'scale': 1e-3, 'units': 'm/s'}},
+        dim_map={'latitude': 'lat', 'longitude': 'lon'},
+    )
+
+#### • `info`
+
+`info()`
+
+Summarize a spec-driven case: raw names per hstr, translated names, spec notes
+
+---
+
 #### • `get_paths`
 
 `get_paths(comp, hstr, vn, timespan=None)`
@@ -622,6 +661,11 @@ Load a variable or derived diagnostic into `self.ds`.
 Automatically detects whether `vn` is a raw timeseries or a
 derived diagnostic and loads or computes it. Results are stored
 in `self.ds[vn]`.
+
+For a spec-driven (non-CESM) case, `vn` may be a `vn_dict` name or a raw source
+name; `hstr` picks the file group when a raw name is in several, and `period`
+selects climatology files ('ann', 'jja', 'climo', or a list); `comp`,
+`timespan` and `load_idx` are ignored.
 
 ---
 

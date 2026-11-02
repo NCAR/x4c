@@ -73,6 +73,7 @@ project:
         - file: notebooks/diags-new_vars.ipynb
         - file: notebooks/diags-quickview.ipynb
         - file: notebooks/diags-logs.ipynb
+        - file: notebooks/diags-port2hadcm3.ipynb
 
     - title: API Reference
       file: api.md
