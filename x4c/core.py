@@ -959,7 +959,8 @@ class XDataArray:
 
     def plot(self, title=None, figsize=None, ax=None, latlon_range=None, add_clabels=False, clevels=None, clabel_kwargs=None,
              projection='Robinson', transform='PlateCarree', central_longitude=180, proj_args=None, bad_color='dimgray',
-             add_gridlines=False, gridline_labels=True, gridline_style='--', ssv=None, log=False, vmin=None, vmax=None,
+             add_gridlines=False, gridline_labels=True, gridline_labels_fontsize=12, gridline_style='--', gridline_kws=None,
+             ssv=None, log=False, vmin=None, vmax=None,
              coastline_zorder=99, coastline_width=1, site_markersizes=100, df_sites=None, colname_dict=None, gs='T', ux=False,
              site_marker_dict=None, site_color_dict=None, count_site_num=False, lgd_kws=None, legend=True, return_im=False,
              mesh=False, **kws):
@@ -977,6 +978,11 @@ class XDataArray:
             add_gridlines (bool): if True, the map will be added with gridlines
             gridline_labels (bool): if True, the lat/lon ticklabels will appear
             gridline_style (str): the gridline style, e.g., '-', '--'
+            gridline_kws (dict): extra keyword arguments forwarded to `cartopy`'s `GeoAxes.gridlines()`,
+                e.g., `xlocs`/`ylocs` to place the lines, `xformatter`/`yformatter` to control the
+                ticklabel text, or `color`/`linewidth`/`zorder` to override the styling taken from
+                `matplotlib`'s `grid.*` rcParams. Takes precedence over `gridline_style` and
+                `gridline_labels`.
             ssv (`xarray.DataArray`): a sea surface variable used for plotting the coastlines
             gs (str): grid style in 'T' or 'U' for the ocean grid
             coastline_zorder (int): the layer order for the coastlines
@@ -1037,9 +1043,15 @@ class XDataArray:
                 ax.set_extent([lon_min, lon_max, lat_min, lat_max], crs=_transform)
 
             if add_gridlines:
-                gl = ax.gridlines(linestyle=gridline_style, draw_labels=gridline_labels)
+                _gl_kws = {'linestyle': gridline_style, 'draw_labels': gridline_labels}
+                # caller-supplied options win, so `gridline_kws` can override the style/labels
+                # defaults and reach options `plot()` has no named argument for (xlocs, xformatter, ...)
+                _gl_kws.update({} if gridline_kws is None else gridline_kws)
+                gl = ax.gridlines(**_gl_kws)
                 gl.top_labels = False
                 gl.right_labels = False
+                gl.xlabel_style = {'size': gridline_labels_fontsize}
+                gl.ylabel_style = {'size': gridline_labels_fontsize}
 
             # add coastlines
             if ssv is not None:

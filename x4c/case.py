@@ -521,8 +521,38 @@ class Timeseries:
     produced by CESM postprocessing. Provides convenience methods to
     locate paths, load raw or derived diagnostics, compute spells, and
     create plots and seasonal means.
+
+    The same class reads other models' output when given a model spec
+    (:mod:`x4c.models`): a registered `model` name, and/or the spec fields
+    `vn_dict`, `path_pattern`, `dim_map`, ... directly. Variables are then loaded
+    under their CESM-style names and work with the `.x` accessors unchanged.
+
+    Examples:
+
+    .. code-block:: python
+
+        # CESM, as before
+        case = x4c.Timeseries('/path/to/cesm/case')
+
+        # a built-in non-CESM spec, optionally extended
+        case = x4c.Timeseries('/path/to/iHadCM3/Data/tfdul', model='hadcm3',
+                              vn_dict={'TSICE': 'temp_mm_srf'})
+        case.load('TS', period='ann')
+
+        # a model with no built-in spec: describe it inline
+        case = x4c.Timeseries(
+            '/path/to/run1',
+            path_pattern='{case}_{vn}_{timespan}.nc',
+            vn_dict={'TREFHT': 'tas', 'PRECT': {'src': 'pr', 'scale': 1e-3, 'units': 'm/s'}},
+            dim_map={'latitude': 'lat', 'longitude': 'lon'},
+        )
     '''
-    def __init__(self, root_dir, grid_dict=None, casename=None, cesm_ver=3):
+    # class-level default, so an instance pickled before spec support existed still
+    # takes the CESM path in `load()` instead of raising AttributeError
+    spec = None
+
+    def __init__(self, root_dir, grid_dict=None, casename=None, cesm_ver=3,
+                 model=None, vn_dict=None, path_pattern=None, dim_map=None, **spec_kws):
         '''Initialize a Timeseries instance and index available files.
 
         Populates `self.paths`, `self.vns`, and basic metadata used by
@@ -533,11 +563,44 @@ class Timeseries:
             grid_dict (dict): optional mapping of component->grid names.
             casename (str): optional case name override.
             cesm_ver (int): CESM version (affects time adjustments).
+            model (str or `x4c.models.ModelSpec`): a non-CESM model spec, e.g. 'hadcm3'
+                (see `x4c.models.list_models()`).
+            vn_dict (dict): CESM-style name -> source variable, as a source name (str), a
+                dict of `x4c.models.Var` fields (`src`, `hstr`, `scale`, `offset`, `units`,
+                `long_name`, `comp`, `isel`), or a `Var`. Merged over the `model`'s own table.
+            path_pattern (str or list): filename template(s) relative to `root_dir`, with
+                fields `{case}`, `{hstr}`, `{period}`, `{vn}`, `{timespan}`; replaces the
+                `model`'s.
+            dim_map (dict): source dim -> x4c dim (`lat`, `lon`, `plev`, `lev`, `time`);
+                merged over the `model`'s.
+            **spec_kws: other `x4c.models.ModelSpec` fields (`fields`, `grid`, `squeeze`,
+                `sort_lat`, `decode_times`, `preprocess`).
+
+        Giving any of `model`, `vn_dict`, `path_pattern`, `dim_map` or `spec_kws`
+        switches from the CESM layout to the spec-driven one.
         '''
-        self.path_pattern='comp/proc/tseries/*/casename.hstr.vn.timespan.nc'
         self.root_dir = os.path.abspath(root_dir)
-        self.casename = os.path.basename(root_dir) if casename is None else casename
+        self.casename = os.path.basename(self.root_dir) if casename is None else casename
         self.cesm_ver = cesm_ver
+        self.ds = {}
+        self.diags = {}
+
+        self.spec = None
+        if spec_kws:
+            # `**spec_kws` must not swallow typos of the CESM arguments (`grid_dic=`)
+            # into a confusing spec-mode error, so only accept real ModelSpec fields
+            import dataclasses
+            from .models import ModelSpec
+            allowed = {f.name for f in dataclasses.fields(ModelSpec)} - {'name', 'path_patterns', 'vars', 'dim_map'}
+            unknown = sorted(set(spec_kws) - allowed)
+            if unknown:
+                raise TypeError(f'Timeseries() got unexpected keyword argument(s) {unknown}; '
+                                f'spec options are {sorted(allowed)}')
+        if any(a is not None for a in (model, vn_dict, path_pattern, dim_map)) or spec_kws:
+            self._init_spec(model, vn_dict=vn_dict, path_pattern=path_pattern, dim_map=dim_map, **spec_kws)
+            return
+
+        self.path_pattern='comp/proc/tseries/*/casename.hstr.vn.timespan.nc'
 
         self.grid_dict = {'atm': 'ne30pg3', 'ocn': 'g16'}
         if grid_dict is not None:
@@ -554,9 +617,6 @@ class Timeseries:
 
         self.paths_all = utils.find_paths(self.root_dir, self.path_pattern)
         self.hstr_all = list(set('.'.join(s.split('.')[:-1]) for s in utils.get_hstr(self.paths_all, casename=self.casename)))
-
-        self.ds = {}
-        self.diags = {}
 
         # one pass, not two: the original walked `paths_all` twice, the first time only
         # to create empty containers. `defaultdict` collapses that.
@@ -585,6 +645,75 @@ class Timeseries:
         for comp in self.vns:
             for hstr in self.vns[comp]:
                 utils.p_success(f'>>> case.vns["{comp}"]["{hstr}"] created')
+
+    def _init_spec(self, model, **spec_kws):
+        ''' Index `root_dir` with a non-CESM model spec (see `x4c.models`) '''
+        from . import models
+        self.spec = models.build_spec(model, **spec_kws)
+        self.reader = models.base.SpecReader(self.root_dir, self.spec, self.casename)
+        self.path_pattern = self.spec.path_patterns
+        self.paths = self.reader.paths
+        self.vns = self.reader.vns
+        self.vn_dict = self.spec.vars
+
+        utils.p_header(f'>>> case.root_dir: {self.root_dir}')
+        utils.p_header(f'>>> case.model: {self.spec.name}')
+        utils.p_header(f'>>> case.path_pattern: {self.path_pattern}')
+        utils.p_header(f'>>> case.casename: {self.casename}')
+        utils.p_success(f'>>> {len(self.reader.index)} files indexed; case.vns[hstr] created for hstr: {self.reader.hstrs}')
+        if self.reader.periods: utils.p_success(f'>>> periods: {self.reader.periods}')
+        for rel in self.reader.skipped:
+            utils.p_warning(f'>>> Skipping file matching no path pattern: {rel}')
+
+    def info(self):
+        ''' Summarize a spec-driven case: raw names per hstr, translated names, spec notes '''
+        if self.spec is None:
+            for comp in self.vns:
+                for hstr, vns in self.vns[comp].items():
+                    print(f'  {comp}/{hstr}: {vns}')
+            return
+        utils.p_header(f'>>> {self.spec.name} case `{self.casename}`')
+        for hstr, vns in self.vns.items():
+            print(f'  hstr `{hstr}`: {vns}')
+        print(f'  names from vn_dict available: {self.reader.translatable}')
+        if self.spec.notes: print(self.spec.notes)
+
+    def _load_spec(self, vn, vtype=None, hstr=None, period=None, verbose=True, reload=False, **kws):
+        ''' `load()` for a spec-driven case
+
+        A name in `vn_dict` or a raw source name wins over a derived diagnostic of the same
+        name: e.g. HadCM3 writes PRECT directly, so `diags`' PRECC+PRECL must not run.
+        '''
+        if vtype is None:
+            if self.reader.has(vn): vtype = 'raw'
+            elif vn in diags.Registry.funcs: vtype = 'derived'
+            else: vtype = 'raw'   # let the reader raise a descriptive error
+
+        if reload: self.clear_ds(vn)
+
+        if vtype == 'derived':
+            if verbose: utils.p_warning(f'>>> {vn} is a supported derived variable.')
+            self.ds[vn] = diags.Registry.funcs[vn](self, hstr=hstr, period=period, verbose=verbose, reload=reload, **kws)
+            self.ds[vn].attrs['vn'] = vn
+        else:
+            if vn in self.ds:
+                same = (self.ds[vn].attrs.get('period') == period
+                        and (hstr is None or self.ds[vn].attrs.get('hstr') == hstr))
+                if same:
+                    if verbose: utils.p_warning(f'>>> case.ds["{vn}"] already loaded; to reload, run case.load("{vn}", ..., reload=True).')
+                    return
+                if verbose: utils.p_warning(f'>>> case.ds["{vn}"] will be reloaded due to a different period/hstr.')
+            self.ds[vn] = self.reader.open(vn, period=period, hstr=hstr)
+            self.ds[vn].attrs['casename'] = self.casename
+        if verbose: utils.p_success(f'>>> case.ds["{vn}"] created')
+
+    def _require_cesm(self, method):
+        if self.spec is not None:
+            raise NotImplementedError(
+                f'`Timeseries.{method}()` relies on the CESM layout and variable set and is not '
+                f'available for a `{self.spec.name}` spec-driven case; use `load()`/`calc()` and '
+                'the `.x` accessors instead.'
+            )
 
     def _parse_ts_path(self, path):
         ''' Pull (comp, hstr, vn) out of a timeseries path
@@ -677,7 +806,17 @@ class Timeseries:
         Automatically detects whether `vn` is a raw timeseries or a
         derived diagnostic and loads or computes it. Results are stored
         in `self.ds[vn]`.
+
+        For a spec-driven (non-CESM) case, `vn` may be a `vn_dict` name or a raw source
+        name; `hstr` picks the file group when a raw name is in several, and `period`
+        selects climatology files ('ann', 'jja', 'climo', or a list); `comp`,
+        `timespan` and `load_idx` are ignored.
         '''
+        if self.spec is not None:
+            if timespan is not None and verbose:
+                utils.p_warning('>>> `timespan` is ignored for a spec-driven case; all matching files are loaded.')
+            return self._load_spec(vn, vtype=vtype, hstr=hstr, verbose=verbose, reload=reload, **kws)
+
         shift_time = True if self.cesm_ver == 1 else False
 
         if vtype is None:
@@ -816,6 +955,7 @@ class Timeseries:
         Detects plot type (map, ts, zm, yz) from the DataArray and
         dispatches to the plotting helpers in `diags`/`visual`.
         '''
+        self._require_cesm('plot')
         if spell not in self.diags:
             utils.p_warning(f'>>> "{spell}" not calculated yet. Calculating now ...')
             self.calc(spell, timespan=timespan)
@@ -901,6 +1041,7 @@ class Timeseries:
         Returns `(fig, ax)` where `ax` is a dict of axes keyed by spell
         keys.
         '''
+        self._require_cesm('quickview')
         spells = {
             'GMST': 'TS:ann:gm',
             'GMRESTOM': 'RESTOM:ann:gm',
@@ -1036,6 +1177,7 @@ class Timeseries:
             slicing (bool): additionally `.sel` the time axis to `timespan`
             regrid (bool): regrid to a regular `dlat` x `dlon` grid
         '''
+        self._require_cesm('get_ts')
         shift_time = True if self.cesm_ver == 1 else False
 
         if comp is None or hstr is None:
@@ -1081,6 +1223,7 @@ class Timeseries:
         Writes files for ANN, DJF, MAM, JJA and SON for the given
         `timespan` and optionally regrids results.
         '''
+        self._require_cesm('save_means')
         if output_dirpath is None: raise ValueError('Please specify `output_dirpath`.')
         if timespan is None: raise ValueError('Please specify `timespan`.')
 

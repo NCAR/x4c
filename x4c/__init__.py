@@ -42,6 +42,7 @@ warnings.filterwarnings('ignore', message=r"Engine 'gmt' loading failed", catego
 from .core import load_dataset, open_dataset, open_mfdataset, XDataset, XDataArray
 from .case import History, Timeseries, Logs
 from .spell import Spell
+from . import models
 
 from . import utils
 from .utils import fetch_sample_data

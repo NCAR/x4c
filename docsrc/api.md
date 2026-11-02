@@ -384,7 +384,7 @@ Calculate the geospatial-weighted (latitude or area) mean over a specified regio
 
 #### • `plot`
 
-`plot(title=None, figsize=None, ax=None, latlon_range=None, add_clabels=False, clevels=None, clabel_kwargs=None, projection='Robinson', transform='PlateCarree', central_longitude=180, proj_args=None, bad_color='dimgray', add_gridlines=False, gridline_labels=True, gridline_style='--', ssv=None, log=False, vmin=None, vmax=None, coastline_zorder=99, coastline_width=1, site_markersizes=100, df_sites=None, colname_dict=None, gs='T', ux=False, site_marker_dict=None, site_color_dict=None, count_site_num=False, lgd_kws=None, legend=True, return_im=False, **kws)`
+`plot(title=None, figsize=None, ax=None, latlon_range=None, add_clabels=False, clevels=None, clabel_kwargs=None, projection='Robinson', transform='PlateCarree', central_longitude=180, proj_args=None, bad_color='dimgray', add_gridlines=False, gridline_labels=True, gridline_style='--', ssv=None, log=False, vmin=None, vmax=None, coastline_zorder=99, coastline_width=1, site_markersizes=100, df_sites=None, colname_dict=None, gs='T', ux=False, site_marker_dict=None, site_color_dict=None, count_site_num=False, lgd_kws=None, legend=True, return_im=False, mesh=False, **kws)`
 
 The plotting functionality
 
@@ -423,6 +423,12 @@ The plotting functionality
 - `df_sites` (``pandas.DataFrame``): a `pandas.DataFrame` that stores the information of a collection of sites
 
 - `colname_dict` (`dict`): a dictionary of column names for `df_sites` in the "key:value" format "assumed name:real name"
+
+- `mesh` (`bool`): if True, render with `pcolormesh`/`tripcolor` (per-cell shading) instead of the
+  default `contourf`/`tricontourf` (smoothed, filled contours). Applies to the regular
+  lat-lon grid, the vertical (2D) plots, the CAM-SE grid (via `tripcolor`, `ux=False` only),
+  and the POP grid. `levels`/`extend`, which are contour-only concepts, are ignored for the
+  unstructured (CAM-SE/POP) `tripcolor` paths since `tripcolor` has no analogous option.
 
 ---
 
